@@ -29,12 +29,6 @@ jobs:
           cp .dockerignore hf-space-sync/.dockerignore
           cp requirements.txt hf-space-sync/requirements.txt
           cp -r backend hf-space-sync/backend
-          rm -f hf-space-sync/backend/.env
-          rm -f hf-space-sync/backend/sessions.db
-          rm -rf hf-space-sync/backend/uploads
-          rm -rf hf-space-sync/backend/output
-          rm -rf hf-space-sync/backend/outputs
-          rm -f hf-space-sync/backend/backend.log
 
       - name: Sync to Hugging Face Space
         env:
@@ -56,6 +50,30 @@ jobs:
               repo_id='koushik444/asa_backend',
               repo_type='space',
               folder_path='hf-space-sync',
+              ignore_patterns=[
+                  'backend/.env',
+                  'backend/sessions.db',
+                  'backend/backend.log',
+                  'backend/__pycache__/**',
+                  'backend/.pytest_cache/**',
+                  'backend/.mypy_cache/**',
+                  'backend/.ruff_cache/**',
+                  'backend/uploads/**',
+                  'backend/output/**',
+                  'backend/outputs/**',
+              ],
+              delete_patterns=[
+                  'backend/.env',
+                  'backend/sessions.db',
+                  'backend/backend.log',
+                  'backend/__pycache__/**',
+                  'backend/.pytest_cache/**',
+                  'backend/.mypy_cache/**',
+                  'backend/.ruff_cache/**',
+                  'backend/uploads/**',
+                  'backend/output/**',
+                  'backend/outputs/**',
+              ],
               commit_message='Sync backend from GitHub Actions',
           )
           PY
