@@ -46,6 +46,12 @@ jobs:
 
           token = os.environ['HF_TOKEN']
           api = HfApi(token=token)
+          api.create_repo(
+              repo_id='koushik444/asa_backend',
+              repo_type='space',
+              space_sdk='docker',
+              exist_ok=True,
+          )
           api.upload_large_folder(
               repo_id='koushik444/asa_backend',
               repo_type='space',
