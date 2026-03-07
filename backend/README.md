@@ -1,66 +1,69 @@
-# 🩺 Acne Clinical Intelligence - API-ONLY GOLD EDITION (V7)
-
-The most advanced, lightweight, and high-precision clinical diagnostic engine for facial acne. This version uses a **Pure Cloud Detection Ensemble** to deliver medical-grade results without requiring large model downloads.
-
+---
+title: Acne Severity Analytics Backend
+emoji: 🩺
+colorFrom: cyan
+colorTo: blue
+sdk: docker
+app_port: 8000
+pinned: false
 ---
 
-## 💎 The Gold Standard Architecture
-- **Detection (100% Remote)**: Calls the Roboflow Cloud API for `acne-ijcab/2` and `acne-detection-v2/1`. Zero YOLO weights are stored locally.
-- **Ensemble (Local Fusion)**: Merges remote detections using the **Weighted Box Fusion (WBF)** algorithm locally to achieve maximum coordinate precision.
-- **Segmentation (Local Hybrid)**: Uses BiSeNet and MediaPipe (locally pre-loaded) for zero-latency anatomical region mapping.
-- **Resolution Intelligence**: Automatically scales ultra-high-res images (up to 4.6M pixels) for the API while maintaining sub-millimeter clinical accuracy.
+# Acne Severity Analytics Backend
 
----
+FastAPI backend for acne lesion detection, face-region mapping, GAGS scoring, longitudinal comparison, and baseline-aware PDF export workflows.
 
-## 🛠 Features
-- **6-Region Clinical Grid**: Forehead, Nose, L-Cheek, R-Cheek, Chin, and U-Zone (Jawline).
-- **Consensus Grading**: Only lesions confirmed by multiple cloud models are marked as "High Confidence."
-- **Skin Health Analytics**: Automatic Erythema Index (Redness) and LPI (Lesion Density) tracking.
-- **Privacy Mode**: Automated medical anonymization (blackout privacy mode) for HIPAA-style data sharing.
+## What It Does
 
----
+- runs Roboflow-based lesion detection
+- maps lesions to facial clinical regions
+- computes GAGS score and severity band
+- stores session history in SQLite
+- supports notes, privacy controls, retention, compare, and export flows
+- renders lesion-box diagnostic overlays for the frontend workstation
 
-## 🚀 Installation & Setup
+## Local Run
 
-1. **Environment**:
 ```bash
-cd E:/acne_v7_api_only_gold_dist
+cd ..
 pip install -r requirements.txt
+cd backend
+python -m uvicorn api_bridge:app --host 0.0.0.0 --port 8000
 ```
 
-2. **Backend (FastAPI)**:
+Required environment variables:
+
+- `ROBOFLOW_API_KEY`
+
+Optional environment variables:
+
+- `MODEL_A_ID`
+- `MODEL_B_ID`
+- `MAX_API_DIM`
+- `DEFAULT_RETENTION_HOURS`
+- `MAX_RETENTION_HOURS`
+
+Start from `.env.example`.
+
+## Docker
+
 ```bash
-python api_bridge.py
+docker build -t acne-severity-backend ..
+docker run --env-file .env -p 8000:8000 acne-severity-backend
 ```
 
-3. **Frontend (3D Dashboard)**:
-```bash
-cd E:/acne_3d_platform
-npm run dev
-```
+## Hugging Face Spaces
 
----
+This backend is prepared for a Docker Space.
 
-## 📖 Usage Guide
+- SDK: `docker`
+- app port: `8000`
+- runtime entrypoint: `uvicorn api_bridge:app --host 0.0.0.0 --port 8000`
 
-### Clinical Diagnostic CLI
-```bash
-python main.py --image "patient.jpg" --visualize --smooth --anonymize
-```
-- **Privacy Mode**: `--anonymize` blacks out eyes and hair.
-- **Consensus Mode**: Automatically fuses Model A and Model B via Cloud API.
+Make sure these files are present in the Space root:
 
-### Batch Medical Audit
-```bash
-python batch_process.py --input "test_images/" --output "clinical_audit"
-```
+- `requirements.txt`
+- `Dockerfile`
+- `.dockerignore`
+- `backend/`
 
----
-
-## 📊 Technical Standards
-- **API Models**: `acne-ijcab v2` (Recall) & `acne-detection-v2 v1` (Precision).
-- **GAGS Scale**: Automated Clinical Grading (None, Mild, Moderate, Severe, Cystic).
-- **LPI**: Standardized Lesion-to-Pixel Index for cross-device reporting.
-
----
-**Secure. Lightweight. Clinically Superior.**
+Set `ROBOFLOW_API_KEY` in the Space secrets before launching.

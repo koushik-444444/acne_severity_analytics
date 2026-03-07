@@ -62,9 +62,9 @@ Tech stack:
 Run locally:
 
 ```bash
-cd backend
 pip install -r requirements.txt
-python api_bridge.py
+cd backend
+python -m uvicorn api_bridge:app --host 0.0.0.0 --port 8000
 ```
 
 Default API URL:
@@ -74,6 +74,21 @@ Required environment variables:
 - `ROBOFLOW_API_KEY`
 
 Use `backend/.env.example` as the starting point.
+
+Deploy with Docker:
+
+```bash
+docker build -t acne-severity-backend .
+docker run --env-file backend/.env -p 8000:8000 acne-severity-backend
+```
+
+## Deployment Notes
+
+- Frontend builds need `VITE_API_BASE_URL` set to your deployed backend URL
+- Backend needs `ROBOFLOW_API_KEY` in its runtime environment
+- Root-level `Dockerfile`, `.dockerignore`, and `requirements.txt` are used for backend container deployment
+- The backend uses local files for uploads, outputs, reports, and SQLite session data, so persistent disk is recommended for production
+- The bundled `backend/weights/79999_iter.pth` file is large enough that some platforms may prefer Git LFS or external artifact storage
 
 ## Workflow
 
