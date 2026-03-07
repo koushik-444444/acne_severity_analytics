@@ -929,6 +929,17 @@ def get_store() -> BridgeStore:
     return app.state.resources['store']
 
 
+@app.get('/')
+async def root() -> Dict[str, Any]:
+    return {
+        'app': 'Acne V7 API Bridge',
+        'status': 'ok',
+        'version': APP_VERSION,
+        'docs': '/docs',
+        'health': '/health',
+    }
+
+
 def get_pipeline() -> Any:
     pipeline = app.state.resources['pipeline']
     if pipeline is None:
