@@ -1,7 +1,7 @@
 ---
 title: Acne Severity Analytics Backend
 emoji: 🩺
-colorFrom: cyan
+colorFrom: blue
 colorTo: blue
 sdk: docker
 app_port: 8000
