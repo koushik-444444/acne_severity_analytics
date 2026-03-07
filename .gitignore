@@ -1,0 +1,33 @@
+# Environment and secrets
+frontend/.env
+backend/.env
+
+# Dependencies and build output
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/coverage/
+
+# Runtime data
+frontend/uploads/
+frontend/outputs/
+frontend/sessions.db
+backend/uploads/
+backend/output/
+backend/outputs/
+backend/sessions.db
+
+# Logs and local artifacts
+*.log
+frontend/*.log
+backend/*.log
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+backend/__pycache__/
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.ruff_cache/
+frontend/.DS_Store
+backend/.DS_Store

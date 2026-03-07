@@ -1,0 +1,7 @@
+{
+  "name": "ClearSkin AI - Acne Severity Analytics",
+  "description": "Advanced acne detection, classification, and treatment analysis powered by AI.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

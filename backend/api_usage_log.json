@@ -1,0 +1,210 @@
+{
+    "total_calls": 41,
+    "history": [
+        {
+            "timestamp": "2026-03-06T22:24:58.774178",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T22:24:58.168944",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T22:11:07.072005",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T22:11:06.856420",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T22:11:06.618161",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T18:56:05.002211",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T18:56:03.940618",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T18:56:03.850301",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:08.674400",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:08.300213",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:08.056177",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:04.206625",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:03.875874",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:37:03.562110",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:59.399547",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:58.874621",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:58.770834",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:54.604896",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:53.481174",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:52.054826",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:48.355527",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:47.879192",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:47.257551",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:42.603941",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:41.808853",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:41.158760",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:37.163421",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:35.915070",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:35.702926",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:31.705164",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:31.568586",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:31.565512",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:26.919453",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:26.466586",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:26.261542",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:22.115062",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:21.620191",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:21.379235",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:17.477359",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:16.583425",
+            "model": "runner-e0dmy/acne-ijcab/2",
+            "status": "success"
+        },
+        {
+            "timestamp": "2026-03-06T08:36:16.288793",
+            "model": "acne-project-2auvb/acne-detection-v2/1",
+            "status": "success"
+        }
+    ]
+}

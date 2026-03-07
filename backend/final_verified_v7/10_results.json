@@ -1,0 +1,677 @@
+{
+    "total_face_pixels": 120450,
+    "regions": {
+        "nose": {
+            "pixel_count": 7949,
+            "area_ratio": 0.06599418845994189,
+            "erythema_index": 11.62
+        },
+        "chin": {
+            "pixel_count": 10063,
+            "area_ratio": 0.0835450394354504,
+            "erythema_index": 11.79
+        },
+        "forehead": {
+            "pixel_count": 43844,
+            "area_ratio": 0.3640016604400166,
+            "erythema_index": 8.36
+        },
+        "left_cheek": {
+            "pixel_count": 21611,
+            "area_ratio": 0.17941884599418845,
+            "erythema_index": 11.15
+        },
+        "right_cheek": {
+            "pixel_count": 17124,
+            "area_ratio": 0.14216687422166874,
+            "erythema_index": 11.17
+        },
+        "jawline_neck": {
+            "pixel_count": 19859,
+            "area_ratio": 0.16487339144873392,
+            "erythema_index": 12.21
+        }
+    },
+    "timing_ms": {
+        "bisenet": 762.1975000001839,
+        "landmarks": 41.808400000263646,
+        "geometry": 21.61519999981465,
+        "combine": 69.39409999995405,
+        "total": 895.0152000002163
+    },
+    "clinical_analysis": {
+        "regions": {
+            "nose": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 7949,
+                "gags_score": 0
+            },
+            "chin": {
+                "count": 6,
+                "lpi": 596.24,
+                "area_px": 10063,
+                "gags_score": 2
+            },
+            "forehead": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 43844,
+                "gags_score": 0
+            },
+            "left_cheek": {
+                "count": 12,
+                "lpi": 555.27,
+                "area_px": 21611,
+                "gags_score": 4
+            },
+            "right_cheek": {
+                "count": 15,
+                "lpi": 875.96,
+                "area_px": 17124,
+                "gags_score": 4
+            },
+            "jawline_neck": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 19859,
+                "gags_score": 0
+            }
+        },
+        "total_lesions": 33,
+        "gags_total_score": 10,
+        "clinical_severity": "Mild",
+        "symmetry_delta": 36.6
+    },
+    "lesions": {
+        "nose": [],
+        "chin": [
+            {
+                "bbox": [
+                    332,
+                    479,
+                    355,
+                    501
+                ],
+                "center": [
+                    343,
+                    490
+                ],
+                "confidence": 0.27607191692699085,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    264,
+                    468,
+                    283,
+                    489
+                ],
+                "center": [
+                    273,
+                    478
+                ],
+                "confidence": 0.2473717927932739,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    332,
+                    478,
+                    354,
+                    500
+                ],
+                "center": [
+                    343,
+                    489
+                ],
+                "confidence": 0.13088172132318668,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    363,
+                    471,
+                    382,
+                    492
+                ],
+                "center": [
+                    372,
+                    481
+                ],
+                "confidence": 0.12577694925394925,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    268,
+                    471,
+                    283,
+                    490
+                ],
+                "center": [
+                    275,
+                    480
+                ],
+                "confidence": 0.11446251381527292,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    242,
+                    448,
+                    260,
+                    466
+                ],
+                "center": [
+                    251,
+                    457
+                ],
+                "confidence": 0.04707094620574604,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            }
+        ],
+        "forehead": [],
+        "left_cheek": [
+            {
+                "bbox": [
+                    406,
+                    378,
+                    429,
+                    396
+                ],
+                "center": [
+                    417,
+                    387
+                ],
+                "confidence": 0.35988555713133374,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    397,
+                    336,
+                    422,
+                    357
+                ],
+                "center": [
+                    409,
+                    346
+                ],
+                "confidence": 0.2697226947004145,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    392,
+                    359,
+                    412,
+                    378
+                ],
+                "center": [
+                    402,
+                    368
+                ],
+                "confidence": 0.23648170449516986,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    367,
+                    368,
+                    388,
+                    389
+                ],
+                "center": [
+                    377,
+                    378
+                ],
+                "confidence": 0.22325206886638294,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    400,
+                    336,
+                    418,
+                    353
+                ],
+                "center": [
+                    409,
+                    344
+                ],
+                "confidence": 0.2203962884166024,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    367,
+                    440,
+                    390,
+                    459
+                ],
+                "center": [
+                    378,
+                    449
+                ],
+                "confidence": 0.20264857194640418,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    383,
+                    402,
+                    402,
+                    420
+                ],
+                "center": [
+                    392,
+                    411
+                ],
+                "confidence": 0.18041417002677915,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    394,
+                    360,
+                    412,
+                    379
+                ],
+                "center": [
+                    403,
+                    369
+                ],
+                "confidence": 0.17801956696943802,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    377,
+                    420,
+                    399,
+                    439
+                ],
+                "center": [
+                    388,
+                    429
+                ],
+                "confidence": 0.17399787902832028,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    369,
+                    459,
+                    390,
+                    478
+                ],
+                "center": [
+                    379,
+                    468
+                ],
+                "confidence": 0.15907437963919205,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    387,
+                    390,
+                    419,
+                    417
+                ],
+                "center": [
+                    403,
+                    403
+                ],
+                "confidence": 0.06750849837606603,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    421,
+                    351,
+                    439,
+                    369
+                ],
+                "center": [
+                    430,
+                    360
+                ],
+                "confidence": 0.055142380297183984,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            }
+        ],
+        "right_cheek": [
+            {
+                "bbox": [
+                    214,
+                    358,
+                    235,
+                    380
+                ],
+                "center": [
+                    224,
+                    369
+                ],
+                "confidence": 0.4268959002061323,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    247,
+                    349,
+                    263,
+                    365
+                ],
+                "center": [
+                    255,
+                    357
+                ],
+                "confidence": 0.3110091902992942,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    212,
+                    359,
+                    231,
+                    377
+                ],
+                "center": [
+                    221,
+                    368
+                ],
+                "confidence": 0.21211389790881763,
+                "class_name": "papules",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    220,
+                    439,
+                    243,
+                    461
+                ],
+                "center": [
+                    231,
+                    450
+                ],
+                "confidence": 0.2012322572144595,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    188,
+                    401,
+                    206,
+                    420
+                ],
+                "center": [
+                    197,
+                    410
+                ],
+                "confidence": 0.184344161640514,
+                "class_name": "dark spot",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    235,
+                    430,
+                    254,
+                    449
+                ],
+                "center": [
+                    244,
+                    439
+                ],
+                "confidence": 0.14595420523123306,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    204,
+                    398,
+                    223,
+                    419
+                ],
+                "center": [
+                    213,
+                    408
+                ],
+                "confidence": 0.1379188217900016,
+                "class_name": "dark spot",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    205,
+                    417,
+                    224,
+                    436
+                ],
+                "center": [
+                    214,
+                    426
+                ],
+                "confidence": 0.12437529184601523,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    221,
+                    346,
+                    238,
+                    363
+                ],
+                "center": [
+                    229,
+                    354
+                ],
+                "confidence": 0.11863100257786836,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    190,
+                    400,
+                    210,
+                    422
+                ],
+                "center": [
+                    200,
+                    411
+                ],
+                "confidence": 0.11519008333032779,
+                "class_name": "dark spot",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    206,
+                    400,
+                    223,
+                    418
+                ],
+                "center": [
+                    214,
+                    409
+                ],
+                "confidence": 0.08175277980891141,
+                "class_name": "dark spot",
+                "severity_grade": 2,
+                "confidence_level": "Medium (Scale Agreement)",
+                "votes": 2
+            },
+            {
+                "bbox": [
+                    213,
+                    383,
+                    231,
+                    400
+                ],
+                "center": [
+                    222,
+                    391
+                ],
+                "confidence": 0.07628444920886646,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    188,
+                    365,
+                    201,
+                    381
+                ],
+                "center": [
+                    194,
+                    373
+                ],
+                "confidence": 0.07523580708286978,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    201,
+                    353,
+                    217,
+                    371
+                ],
+                "center": [
+                    209,
+                    362
+                ],
+                "confidence": 0.055825828828594895,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            },
+            {
+                "bbox": [
+                    217,
+                    420,
+                    236,
+                    441
+                ],
+                "center": [
+                    226,
+                    430
+                ],
+                "confidence": 0.05360369993881745,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            }
+        ],
+        "jawline_neck": [],
+        "unassigned": [
+            {
+                "bbox": [
+                    491,
+                    255,
+                    506,
+                    276
+                ],
+                "center": [
+                    498,
+                    265
+                ],
+                "confidence": 0.06146238608793778,
+                "class_name": "Acne",
+                "severity_grade": 2,
+                "confidence_level": "Review (Single Detection)",
+                "votes": 1
+            }
+        ]
+    }
+}

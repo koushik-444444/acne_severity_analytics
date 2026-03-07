@@ -1,0 +1,95 @@
+{
+    "total_face_pixels": 128799,
+    "regions": {
+        "nose": {
+            "pixel_count": 8893,
+            "area_ratio": 0.06904556712396835,
+            "erythema_index": 11.57
+        },
+        "chin": {
+            "pixel_count": 9687,
+            "area_ratio": 0.07521021125940419,
+            "erythema_index": 11.47
+        },
+        "forehead": {
+            "pixel_count": 47608,
+            "area_ratio": 0.3696301989922282,
+            "erythema_index": 8.33
+        },
+        "left_cheek": {
+            "pixel_count": 23674,
+            "area_ratio": 0.1838057748895566,
+            "erythema_index": 11.13
+        },
+        "right_cheek": {
+            "pixel_count": 19019,
+            "area_ratio": 0.1476641899393629,
+            "erythema_index": 11.16
+        },
+        "jawline_neck": {
+            "pixel_count": 19918,
+            "area_ratio": 0.15464405779547977,
+            "erythema_index": 12.04
+        }
+    },
+    "timing_ms": {
+        "bisenet": 674.7463999781758,
+        "landmarks": 23.565199982840568,
+        "geometry": 15.878699952736497,
+        "combine": 41.27330001210794,
+        "total": 755.4635999258608
+    },
+    "clinical_analysis": {
+        "regions": {
+            "nose": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 8893,
+                "gags_score": 0
+            },
+            "chin": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 9687,
+                "gags_score": 0
+            },
+            "forehead": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 47608,
+                "gags_score": 0
+            },
+            "left_cheek": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 23674,
+                "gags_score": 0
+            },
+            "right_cheek": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 19019,
+                "gags_score": 0
+            },
+            "jawline_neck": {
+                "count": 0,
+                "lpi": 0.0,
+                "area_px": 19918,
+                "gags_score": 0
+            }
+        },
+        "total_lesions": 0,
+        "gags_total_score": 0,
+        "clinical_severity": "None",
+        "symmetry_delta": 0.0
+    },
+    "lesions": {
+        "nose": [],
+        "chin": [],
+        "forehead": [],
+        "left_cheek": [],
+        "right_cheek": [],
+        "jawline_neck": [],
+        "unassigned": []
+    }
+}
