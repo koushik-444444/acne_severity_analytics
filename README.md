@@ -89,6 +89,8 @@ docker run --env-file backend/.env -p 8000:8000 acne-severity-backend
 - Root-level `Dockerfile`, `.dockerignore`, and `requirements.txt` are used for backend container deployment
 - The backend uses local files for uploads, outputs, reports, and SQLite session data, so persistent disk is recommended for production
 - The bundled `backend/weights/79999_iter.pth` file is large enough that some platforms may prefer Git LFS or external artifact storage
+- GitHub Actions can auto-sync the backend deployment files to the Hugging Face Space using `.github/workflows/sync-hf-space.yml`
+- Add a GitHub repository secret named `HF_TOKEN` with a Hugging Face write token before using the auto-sync workflow
 
 ## Workflow
 

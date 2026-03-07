@@ -1,0 +1,54 @@
+name: Sync Hugging Face Space
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  sync-backend-space:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Hugging Face Hub
+        run: pip install huggingface_hub
+
+      - name: Prepare Space payload
+        run: |
+          mkdir -p hf-space-sync
+          cp Dockerfile hf-space-sync/Dockerfile
+          cp .dockerignore hf-space-sync/.dockerignore
+          cp requirements.txt hf-space-sync/requirements.txt
+          cp -r backend hf-space-sync/backend
+          rm -f hf-space-sync/backend/.env
+          rm -f hf-space-sync/backend/sessions.db
+          rm -rf hf-space-sync/backend/uploads
+          rm -rf hf-space-sync/backend/output
+          rm -rf hf-space-sync/backend/outputs
+          rm -f hf-space-sync/backend/backend.log
+
+      - name: Sync to Hugging Face Space
+        env:
+          HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        run: |
+          python - <<'PY'
+          import os
+          from huggingface_hub import HfApi
+
+          token = os.environ['HF_TOKEN']
+          api = HfApi(token=token)
+          api.upload_large_folder(
+              repo_id='koushik444/asa_backend',
+              repo_type='space',
+              folder_path='hf-space-sync',
+          )
+          PY
