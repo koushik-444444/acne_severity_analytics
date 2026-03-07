@@ -29,10 +29,17 @@ from face_segmentation.utils.visualization import (
     save_individual_masks,
     anonymize_image
 )
-from extract_parts import extract_parts
+try:
+    from extract_parts import extract_parts
+except ImportError:
+    extract_parts = None
 
 # Clinical Configuration (Environment fallback)
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "P3xb3D2tKzmT0XEOIJS4")
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
+if not ROBOFLOW_API_KEY:
+    print("[Fatal] ROBOFLOW_API_KEY environment variable is required. Set it in .env or export it.")
+    sys.exit(1)
+assert ROBOFLOW_API_KEY is not None
 MODEL_A_ID = os.getenv("MODEL_A_ID", "runner-e0dmy/acne-ijcab/2")
 MODEL_B_ID = os.getenv("MODEL_B_ID", "acne-project-2auvb/acne-detection-v2/1")
 MAX_API_DIM = int(os.getenv("MAX_API_DIM", 2048))
@@ -125,7 +132,8 @@ def process_batch(input_dir, output_root, smooth=True, anonymize=False):
                 cv2.imwrite(str(img_output_dir / f"{img_name}_anonymized.jpg"), anon)
 
             # Pass the correct mask directory to extract_parts
-            extract_parts(str(img_file), str(mask_save_dir), str(img_output_dir / "face_parts"))
+            if extract_parts is not None:
+                extract_parts(str(img_file), str(mask_save_dir), str(img_output_dir / "face_parts"))
             print(f"  [{img_name}] Completed - Grade: {row['severity']}")
 
             

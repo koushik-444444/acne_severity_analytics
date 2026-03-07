@@ -43,12 +43,12 @@ export function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-8">
-              <button className="btn-precision terminal-text px-12 py-6 text-[10px] font-bold text-cyan-400">
+              <a href="#workspace" className="btn-precision terminal-text px-12 py-6 text-[10px] font-bold text-cyan-400">
                 INIT_DIAGNOSTIC
-              </button>
-              <button className="terminal-text border border-white/5 bg-white/2 px-12 py-6 text-[10px] font-bold text-white/40 transition-all hover:border-white/20 hover:text-white">
+              </a>
+              <a href="#features" className="terminal-text border border-white/5 bg-white/2 px-12 py-6 text-[10px] font-bold text-white/40 transition-all hover:border-white/20 hover:text-white">
                 WHITE_PAPER
-              </button>
+              </a>
             </div>
           </motion.div>
 

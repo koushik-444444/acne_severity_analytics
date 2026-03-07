@@ -33,7 +33,11 @@ from face_segmentation.utils.visualization import (
 )
 
 # --- Configuration (Load from .env or fallback) ---
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "P3xb3D2tKzmT0XEOIJS4")
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
+if not ROBOFLOW_API_KEY:
+    print("[Fatal] ROBOFLOW_API_KEY environment variable is required. Set it in .env or export it.")
+    sys.exit(1)
+assert ROBOFLOW_API_KEY is not None
 MODEL_A_ID = os.getenv("MODEL_A_ID", "runner-e0dmy/acne-ijcab/2")
 MODEL_B_ID = os.getenv("MODEL_B_ID", "acne-project-2auvb/acne-detection-v2/1")
 # Max resolution for API upload (10MB limit / Latency optimization)

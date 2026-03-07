@@ -3,9 +3,9 @@ Ensemble Mapping Utility - V7 GOLD (Statistical Adaptive Gating Edition)
 Fuses Roboflow API detections with Local Statistical Anomaly Detection.
 Uses Patient-Specific Skin Baselines to eliminate consistent background noise.
 """
+import cv2
 import numpy as np
 from typing import Dict, List, Tuple, Optional
-from ensemble_boxes import weighted_boxes_fusion
 from .mapping import LesionMapper
 
 class EnsembleLesionMapper(LesionMapper):
@@ -127,11 +127,7 @@ class EnsembleLesionMapper(LesionMapper):
     def ensemble_map_api(self, preds_a, preds_b, image_shape, image=None, weights=None, iou_thr=0.5):
         return self.ensemble_map_multi_scale(preds_a, [], preds_b, image_shape, image=image)
 
-    def _calculate_iou(self, box1, box2):
-        x1 = max(box1[0], box2[0]); y1 = max(box1[1], box2[1])
-        x2 = min(box1[2], box2[2]); y2 = min(box1[3], box2[3])
-        inter = max(0, x2 - x1) * max(0, y2 - y1)
-        union = (box1[2]-box1[0])*(box1[3]-box1[1]) + (box2[2]-box2[0])*(box2[3]-box2[1]) - inter
-        return inter / union if union > 0 else 0
-
-import cv2 # Ensure cv2 is available for bitwise_or
+    @staticmethod
+    def _calculate_iou(box1, box2):
+        from utils import calculate_iou
+        return calculate_iou(box1, box2)

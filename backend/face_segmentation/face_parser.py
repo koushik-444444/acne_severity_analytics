@@ -88,7 +88,7 @@ class FaceParser:
                 f"Download from: https://drive.google.com/open?id=154JgKpzCPW82qINcVieuPH3fZ2e0P812\n"
                 f"Or run: python download_weights.py"
             )
-        state_dict = torch.load(weight_path, map_location="cpu", weights_only=False)
+        state_dict = torch.load(weight_path, map_location="cpu", weights_only=True)
         self.net.load_state_dict(state_dict)
 
     @torch.no_grad()
@@ -108,7 +108,7 @@ class FaceParser:
         rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         pil_img = Image.fromarray(rgb)
         resized = pil_img.resize(
-            (self.input_size[1], self.input_size[0]), Image.BILINEAR
+            (self.input_size[1], self.input_size[0]), Image.Resampling.BILINEAR
         )
 
         # Transform and infer

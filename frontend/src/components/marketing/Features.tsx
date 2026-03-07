@@ -1,4 +1,3 @@
-import { memo } from 'react'
 import { Activity, Brain, Sparkles, Target } from 'lucide-react'
 import { motion } from 'framer-motion'
 
@@ -25,7 +24,7 @@ const FEATURES = [
   },
 ]
 
-export const Features = memo(function Features() {
+export function Features() {
   return (
     <section className="relative bg-black py-40">
       <div className="mx-auto max-w-7xl px-8">
@@ -50,4 +49,4 @@ export const Features = memo(function Features() {
       </div>
     </section>
   )
-})
+}

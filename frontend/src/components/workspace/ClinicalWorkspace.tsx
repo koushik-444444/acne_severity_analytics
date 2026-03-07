@@ -194,10 +194,15 @@ export function ClinicalWorkspace() {
   const [profileSwitchNotice, setProfileSwitchNotice] = useState<{ from: string; to: string } | null>(null)
   const [profileGuard, setProfileGuard] = useState<ActiveCaseProfileGuard | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [isExporting, setIsExporting] = useState(false)
+  const [isSavingNotes, setIsSavingNotes] = useState(false)
+  const [isLoadingSession, setIsLoadingSession] = useState(false)
+  const [isPurging, setIsPurging] = useState(false)
   const workspaceRef = useRef<HTMLDivElement | null>(null)
   const hasHydratedInitialProfileRef = useRef(false)
   const previousProfileRef = useRef(activeProfileId)
   const profileNoticeTimerRef = useRef<number | null>(null)
+  const prefsSaveTimerRef = useRef<number | null>(null)
 
   useEffect(() => {
     setShowOnboarding(readStorageItem(ONBOARDING_SEEN_KEY) !== 'true')
@@ -312,17 +317,30 @@ export function ClinicalWorkspace() {
       return
     }
 
-    writeStorageItem(
-      getProfileStorageKey(UI_PREFS_KEY, activeProfileId),
-      JSON.stringify({
-        leftRailWidth,
-        rightRailWidth,
-        compareViewerMode,
-        showDetectionOverlay,
-        showCompareOverlay,
-        exportPreset,
-      } satisfies WorkspaceUiPrefs),
-    )
+    if (prefsSaveTimerRef.current !== null) {
+      window.clearTimeout(prefsSaveTimerRef.current)
+    }
+
+    prefsSaveTimerRef.current = window.setTimeout(() => {
+      writeStorageItem(
+        getProfileStorageKey(UI_PREFS_KEY, activeProfileId),
+        JSON.stringify({
+          leftRailWidth,
+          rightRailWidth,
+          compareViewerMode,
+          showDetectionOverlay,
+          showCompareOverlay,
+          exportPreset,
+        } satisfies WorkspaceUiPrefs),
+      )
+      prefsSaveTimerRef.current = null
+    }, 300)
+
+    return () => {
+      if (prefsSaveTimerRef.current !== null) {
+        window.clearTimeout(prefsSaveTimerRef.current)
+      }
+    }
   }, [activeProfileId, prefsHydrated, leftRailWidth, rightRailWidth, compareViewerMode, showDetectionOverlay, showCompareOverlay, exportPreset])
 
   useEffect(() => {
@@ -446,9 +464,19 @@ export function ClinicalWorkspace() {
   const handleFileChange = (event: import('react').ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
     setSelectedFile(file)
-    setPreviewUrl(file ? URL.createObjectURL(file) : null)
+    setPreviewUrl((oldUrl) => {
+      if (oldUrl) URL.revokeObjectURL(oldUrl)
+      return file ? URL.createObjectURL(file) : null
+    })
     setError(null)
   }
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handleStart = async () => {
     if (!selectedFile) return
@@ -500,6 +528,7 @@ export function ClinicalWorkspace() {
 
   const handleSelectHistory = async (item: SessionSummary) => {
     try {
+      setIsLoadingSession(true)
       const session = await api.getSession(item.session_id)
       const sessionProfileId = item.profile_id ?? DEFAULT_PROFILE_ID
       if (sessionProfileId !== activeProfileId) {
@@ -529,11 +558,15 @@ export function ClinicalWorkspace() {
       setProfileGuard(null)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load session')
+    } finally {
+      setIsLoadingSession(false)
     }
   }
 
   const handlePurge = async (item: SessionSummary) => {
+    if (!window.confirm('Permanently delete this session? This cannot be undone.')) return
     try {
+      setIsPurging(true)
       await api.purgeSession(item.session_id)
       if (active?.session_id === item.session_id) {
         setActive(null)
@@ -545,6 +578,8 @@ export function ClinicalWorkspace() {
       await refreshHistory()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to purge session')
+    } finally {
+      setIsPurging(false)
     }
   }
 
@@ -564,12 +599,15 @@ export function ClinicalWorkspace() {
   const handleExport = async () => {
     if (!active?.session_id) return
     try {
+      setIsExporting(true)
       const bundle = await api.exportBundle(active.session_id, exportPreset, compare?.previous_session_id)
       if (bundle.pdf_data_uri) {
         window.open(bundle.pdf_data_uri, '_blank')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Export failed')
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -607,9 +645,12 @@ export function ClinicalWorkspace() {
   const saveNotes = async () => {
     if (!active?.session_id) return
     try {
+      setIsSavingNotes(true)
       await api.updateSessionNotes(active.session_id, noteDraft)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to save notes')
+    } finally {
+      setIsSavingNotes(false)
     }
   }
 
@@ -635,6 +676,8 @@ export function ClinicalWorkspace() {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement
+      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable) return
       if (!active) return
       if (event.key === '+') setMainViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))
       if (event.key === '-') setMainViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))
@@ -789,7 +832,8 @@ export function ClinicalWorkspace() {
                   </div>
                   <div className="mt-3 flex items-center justify-between">
                     <span className="terminal-text text-[8px] text-zinc-700">#{item.session_id.slice(0, 8)}</span>
-                    <span
+                    <button
+                      type="button"
                       onClick={(event) => {
                         event.stopPropagation()
                         void handlePurge(item)
@@ -797,7 +841,7 @@ export function ClinicalWorkspace() {
                       className="inline-flex items-center gap-1 text-[10px] text-zinc-500 hover:text-red-300"
                     >
                       <Trash2 className="h-3 w-3" /> purge
-                    </span>
+                    </button>
                   </div>
                   <div className="mt-2 flex items-center justify-between">
                     <button
@@ -1301,8 +1345,8 @@ export function ClinicalWorkspace() {
                       </select>
                     </div>
                     <div className="mt-6 flex flex-wrap gap-3">
-                      <button onClick={() => void handleExport()} className="terminal-text rounded-full border border-white/10 px-4 py-2 text-[10px] text-white transition-colors hover:border-cyan-400/20 hover:text-cyan-400">
-                        EXPORT {exportPreset.toUpperCase()}
+                      <button onClick={() => void handleExport()} disabled={isExporting} className="terminal-text rounded-full border border-white/10 px-4 py-2 text-[10px] text-white transition-colors hover:border-cyan-400/20 hover:text-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed">
+                        {isExporting ? 'EXPORTING...' : `EXPORT ${exportPreset.toUpperCase()}`}
                       </button>
                       <button
                         onClick={resetCaseWorkspace}
@@ -1369,8 +1413,8 @@ export function ClinicalWorkspace() {
                   />
                   <div className="mt-4 flex items-center justify-between">
                     <div className="text-xs text-zinc-500">Notes persist with this session.</div>
-                    <button onClick={() => void saveNotes()} className="rounded-full border border-white/10 px-4 py-2 text-xs text-white transition-colors hover:border-cyan-400/20 hover:text-cyan-400">
-                      Save notes
+                    <button onClick={() => void saveNotes()} disabled={isSavingNotes} className="rounded-full border border-white/10 px-4 py-2 text-xs text-white transition-colors hover:border-cyan-400/20 hover:text-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed">
+                      {isSavingNotes ? 'Saving...' : 'Save notes'}
                     </button>
                   </div>
                 </div>
@@ -1485,7 +1529,9 @@ function AdvancedImageViewer({
 }) {
   const dragRef = useRef<{ x: number; y: number } | null>(null)
   const minimapDragRef = useRef(false)
+  const imgRef = useRef<HTMLImageElement | null>(null)
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
+  const [naturalDims, setNaturalDims] = useState<{ w: number; h: number } | null>(null)
 
   const startDrag = (event: ReactMouseEvent<HTMLDivElement>) => {
     if (state.scale <= 1) return
@@ -1572,16 +1618,23 @@ function AdvancedImageViewer({
             <img
               src={src}
               alt={alt}
+              ref={imgRef}
               className="max-h-full max-w-full object-contain select-none transition-transform duration-200"
               style={{ transform: `translate(${state.x}px, ${state.y}px) scale(${state.scale})` }}
               draggable={false}
+              onLoad={(e) => {
+                const img = e.currentTarget
+                setNaturalDims({ w: img.naturalWidth, h: img.naturalHeight })
+              }}
             />
-            {lesions.length > 0 && (
+            {lesions.length > 0 && naturalDims && (
               <div className="pointer-events-none absolute inset-0">
                 {lesions.map((lesion) => {
                   const [x1, y1, x2, y2] = lesion.bbox
-                  const width = Math.max(0, x2 - x1)
-                  const height = Math.max(0, y2 - y1)
+                  const pctLeft = (x1 / naturalDims.w) * 100
+                  const pctTop = (y1 / naturalDims.h) * 100
+                  const pctWidth = (Math.max(0, x2 - x1) / naturalDims.w) * 100
+                  const pctHeight = (Math.max(0, y2 - y1) / naturalDims.h) * 100
                   const isActive = activeLesionKey === lesion.key
                   const tone = lesion.confidence >= 0.7
                     ? 'border-cyan-300/90 shadow-[0_0_20px_rgba(0,242,255,0.25)]'
@@ -1597,10 +1650,10 @@ function AdvancedImageViewer({
                       onMouseLeave={() => onLesionHover?.(null)}
                       className={`pointer-events-auto absolute border transition-all ${tone} ${isActive ? 'scale-[1.02] bg-cyan-400/10' : 'bg-transparent'}`}
                       style={{
-                        left: `${x1}px`,
-                        top: `${y1}px`,
-                        width: `${width}px`,
-                        height: `${height}px`,
+                        left: `${pctLeft}%`,
+                        top: `${pctTop}%`,
+                        width: `${pctWidth}%`,
+                        height: `${pctHeight}%`,
                         transform: `translate(${state.x}px, ${state.y}px) scale(${state.scale})`,
                         transformOrigin: 'top left',
                       }}

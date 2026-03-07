@@ -3,14 +3,31 @@ Cloud Inference Engine - V7 Multi-Scale Parallel Version
 Handles Roboflow API communication with automated resolution scaling
 and concurrent request handling for minimum latency.
 """
+import logging
 import os
+import tempfile
 import cv2
 import time
 import json
 import concurrent.futures
+import numpy as np
 from typing import List, Dict, Optional
 from roboflow import Roboflow
 from usage_tracker import log_api_call
+
+logger = logging.getLogger(__name__)
+
+# Per-scale confidence thresholds:
+# Scaled images use confidence=10 (permissive) because downscaling
+# reduces lesion contrast and the ensemble NMS + SAG gating
+# eliminate false positives downstream.
+# Native resolution uses confidence=35 (stricter) because full-size
+# images have sufficient detail for reliable single-pass detection.
+SCALED_CONFIDENCE = 10
+NATIVE_CONFIDENCE = 35
+
+# Timeout in seconds for each Roboflow API call
+API_CALL_TIMEOUT = 60
 
 class CloudInferenceEngine:
     def __init__(self, api_key: str):
@@ -19,7 +36,7 @@ class CloudInferenceEngine:
 
     def fetch_multi_scale_consensus(
         self, 
-        image: cv2.Mat, 
+        image: np.ndarray, 
         model_a_id: str, 
         model_b_id: str
     ) -> Dict[str, List[Dict]]:
@@ -50,9 +67,9 @@ class CloudInferenceEngine:
             for future in concurrent.futures.as_completed(future_to_task):
                 task_name = future_to_task[future]
                 try:
-                    results[task_name] = future.result()
+                    results[task_name] = future.result(timeout=API_CALL_TIMEOUT)
                 except Exception as e:
-                    print(f"[Cloud Engine Error] {task_name}: {e}")
+                    logger.error('[Cloud Engine] %s: %s', task_name, e)
                     results[task_name] = []
 
         return {
@@ -61,7 +78,7 @@ class CloudInferenceEngine:
             "preds_b": results.get(f"{model_b_id}_{self.max_api_dim}", [])
         }
 
-    def _fetch_single_scale(self, image: cv2.Mat, model_id: str, target_dim: int) -> List[Dict]:
+    def _fetch_single_scale(self, image: np.ndarray, model_id: str, target_dim: int) -> List[Dict]:
         """Internal helper for single API call with scaling."""
         parts = model_id.split("/")
         ws = parts[0] if len(parts) == 3 else "runner-e0dmy"
@@ -75,11 +92,13 @@ class CloudInferenceEngine:
         if max(H, W) > target_dim:
             scale = target_dim / max(H, W)
             temp = cv2.resize(image, (int(W*scale), int(H*scale)))
-            temp_path = f"temp_api_{proj}_{target_dim}_{time.time()}.jpg"
+            tmp = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
+            temp_path = tmp.name
+            tmp.close()
             cv2.imwrite(temp_path, temp)
             
             try:
-                res = model.predict(temp_path, confidence=10).json()
+                res = model.predict(temp_path, confidence=SCALED_CONFIDENCE).json()
                 preds = res.get("predictions", [])
                 # Re-scale coordinates back to original image size
                 for p in preds:
@@ -88,16 +107,16 @@ class CloudInferenceEngine:
                 log_api_call(model_id, "success")
                 return preds
             finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
+                os.remove(temp_path)
         else:
             # Native resolution
-            temp_path = f"temp_native_{proj}_{time.time()}.jpg"
+            tmp = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
+            temp_path = tmp.name
+            tmp.close()
             cv2.imwrite(temp_path, image)
             try:
-                res = model.predict(temp_path, confidence=35).json()
+                res = model.predict(temp_path, confidence=NATIVE_CONFIDENCE).json()
                 log_api_call(model_id, "success")
                 return res.get("predictions", [])
             finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
+                os.remove(temp_path)

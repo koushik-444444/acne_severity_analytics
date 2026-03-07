@@ -16,18 +16,16 @@ from cloud_inference import CloudInferenceEngine
 
 load_dotenv()
 
-ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY", "P3xb3D2tKzmT0XEOIJS4")
+ROBOFLOW_API_KEY = os.getenv("ROBOFLOW_API_KEY")
+if not ROBOFLOW_API_KEY:
+    print("[Fatal] ROBOFLOW_API_KEY environment variable is required. Set it in .env or export it.")
+    import sys
+    sys.exit(1)
+assert ROBOFLOW_API_KEY is not None
 MODEL_A_ID = os.getenv("MODEL_A_ID", "runner-e0dmy/acne-ijcab/2")
 MODEL_B_ID = os.getenv("MODEL_B_ID", "acne-project-2auvb/acne-detection-v2/1")
 
-def calculate_iou(box1, box2):
-    x1 = max(box1[0], box2[0]); y1 = max(box1[1], box2[1])
-    x2 = min(box1[2], box2[2]); y2 = min(box1[3], box2[3])
-    inter = max(0, x2 - x1) * max(0, y2 - y1)
-    area1 = (box1[2]-box1[0])*(box1[3]-box1[1])
-    area2 = (box2[2]-box2[0])*(box2[3]-box2[1])
-    union = area1 + area2 - inter
-    return inter / union if union > 0 else 0
+from utils import calculate_iou
 
 def validate(image_dir, label_dir, iou_threshold=0.45, limit=20):
     print(f"[Validator] Initializing Clinical Pipeline (SAG-Enabled)...")

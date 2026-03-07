@@ -1,6 +1,7 @@
 import asyncio
 import base64
 import json
+import logging
 import os
 import re
 import sqlite3
@@ -9,17 +10,19 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Literal, Optional, Set
 
 import cv2
 import numpy as np
 from dotenv import load_dotenv
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import Response, StreamingResponse
 from pydantic import BaseModel, Field
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+
+logger = logging.getLogger(__name__)
 
 load_dotenv()
 
@@ -81,12 +84,12 @@ class AnalysisStartRequest(BaseModel):
 
 class ExportRequest(BaseModel):
     include_pdf_data: bool = True
-    preset: str = 'clinical'
+    preset: Literal['clinical', 'compact', 'presentation'] = 'clinical'
     previous_session_id: Optional[str] = None
 
 
 class NotesRequest(BaseModel):
-    note: str = ''
+    note: str = Field(default='', max_length=5000)
 
 
 model_init_lock = threading.Lock()
@@ -148,6 +151,9 @@ def file_to_data_uri(path: Optional[str], mime: str) -> Optional[str]:
     file_path = Path(path)
     if not file_path.is_absolute():
         file_path = (BASE_DIR / file_path).resolve()
+    managed_roots = (UPLOAD_DIR.resolve(), OUTPUT_DIR.resolve(), REPORT_DIR.resolve())
+    if not any(str(file_path).startswith(str(r)) for r in managed_roots):
+        return None
     if not file_path.exists():
         return None
     return bytes_to_data_uri(file_path.read_bytes(), mime)
@@ -172,6 +178,9 @@ def validate_upload(upload: UploadFile, payload: bytes) -> None:
             status_code=415,
             detail='Only JPEG, PNG, and WEBP images are supported',
         )
+    MAGIC_BYTES = {b'\xff\xd8\xff': 'image/jpeg', b'\x89PNG': 'image/png', b'RIFF': 'image/webp'}
+    if not any(payload.startswith(sig) for sig in MAGIC_BYTES):
+        raise HTTPException(status_code=400, detail='File content does not match declared type')
     if not payload:
         raise HTTPException(status_code=400, detail='Uploaded file is empty')
     if len(payload) > MAX_UPLOAD_BYTES:
@@ -491,23 +500,26 @@ class BridgeStore:
         return status
 
     def get_status(self, session_id: str) -> Optional[Dict[str, Any]]:
-        row = self.conn.execute(
-            'SELECT status_json FROM statuses WHERE session_id = ?',
-            (session_id,),
-        ).fetchone()
+        with self.lock:
+            row = self.conn.execute(
+                'SELECT status_json FROM statuses WHERE session_id = ?',
+                (session_id,),
+            ).fetchone()
         return json.loads(row['status_json']) if row else None
 
     def latest_status(self) -> Optional[Dict[str, Any]]:
-        row = self.conn.execute(
-            'SELECT status_json FROM statuses ORDER BY updated_at DESC LIMIT 1'
-        ).fetchone()
+        with self.lock:
+            row = self.conn.execute(
+                'SELECT status_json FROM statuses ORDER BY updated_at DESC LIMIT 1'
+            ).fetchone()
         return json.loads(row['status_json']) if row else None
 
     def get_session_row(self, session_id: str) -> Optional[sqlite3.Row]:
-        return self.conn.execute(
-            'SELECT * FROM sessions WHERE session_id = ?',
-            (session_id,),
-        ).fetchone()
+        with self.lock:
+            return self.conn.execute(
+                'SELECT * FROM sessions WHERE session_id = ?',
+                (session_id,),
+            ).fetchone()
 
     def session_payload(self, session_id: str) -> Optional[Dict[str, Any]]:
         row = self.get_session_row(session_id)
@@ -539,7 +551,19 @@ class BridgeStore:
             'SELECT * FROM sessions ORDER BY timestamp DESC LIMIT ?',
             (max(1, min(limit, 200)),),
         ).fetchall()
-        return [row_to_session(row, self.get_status(row['session_id'])) for row in rows]
+        if not rows:
+            return []
+        session_ids = [row['session_id'] for row in rows]
+        placeholders = ','.join('?' for _ in session_ids)
+        with self.lock:
+            status_rows = self.conn.execute(
+                f'SELECT session_id, status_json FROM statuses WHERE session_id IN ({placeholders})',
+                session_ids,
+            ).fetchall()
+        status_map: Dict[str, Dict[str, Any]] = {
+            r['session_id']: json.loads(r['status_json']) for r in status_rows
+        }
+        return [row_to_session(row, status_map.get(row['session_id'])) for row in rows]
 
     def purge(self, session_id: str) -> bool:
         row = self.get_session_row(session_id)
@@ -906,23 +930,49 @@ async def build_app_state() -> Dict[str, Any]:
     }
 
 
+async def _periodic_cleanup(app: FastAPI) -> None:
+    while True:
+        try:
+            await asyncio.sleep(300)
+            app.state.resources['store'].cleanup_expired()
+        except Exception:
+            pass
+
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     app.state.resources = await build_app_state()
+    cleanup_task = asyncio.create_task(_periodic_cleanup(app))
     try:
         yield
     finally:
+        cleanup_task.cancel()
         app.state.resources['store'].close()
 
 
 app = FastAPI(title='Acne V7 API Bridge', version=APP_VERSION, lifespan=lifespan)
+ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
+    if origin.strip()
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=['*'],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=['*'],
     allow_headers=['*'],
 )
+
+
+@app.middleware('http')
+async def add_security_headers(request: Request, call_next) -> Response:
+    response = await call_next(request)
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'DENY'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    return response
 
 
 def get_store() -> BridgeStore:
@@ -948,13 +998,13 @@ def get_pipeline() -> Any:
             if pipeline is None:
                 ensure_runtime_imports()
                 runtime_pipeline = FaceSegmentationPipeline
-                print('[Bridge] Initializing FaceSegmentationPipeline...')
+                logger.info('Initializing FaceSegmentationPipeline...')
                 pipeline = runtime_pipeline(
                     bisenet_weights='weights/79999_iter.pth',
                     smooth_edges=True,
                 )
                 app.state.resources['pipeline'] = pipeline
-                print('[Bridge] FaceSegmentationPipeline ready.')
+                logger.info('FaceSegmentationPipeline ready.')
     return pipeline
 
 
@@ -966,10 +1016,10 @@ def get_cloud_engine() -> Any:
             if cloud_engine is None:
                 ensure_runtime_imports()
                 runtime_cloud_engine = CloudInferenceEngine
-                print('[Bridge] Initializing CloudInferenceEngine...')
+                logger.info('Initializing CloudInferenceEngine...')
                 cloud_engine = runtime_cloud_engine(api_key=API_KEY)
                 app.state.resources['cloud_engine'] = cloud_engine
-                print('[Bridge] CloudInferenceEngine ready.')
+                logger.info('CloudInferenceEngine ready.')
     return cloud_engine
 
 
@@ -981,7 +1031,6 @@ async def health() -> Dict[str, Any]:
         'roboflow_api_key_configured': True,
         'pipeline_initialized': app.state.resources['pipeline'] is not None,
         'cloud_engine_initialized': app.state.resources['cloud_engine'] is not None,
-        'cleanup': get_store().cleanup_expired(),
     }
 
 
@@ -1019,7 +1068,7 @@ async def privacy() -> Dict[str, Any]:
     }
 
 
-@app.post('/privacy/purge/{session_id}')
+@app.delete('/privacy/purge/{session_id}')
 async def purge_session(session_id: str) -> Dict[str, Any]:
     session_id = validate_session_id(session_id)
     if not get_store().purge(session_id):
@@ -1030,7 +1079,6 @@ async def purge_session(session_id: str) -> Dict[str, Any]:
 @app.post('/analysis/start')
 async def analysis_start(request: AnalysisStartRequest) -> Dict[str, Any]:
     store = get_store()
-    store.cleanup_expired()
     session_id = validate_session_id(request.session_id or uuid.uuid4().hex)
     if store.get_session_row(session_id):
         raise HTTPException(status_code=409, detail='Session already exists')
@@ -1053,7 +1101,9 @@ async def session_status_stream(session_id: str) -> StreamingResponse:
 
     async def event_generator():
         previous = None
-        while True:
+        iterations = 0
+        while iterations < 500:
+            iterations += 1
             current = get_store().get_status(session_id)
             if current and current != previous:
                 previous = current
@@ -1089,24 +1139,26 @@ async def history(limit: int = 25, profile_id: Optional[str] = None) -> Dict[str
 
 @app.get('/profiles')
 async def profiles() -> Dict[str, Any]:
-    items = get_store().history(500)
-    grouped: Dict[str, Dict[str, Any]] = {}
-    for item in items:
-        profile_id = item.get('profile_id') or 'default-profile'
-        current = grouped.setdefault(
-            profile_id,
-            {
-                'profile_id': profile_id,
-                'sessions': 0,
-                'latest_timestamp': item['timestamp'],
-                'latest_severity': item.get('severity'),
-            },
-        )
-        current['sessions'] += 1
-        if item['timestamp'] > current['latest_timestamp']:
-            current['latest_timestamp'] = item['timestamp']
-            current['latest_severity'] = item.get('severity')
-    return {'items': list(grouped.values())}
+    store = get_store()
+    with store.lock:
+        group_rows = store.conn.execute(
+            'SELECT profile_id, COUNT(*) as sessions, MAX(timestamp) as latest_timestamp FROM sessions GROUP BY profile_id'
+        ).fetchall()
+    items = []
+    for row in group_rows:
+        profile_id = row['profile_id'] or 'default-profile'
+        with store.lock:
+            latest_row = store.conn.execute(
+                'SELECT severity FROM sessions WHERE profile_id = ? ORDER BY timestamp DESC LIMIT 1',
+                (row['profile_id'],),
+            ).fetchone()
+        items.append({
+            'profile_id': profile_id,
+            'sessions': row['sessions'],
+            'latest_timestamp': row['latest_timestamp'],
+            'latest_severity': latest_row['severity'] if latest_row else None,
+        })
+    return {'items': items}
 
 
 @app.get('/session/{session_id}')
@@ -1119,22 +1171,12 @@ async def update_session_notes(session_id: str, request: NotesRequest) -> Dict[s
     session_id = validate_session_id(session_id)
     session = require_session(session_id)
     store = get_store()
-    payload = {
-        'session_id': session['session_id'],
-        'profile_id': session.get('profile_id'),
-        'timestamp': session['timestamp'],
-        'severity': session.get('severity'),
-        'gags_score': session.get('gags_score'),
-        'lesion_count': session.get('lesion_count'),
-        'symmetry_delta': session.get('symmetry_delta'),
-        'results_json': json.dumps(session.get('results')) if session.get('results') else None,
-        'note': request.note,
-        'diagnostic_image_path': session.get('diagnostic_image_path'),
-        'original_image_path': session.get('original_image_path'),
-        'privacy_mode': session.get('privacy_mode'),
-        'retention_hours': session.get('retention_hours'),
-    }
-    store.upsert_session(payload)
+    with store.lock:
+        store.conn.execute(
+            'UPDATE sessions SET note = ? WHERE session_id = ?',
+            (request.note, session_id),
+        )
+        store.conn.commit()
     return {'session_id': session_id, 'note': request.note}
 
 
@@ -1204,10 +1246,12 @@ async def analyze(
     retention_hours: int = Form(DEFAULT_RETENTION_HOURS),
 ) -> Dict[str, Any]:
     store = get_store()
-    store.cleanup_expired()
     payload = await file.read()
     validate_upload(file, payload)
     image = decode_image(payload)
+    h, w = image.shape[:2]
+    if h > 10000 or w > 10000:
+        raise HTTPException(status_code=400, detail='Image dimensions exceed 10000px limit')
 
     session_id = validate_session_id(session_id or uuid.uuid4().hex)
     retention_hours = normalize_retention(retention_hours)
@@ -1227,26 +1271,27 @@ async def analyze(
     original_jpeg = image_to_jpeg_bytes(image)
     save_image(original_path, image)
 
-    try:
+    def _run_analysis_sync() -> Dict[str, Any]:
+        """Run the blocking ML pipeline off the async event loop."""
         store.set_status(session_id, 'received', 'Upload accepted', 5)
         store.set_status(session_id, 'segmenting', 'Running face segmentation', 20)
         segmentation = get_pipeline().segment(image, return_intermediates=True)
 
         store.set_status(session_id, 'cloud_inference', 'Fetching ensemble detections', 45)
         cloud_results = get_cloud_engine().fetch_multi_scale_consensus(
-            image,  # type: ignore[arg-type]
+            image,
             MODEL_A_ID,
             MODEL_B_ID,
         )
 
         store.set_status(session_id, 'mapping', 'Assigning lesions to regions', 70)
-        height, width = image.shape[:2]
+        img_height, img_width = image.shape[:2]
         mapper = EnsembleLesionMapper(segmentation['masks'])
         assignments = mapper.ensemble_map_multi_scale(
             cloud_results['preds_a_640'],
             cloud_results['preds_a_1280'],
             cloud_results['preds_b'],
-            (height, width),
+            (img_height, img_width),
             image=image,
         )
         clinical_report = mapper.get_clinical_report(assignments)
@@ -1262,24 +1307,26 @@ async def analyze(
         save_image(diagnostic_path, overlay)
 
         timestamp = utcnow_iso()
-        results = dict(segmentation.get('metadata', {}))
-        results['timestamp'] = timestamp
-        results['session_id'] = session_id
-        results['privacy_mode'] = privacy_mode
-        results['retention_hours'] = retention_hours
-        results['clinical_analysis'] = clinical_report
-        results['lesions'] = assignments
-        results['consensus_summary'] = consensus_summary(assignments)
-        results['cloud_results'] = cloud_results
-        results['source_stream_provenance'] = summarize_stream_provenance(cloud_results)
+        analysis_results = dict(segmentation.get('metadata', {}))
+        analysis_results['timestamp'] = timestamp
+        analysis_results['session_id'] = session_id
+        analysis_results['privacy_mode'] = privacy_mode
+        analysis_results['retention_hours'] = retention_hours
+        analysis_results['clinical_analysis'] = clinical_report
+        analysis_results['lesions'] = assignments
+        analysis_results['consensus_summary'] = consensus_summary(assignments)
+        analysis_results['cloud_results'] = cloud_results
+        analysis_results['source_stream_provenance'] = summarize_stream_provenance(cloud_results)
 
-        original_image_path = absolute_managed_path(original_path)
-        diagnostic_image_path = absolute_managed_path(diagnostic_path)
+        managed_original = absolute_managed_path(original_path)
+        managed_diagnostic = absolute_managed_path(diagnostic_path)
+        final_original: Optional[str] = managed_original
+        final_diagnostic: Optional[str] = managed_diagnostic
         if privacy_mode:
-            safe_unlink(original_image_path)
-            safe_unlink(diagnostic_image_path)
-            original_image_path = None
-            diagnostic_image_path = None
+            safe_unlink(managed_original)
+            safe_unlink(managed_diagnostic)
+            final_original = None
+            final_diagnostic = None
 
         session_record = {
             'session_id': session_id,
@@ -1289,14 +1336,23 @@ async def analyze(
             'gags_score': int(clinical_report.get('gags_total_score', 0)),
             'lesion_count': int(clinical_report.get('total_lesions', 0)),
             'symmetry_delta': float(clinical_report.get('symmetry_delta', 0.0)),
-            'results_json': json.dumps(results),
-            'diagnostic_image_path': diagnostic_image_path,
-            'original_image_path': original_image_path,
+            'results_json': json.dumps(analysis_results),
+            'diagnostic_image_path': final_diagnostic,
+            'original_image_path': final_original,
             'privacy_mode': privacy_mode,
             'retention_hours': retention_hours,
         }
         store.set_status(session_id, 'saving', 'Persisting analysis outputs', 92)
         store.upsert_session(session_record)
+
+        return {
+            'diagnostic_jpeg': diagnostic_jpeg,
+        }
+
+    try:
+        loop = asyncio.get_event_loop()
+        sync_result = await loop.run_in_executor(None, _run_analysis_sync)
+
         session_data = store.session_payload(session_id)
         if not session_data:
             raise HTTPException(status_code=500, detail='Failed to reload saved session')
@@ -1320,11 +1376,11 @@ async def analyze(
             'results': session_data['results'],
             'compare': compare_data,
             'original_image': bytes_to_data_uri(original_jpeg, 'image/jpeg'),
-            'diagnostic_image': bytes_to_data_uri(diagnostic_jpeg, 'image/jpeg'),
+            'diagnostic_image': bytes_to_data_uri(sync_result['diagnostic_jpeg'], 'image/jpeg'),
         }
     except HTTPException:
         store.set_status(session_id, 'failed', 'Analysis failed', 100, {'failed': True})
         raise
     except Exception as exc:
         store.set_status(session_id, 'failed', str(exc), 100, {'failed': True})
-        raise HTTPException(status_code=500, detail=f'Analysis failed: {exc}') from exc
+        raise HTTPException(status_code=500, detail='Analysis failed') from exc

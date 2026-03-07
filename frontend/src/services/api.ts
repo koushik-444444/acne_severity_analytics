@@ -11,11 +11,25 @@ import type {
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_BASE}${path}`, init)
+async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal): Promise<T> {
+  const timeoutSignal = AbortSignal.timeout(30_000)
+  const combinedSignal = signal
+    ? AbortSignal.any([signal, timeoutSignal])
+    : timeoutSignal
+
+  const response = await fetch(`${API_BASE}${path}`, {
+    ...init,
+    signal: combinedSignal,
+  })
   if (!response.ok) {
     const text = await response.text()
-    throw new Error(text || `Request failed: ${response.status}`)
+    let detail: string
+    try {
+      detail = (JSON.parse(text) as { detail?: string }).detail ?? text
+    } catch {
+      detail = text
+    }
+    throw new Error(detail || `Request failed: ${response.status}`)
   }
   return response.json() as Promise<T>
 }

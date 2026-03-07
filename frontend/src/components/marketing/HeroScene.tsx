@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 
 const SPLINE_SCENE_URL = 'https://prod.spline.design/DtbMNZsG-pT5th3f/scene.splinecode'
-const SPLINE_VIEWER_SCRIPT_URL = 'https://unpkg.com/@splinetool/viewer/build/spline-viewer.js'
+const SPLINE_VIEWER_SCRIPT_URL = 'https://unpkg.com/@splinetool/viewer@1.9.82/build/spline-viewer.js'
 const SPLINE_BOOT_DELAY_MS = 900
 
 type HeroSceneStatus = 'booting' | 'loading' | 'ready' | 'disabled' | 'error'

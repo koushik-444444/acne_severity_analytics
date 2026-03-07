@@ -28,24 +28,27 @@ type ChartPoint = {
 }
 
 function buildStepLinePath(points: ChartPoint[]) {
-  if (!points.length) {
+  const first = points[0]
+  if (!points.length || !first) {
     return ''
   }
 
-  let path = `M ${points[0].x} ${points[0].y}`
+  let path = `M ${first.x} ${first.y}`
   for (let index = 1; index < points.length; index += 1) {
-    path += ` H ${points[index].x} V ${points[index].y}`
+    const pt = points[index]
+    if (pt) path += ` H ${pt.x} V ${pt.y}`
   }
   return path
 }
 
 function buildStepAreaPath(points: ChartPoint[]) {
-  if (!points.length) {
+  const first = points[0]
+  if (!points.length || !first) {
     return ''
   }
 
   const linePath = buildStepLinePath(points)
-  return `${linePath} V ${CHART_FRAME.bottom} H ${points[0].x} Z`
+  return `${linePath} V ${CHART_FRAME.bottom} H ${first.x} Z`
 }
 
 export function AnalyticsDashboard() {
@@ -62,7 +65,7 @@ export function AnalyticsDashboard() {
     }))
 
     return {
-      activePoint: points[activeIndex] ?? points[points.length - 1],
+      activePoint: points[activeIndex] ?? points[points.length - 1] ?? { name: '', value: 0, x: 0, y: 0 },
       chartPoints: points,
       areaPath: buildStepAreaPath(points),
       linePath: buildStepLinePath(points),

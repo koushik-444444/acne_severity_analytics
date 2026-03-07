@@ -23,24 +23,24 @@ export function Footer() {
             <div>
               <h4 className="terminal-text mb-8 text-[10px] font-bold text-white">NODE_NETWORK</h4>
               <ul className="terminal-text space-y-4 text-[11px] text-zinc-600">
-                <li><a href="#" className="transition-colors hover:text-cyan-400">DIAGNOSTICS</a></li>
-                <li><a href="#" className="transition-colors hover:text-cyan-400">AGI_MAPPING</a></li>
-                <li><a href="#" className="transition-colors hover:text-cyan-400">PRESCRIPTION</a></li>
+                <li><a href="#workspace" className="transition-colors hover:text-cyan-400">DIAGNOSTICS</a></li>
+                <li><a href="#analytics" className="transition-colors hover:text-cyan-400">AGI_MAPPING</a></li>
+                <li><a href="#workspace" className="transition-colors hover:text-cyan-400">PRESCRIPTION</a></li>
               </ul>
             </div>
             <div>
               <h4 className="terminal-text mb-8 text-[10px] font-bold text-white">PROTOCOL</h4>
               <ul className="terminal-text space-y-4 text-[11px] text-zinc-600">
-                <li><a href="#" className="transition-colors hover:text-cyan-400">RESEARCH</a></li>
-                <li><a href="#" className="transition-colors hover:text-cyan-400">HIPAA_SECURE</a></li>
-                <li><a href="#" className="transition-colors hover:text-cyan-400">OPEN_LAB</a></li>
+                <li><a href="#features" className="transition-colors hover:text-cyan-400">RESEARCH</a></li>
+                <li><a href="#workspace" className="transition-colors hover:text-cyan-400">HIPAA_SECURE</a></li>
+                <li><a href="#analytics" className="transition-colors hover:text-cyan-400">OPEN_LAB</a></li>
               </ul>
             </div>
           </div>
         </div>
 
         <div className="flex flex-col items-center justify-between gap-8 border-t border-white/5 pt-12 sm:flex-row">
-          <p className="terminal-text text-[9px] tracking-[0.2em] text-zinc-700">© 2024 CLEARSKIN_AI_CORE. ALL_RIGHTS_RESERVED.</p>
+          <p className="terminal-text text-[9px] tracking-[0.2em] text-zinc-700">© {new Date().getFullYear()} CLEARSKIN_AI_CORE. ALL_RIGHTS_RESERVED.</p>
           <div className="flex gap-10">
             <X className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
             <Activity className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />

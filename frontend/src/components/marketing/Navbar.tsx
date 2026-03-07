@@ -33,18 +33,23 @@ export function Navbar() {
         </div>
 
         <div className="hidden items-center gap-12 md:flex">
-          {['Analysis', 'Clinical', 'Research', 'Archive'].map((item) => (
+          {[
+            { label: 'Analysis', href: '#workspace' },
+            { label: 'Clinical', href: '#analytics' },
+            { label: 'Research', href: '#features' },
+            { label: 'Archive', href: '#workspace' },
+          ].map((item) => (
             <a
-              key={item}
-              href="#"
+              key={item.label}
+              href={item.href}
               className="terminal-text text-[11px] font-bold text-zinc-500 transition-colors hover:text-cyan-400"
             >
-              {item}
+              {item.label}
             </a>
           ))}
-          <button className="terminal-text border border-cyan-400/50 bg-transparent px-6 py-2 text-[10px] font-bold text-cyan-400 transition-all hover:bg-cyan-400 hover:text-black">
+          <a href="#workspace" className="terminal-text border border-cyan-400/50 bg-transparent px-6 py-2 text-[10px] font-bold text-cyan-400 transition-all hover:bg-cyan-400 hover:text-black">
             INIT_SESSION
-          </button>
+          </a>
         </div>
       </div>
     </nav>

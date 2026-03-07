@@ -19,15 +19,11 @@ backend/sessions.db
 
 # Logs and local artifacts
 *.log
-frontend/*.log
-backend/*.log
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
-backend/__pycache__/
-backend/.pytest_cache/
-backend/.mypy_cache/
-backend/.ruff_cache/
-frontend/.DS_Store
-backend/.DS_Store
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.DS_Store

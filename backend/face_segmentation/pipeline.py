@@ -8,6 +8,7 @@ Output: pixel-accurate binary masks for nose, left_cheek, right_cheek,
         forehead, chin.
 """
 
+import logging
 import os
 import time
 from typing import Dict, Optional, Tuple
@@ -18,6 +19,8 @@ import numpy as np
 from face_segmentation.face_parser import FaceParser
 from face_segmentation.landmark_extractor import LandmarkRegionExtractor
 from face_segmentation.region_combiner import RegionCombiner
+
+logger = logging.getLogger(__name__)
 
 
 class FaceSegmentationPipeline:
@@ -50,10 +53,10 @@ class FaceSegmentationPipeline:
             smooth_edges: If True, apply slight Gaussian blur to mask edges.
             **kwargs: Ignored (for backward compatibility with old dlib args).
         """
-        print("[Pipeline] Initializing face segmentation pipeline...")
+        logger.info("Initializing face segmentation pipeline...")
 
         # Stage 1: BiSeNet face parser
-        print(f"[Stage 1] Loading BiSeNet from: {bisenet_weights}")
+        logger.info("Loading BiSeNet from: %s", bisenet_weights)
         self.parser = FaceParser(
             weight_path=bisenet_weights,
             device=device,
@@ -61,7 +64,7 @@ class FaceSegmentationPipeline:
         )
 
         # Stage 2: MediaPipe landmark extractor (468-point FaceMesh)
-        print("[Stage 2] Initializing MediaPipe FaceMesh...")
+        logger.info("Initializing MediaPipe FaceMesh...")
         self.landmark_extractor = LandmarkRegionExtractor()
 
         # Combiner
@@ -70,7 +73,7 @@ class FaceSegmentationPipeline:
             smooth_edges=smooth_edges
         )
 
-        print("[Pipeline] Ready.")
+        logger.info("Pipeline ready.")
 
     def segment(
         self,
@@ -109,10 +112,11 @@ class FaceSegmentationPipeline:
         timing["landmarks"] = time.perf_counter() - t0
 
         if landmarks is None:
-            print("[Warning] No face detected by MediaPipe. Falling back to parsing-only.")
+            logger.warning("No face detected by MediaPipe. Falling back to parsing-only.")
             result["masks"] = self._fallback_parsing_only(parsing, H, W)
             result["coverage"] = RegionCombiner.compute_coverage(result["masks"])
             result["timing"] = timing
+            result["metadata"] = {}
             if return_intermediates:
                 result["parsing"] = parsing
                 result["landmarks"] = None
