@@ -25,6 +25,7 @@ jobs:
       - name: Prepare Space payload
         run: |
           mkdir -p hf-space-sync
+          cp backend/README.md hf-space-sync/README.md
           cp Dockerfile hf-space-sync/Dockerfile
           cp .dockerignore hf-space-sync/.dockerignore
           cp requirements.txt hf-space-sync/requirements.txt
@@ -63,6 +64,7 @@ jobs:
                   'backend/outputs/**',
               ],
               delete_patterns=[
+                  'README.md',
                   'backend/.env',
                   'backend/sessions.db',
                   'backend/backend.log',
