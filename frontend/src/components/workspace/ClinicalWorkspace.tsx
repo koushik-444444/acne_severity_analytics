@@ -327,17 +327,34 @@ export function ClinicalWorkspace() {
 
   useEffect(() => {
     if (!sessionId || !isAnalyzing) return
-    const stream = api.streamStatus(sessionId)
-    stream.onmessage = (event) => {
-      try {
-        const nextStatus = JSON.parse(event.data) as SessionStatus
-        setStatus(nextStatus)
-      } catch {
-        // ignore malformed SSE payloads
+    let cancelled = false
+
+    const pollStatus = async () => {
+      while (!cancelled) {
+        try {
+          const nextStatus = await api.getStatus(sessionId)
+          if (cancelled) {
+            return
+          }
+          setStatus(nextStatus)
+          if (nextStatus.completed || nextStatus.failed) {
+            return
+          }
+        } catch {
+          if (cancelled) {
+            return
+          }
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 1500))
       }
     }
-    stream.onerror = () => stream.close()
-    return () => stream.close()
+
+    void pollStatus()
+
+    return () => {
+      cancelled = true
+    }
   }, [sessionId, isAnalyzing])
 
   const regionDeltaCards = useMemo<[string, CompareRegionDelta][]>(() => {

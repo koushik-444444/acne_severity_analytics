@@ -41,8 +41,6 @@ export const api = {
 
   getStatus: (sessionId: string) => request<SessionStatus>(`/status/${sessionId}`),
 
-  streamStatus: (sessionId: string) => new EventSource(`${API_BASE}/status/stream/${sessionId}`),
-
   getHistory: async (limit = 30, profileId?: string) => {
     const suffix = profileId ? `&profile_id=${encodeURIComponent(profileId)}` : ''
     const data = await request<{ items: SessionSummary[] }>(`/history?limit=${limit}${suffix}`)
