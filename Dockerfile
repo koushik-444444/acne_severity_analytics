@@ -2,7 +2,7 @@ FROM python:3.11-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=7860
 
 WORKDIR /app
 
@@ -24,8 +24,8 @@ WORKDIR /app/backend
 USER appuser
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-8000}/').read()" || exit 1
+    CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:${PORT:-7860}/').read()" || exit 1
 
-EXPOSE 8000
+EXPOSE 7860
 
-CMD ["sh", "-c", "uvicorn api_bridge:app --host 0.0.0.0 --port ${PORT:-8000}"]
+CMD ["sh", "-c", "uvicorn api_bridge:app --host 0.0.0.0 --port ${PORT:-7860}"]
