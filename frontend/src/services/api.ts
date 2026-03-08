@@ -11,16 +11,40 @@ import type {
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
 
+class ApiTimeoutError extends Error {
+  constructor(url: string, timeoutMs: number) {
+    super(
+      `Request to ${url} timed out after ${Math.round(timeoutMs / 1000)}s. ` +
+      'The backend may be waking up from a cold start — please try again in a moment.'
+    )
+    this.name = 'ApiTimeoutError'
+  }
+}
+
 async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal, timeoutMs = 30_000): Promise<T> {
   const timeoutSignal = AbortSignal.timeout(timeoutMs)
   const combinedSignal = signal
     ? AbortSignal.any([signal, timeoutSignal])
     : timeoutSignal
 
-  const response = await fetch(`${API_BASE}${path}`, {
-    ...init,
-    signal: combinedSignal,
-  })
+  const url = `${API_BASE}${path}`
+  let response: Response
+  try {
+    response = await fetch(url, {
+      ...init,
+      signal: combinedSignal,
+    })
+  } catch (err) {
+    if (err instanceof DOMException && err.name === 'TimeoutError') {
+      throw new ApiTimeoutError(path, timeoutMs)
+    }
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw err
+    }
+    throw new Error(
+      `Network error reaching ${path} — is the backend running? (${err instanceof Error ? err.message : String(err)})`
+    )
+  }
   if (!response.ok) {
     const text = await response.text()
     let detail: string
@@ -35,18 +59,21 @@ async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal
 }
 
 export const api = {
+  /** Lightweight ping to wake a sleeping HF Space before heavy work. */
+  wakeBackend: () => request<{ status: string }>('/health', undefined, undefined, 90_000),
+
   startAnalysis: (payload: { session_id?: string; profile_id?: string; privacy_mode: boolean; retention_hours: number }) =>
     request<AnalysisStartResponse>('/analysis/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
-    }),
+    }, undefined, 90_000),
 
   analyze: (payload: FormData) =>
     request<AnalyzeResponse>('/analyze', {
       method: 'POST',
       body: payload,
-    }, undefined, 120_000),
+    }, undefined, 300_000),
 
   getLatestStatus: async () => {
     const data = await request<{ status: SessionStatus }>('/status/latest')

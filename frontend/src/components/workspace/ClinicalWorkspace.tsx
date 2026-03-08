@@ -248,6 +248,20 @@ export function ClinicalWorkspace() {
       dispatch({ type: 'START_ANALYSIS' })
       setStatus({
         stage: 'warming_up',
+        detail: 'Waking backend — this may take a moment on first use...',
+        progress: 1,
+      })
+
+      // Pre-flight: wake the backend if it's sleeping (HF Space cold start)
+      try {
+        await api.wakeBackend()
+      } catch {
+        // Health check failed — continue anyway, startAnalysis will surface
+        // the real error if the backend is truly unreachable.
+      }
+
+      setStatus({
+        stage: 'warming_up',
         detail: 'Booting segmentation + cloud engines for first analysis',
         progress: 3,
       })
@@ -281,7 +295,12 @@ export function ClinicalWorkspace() {
       setCompareViewerMode('single')
       await refreshHistory()
     } catch (err) {
-      dispatch({ type: 'ANALYSIS_FAILED', error: err instanceof Error ? err.message : 'Analysis failed' })
+      const message = err instanceof Error
+        ? (err.name === 'ApiTimeoutError'
+          ? err.message
+          : err.message)
+        : 'Analysis failed — please try again'
+      dispatch({ type: 'ANALYSIS_FAILED', error: message })
     } finally {
       dispatch({ type: 'ANALYSIS_FINISHED' })
     }
