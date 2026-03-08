@@ -27,15 +27,19 @@ export default function App() {
   return (
     <LazyMotion features={domAnimation}>
       <div className="bg-[#010101] text-white selection:bg-cyan-400 selection:text-black">
-        <Navbar />
-        <Hero />
-        <section id="features"><Features /></section>
-        <section id="analytics"><AnalyticsDashboard /></section>
-        <ErrorBoundary>
-          <Suspense fallback={<WorkspaceLoadingFallback />}>
-            <section id="workspace"><ClinicalWorkspace /></section>
-          </Suspense>
-        </ErrorBoundary>
+        <header>
+          <Navbar />
+        </header>
+        <main>
+          <Hero />
+          <section id="features"><Features /></section>
+          <section id="analytics"><AnalyticsDashboard /></section>
+          <ErrorBoundary>
+            <Suspense fallback={<WorkspaceLoadingFallback />}>
+              <section id="workspace"><ClinicalWorkspace /></section>
+            </Suspense>
+          </ErrorBoundary>
+        </main>
         <Footer />
       </div>
     </LazyMotion>

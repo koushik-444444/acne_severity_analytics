@@ -10,17 +10,20 @@ import uuid
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Literal, Optional, Set
+from typing import Any, Dict, List, Literal, Optional, Set, Tuple
 
 import cv2
 import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import Response, StreamingResponse
+from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+from slowapi.util import get_remote_address
 
 logger = logging.getLogger(__name__)
 
@@ -90,6 +93,204 @@ class ExportRequest(BaseModel):
 
 class NotesRequest(BaseModel):
     note: str = Field(default='', max_length=5000)
+
+
+# ---------------------------------------------------------------------------
+# Response models (D-4)
+# ---------------------------------------------------------------------------
+
+
+class RootResponse(BaseModel):
+    app: str
+    status: str
+    version: str
+    docs: str
+    health: str
+
+
+class HealthResponse(BaseModel):
+    status: str
+    version: str
+    roboflow_api_key_configured: bool
+    pipeline_initialized: bool
+    cloud_engine_initialized: bool
+
+
+class VersionResponse(BaseModel):
+    app: str
+    version: str
+    model_a_id: str
+    model_b_id: str
+    max_upload_bytes: int
+
+
+class PrivacyResponse(BaseModel):
+    privacy_mode_supported: bool
+    default_retention_hours: int
+    max_retention_hours: int
+    purge_endpoint: str
+    stored_fields: List[str]
+
+
+class PurgeResponse(BaseModel):
+    purged: bool
+    session_id: str
+
+
+class StatusPayload(BaseModel):
+    """Inline status object returned by multiple endpoints."""
+    model_config = {'extra': 'allow'}
+
+    session_id: str
+    stage: str
+    detail: str
+    progress: int
+    updated_at: str
+    completed: Optional[bool] = None
+    failed: Optional[bool] = None
+
+
+class AnalysisStartResponse(BaseModel):
+    session_id: str
+    profile_id: str
+    privacy_mode: bool
+    retention_hours: int
+    status: StatusPayload
+
+
+class StatusLatestWrapper(BaseModel):
+    """Wrapper for /status/latest which may return a real status or idle stub."""
+    model_config = {'extra': 'allow'}
+
+    stage: str
+    detail: str
+    progress: int
+    session_id: Optional[str] = None
+    updated_at: Optional[str] = None
+    completed: Optional[bool] = None
+    failed: Optional[bool] = None
+
+
+class StatusLatestResponse(BaseModel):
+    status: StatusLatestWrapper
+
+
+class SessionSummaryItem(BaseModel):
+    """Lightweight session row used in /history items."""
+    model_config = {'extra': 'allow'}
+
+    session_id: str
+    profile_id: Optional[str] = None
+    timestamp: str
+    severity: Optional[str] = None
+    gags_score: Optional[int] = None
+    lesion_count: Optional[int] = None
+    symmetry_delta: Optional[float] = None
+    privacy_mode: bool
+    retention_hours: int
+    status: Optional[Dict[str, Any]] = None
+
+
+class HistoryResponse(BaseModel):
+    items: List[SessionSummaryItem]
+    next_cursor: Optional[str] = None
+
+
+class ProfileItem(BaseModel):
+    profile_id: str
+    sessions: int
+    latest_timestamp: Optional[str] = None
+    latest_severity: Optional[str] = None
+
+
+class ProfilesResponse(BaseModel):
+    items: List[ProfileItem]
+
+
+class SessionDetailResponse(BaseModel):
+    """Full session detail returned by GET /session/{id}."""
+    model_config = {'extra': 'allow'}
+
+    session_id: str
+    profile_id: Optional[str] = None
+    timestamp: str
+    severity: Optional[str] = None
+    gags_score: Optional[int] = None
+    lesion_count: Optional[int] = None
+    symmetry_delta: Optional[float] = None
+    results: Optional[Dict[str, Any]] = None
+    note: Optional[str] = None
+    diagnostic_image_path: Optional[str] = None
+    original_image_path: Optional[str] = None
+    diagnostic_image: Optional[str] = None
+    original_image: Optional[str] = None
+    privacy_mode: bool
+    retention_hours: int
+    status: Optional[Dict[str, Any]] = None
+
+
+class NotesResponse(BaseModel):
+    session_id: str
+    note: str
+
+
+class CompareDetailModel(BaseModel):
+    """Shape of the compare payload when comparison data is available."""
+    model_config = {'extra': 'allow'}
+
+    previous_session_id: str
+    current_session_id: str
+    previous_timestamp: str
+    current_timestamp: str
+    severity_change: Dict[str, str]
+    lesion_delta: int
+    gags_delta: int
+    symmetry_delta_change: float
+    regions: Dict[str, Dict[str, Any]]
+    comparison_mode: Optional[str] = None
+
+
+class CompareResponse(BaseModel):
+    current_session_id: str
+    compare: Optional[CompareDetailModel] = None
+
+
+class ReportDetail(BaseModel):
+    model_config = {'extra': 'allow'}
+
+    clinical_analysis: Dict[str, Any] = Field(default_factory=dict)
+    consensus_summary: Dict[str, Any] = Field(default_factory=dict)
+    compare: Optional[Dict[str, Any]] = None
+    pdf_path: str
+    pdf_data_uri: Optional[str] = None
+
+
+class ReportResponse(BaseModel):
+    session_id: str
+    report: ReportDetail
+
+
+class ExportResponse(BaseModel):
+    session_id: str
+    pdf_path: str
+    preset: str
+    pdf_data_uri: Optional[str] = None
+
+
+class AnalyzeResultResponse(BaseModel):
+    """Response for POST /analyze — large payload with full analysis results."""
+    model_config = {'extra': 'allow'}
+
+    session_id: str
+    status: StatusPayload
+    severity: Optional[str] = None
+    gags_score: Optional[int] = None
+    lesion_count: Optional[int] = None
+    symmetry_delta: Optional[float] = None
+    results: Optional[Dict[str, Any]] = None
+    compare: Optional[Dict[str, Any]] = None
+    original_image: str
+    diagnostic_image: str
 
 
 model_init_lock = threading.Lock()
@@ -546,14 +747,48 @@ class BridgeStore:
             return None
         return row_to_session(row, self.get_status(row['session_id']))
 
-    def history(self, limit: int = 25) -> List[Dict[str, Any]]:
-        rows = self.conn.execute(
-            'SELECT * FROM sessions ORDER BY timestamp DESC LIMIT ?',
-            (max(1, min(limit, 200)),),
-        ).fetchall()
+    def history(self, limit: int = 25, profile_id: Optional[str] = None, cursor: Optional[str] = None) -> Tuple[List[Dict[str, Any]], Optional[str]]:
+        """Fetch session history ordered by timestamp DESC.
+
+        Args:
+            limit: Max rows to return (clamped 1-200). One extra row is fetched
+                internally to determine whether a next page exists.
+            profile_id: Optional filter to a single profile.
+            cursor: ISO-8601 timestamp cursor; only rows with timestamp
+                strictly less than this value are returned.
+
+        Returns:
+            A list of session summary dicts. The caller (endpoint) wraps this
+            in an envelope that includes ``next_cursor``.
+        """
+        clamped_limit = max(1, min(limit, 200))
+        # Fetch one extra to detect whether a next page exists
+        fetch_limit = clamped_limit + 1
+        conditions: list[str] = []
+        params: list[object] = []
+
+        if profile_id:
+            conditions.append('profile_id = ?')
+            params.append(profile_id)
+        if cursor:
+            conditions.append('timestamp < ?')
+            params.append(cursor)
+
+        where_clause = (' WHERE ' + ' AND '.join(conditions)) if conditions else ''
+        query = (
+            'SELECT session_id, profile_id, timestamp, severity, gags_score, '
+            'lesion_count, symmetry_delta, privacy_mode, retention_hours '
+            f'FROM sessions{where_clause} ORDER BY timestamp DESC LIMIT ?'
+        )
+        params.append(fetch_limit)
+
+        rows = self.conn.execute(query, params).fetchall()
         if not rows:
-            return []
-        session_ids = [row['session_id'] for row in rows]
+            return [], None
+        # Determine whether there is a next page
+        has_next = len(rows) > clamped_limit
+        page_rows = rows[:clamped_limit]
+        session_ids = [row['session_id'] for row in page_rows]
         placeholders = ','.join('?' for _ in session_ids)
         with self.lock:
             status_rows = self.conn.execute(
@@ -563,7 +798,23 @@ class BridgeStore:
         status_map: Dict[str, Dict[str, Any]] = {
             r['session_id']: json.loads(r['status_json']) for r in status_rows
         }
-        return [row_to_session(row, status_map.get(row['session_id'])) for row in rows]
+        items = [
+            {
+                'session_id': row['session_id'],
+                'profile_id': row['profile_id'],
+                'timestamp': row['timestamp'],
+                'severity': row['severity'],
+                'gags_score': row['gags_score'],
+                'lesion_count': row['lesion_count'],
+                'symmetry_delta': row['symmetry_delta'],
+                'privacy_mode': bool(row['privacy_mode']),
+                'retention_hours': row['retention_hours'],
+                'status': status_map.get(row['session_id']),
+            }
+            for row in page_rows
+        ]
+        next_cursor = page_rows[-1]['timestamp'] if has_next else None
+        return items, next_cursor
 
     def purge(self, session_id: str) -> bool:
         row = self.get_session_row(session_id)
@@ -951,6 +1202,11 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title='Acne V7 API Bridge', version=APP_VERSION, lifespan=lifespan)
+
+limiter = Limiter(key_func=get_remote_address, default_limits=['60/minute'])
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
 ALLOWED_ORIGINS = [
     origin.strip()
     for origin in os.getenv('CORS_ALLOWED_ORIGINS', 'http://localhost:3000,http://localhost:5173').split(',')
@@ -979,7 +1235,7 @@ def get_store() -> BridgeStore:
     return app.state.resources['store']
 
 
-@app.get('/')
+@app.get('/', response_model=RootResponse)
 async def root() -> Dict[str, Any]:
     return {
         'app': 'Acne V7 API Bridge',
@@ -1023,7 +1279,7 @@ def get_cloud_engine() -> Any:
     return cloud_engine
 
 
-@app.get('/health')
+@app.get('/health', response_model=HealthResponse)
 async def health() -> Dict[str, Any]:
     return {
         'status': 'ok',
@@ -1034,7 +1290,7 @@ async def health() -> Dict[str, Any]:
     }
 
 
-@app.get('/version')
+@app.get('/version', response_model=VersionResponse)
 async def version() -> Dict[str, Any]:
     return {
         'app': 'Acne V7 API Bridge',
@@ -1045,7 +1301,7 @@ async def version() -> Dict[str, Any]:
     }
 
 
-@app.get('/privacy')
+@app.get('/privacy', response_model=PrivacyResponse)
 async def privacy() -> Dict[str, Any]:
     return {
         'privacy_mode_supported': True,
@@ -1068,7 +1324,7 @@ async def privacy() -> Dict[str, Any]:
     }
 
 
-@app.delete('/privacy/purge/{session_id}')
+@app.delete('/privacy/purge/{session_id}', response_model=PurgeResponse)
 async def purge_session(session_id: str) -> Dict[str, Any]:
     session_id = validate_session_id(session_id)
     if not get_store().purge(session_id):
@@ -1076,7 +1332,7 @@ async def purge_session(session_id: str) -> Dict[str, Any]:
     return {'purged': True, 'session_id': session_id}
 
 
-@app.post('/analysis/start')
+@app.post('/analysis/start', response_model=AnalysisStartResponse)
 async def analysis_start(request: AnalysisStartRequest) -> Dict[str, Any]:
     store = get_store()
     session_id = validate_session_id(request.session_id or uuid.uuid4().hex)
@@ -1110,18 +1366,20 @@ async def session_status_stream(session_id: str) -> StreamingResponse:
                 yield f"data: {json.dumps(current)}\n\n"
                 if current.get('completed') or current.get('failed'):
                     break
+            else:
+                yield ": keepalive\n\n"
             await asyncio.sleep(0.6)
 
     return StreamingResponse(event_generator(), media_type='text/event-stream')
 
 
-@app.get('/status/latest')
+@app.get('/status/latest', response_model=StatusLatestResponse)
 async def status_latest() -> Dict[str, Any]:
     status = get_store().latest_status()
     return {'status': status or {'stage': 'idle', 'detail': 'No analyses yet', 'progress': 0}}
 
 
-@app.get('/status/{session_id}')
+@app.get('/status/{session_id}', response_model=StatusPayload)
 async def session_status(session_id: str) -> Dict[str, Any]:
     status = get_store().get_status(validate_session_id(session_id))
     if not status:
@@ -1129,44 +1387,70 @@ async def session_status(session_id: str) -> Dict[str, Any]:
     return status
 
 
-@app.get('/history')
-async def history(limit: int = 25, profile_id: Optional[str] = None) -> Dict[str, Any]:
-    items = [compact_session(item) for item in get_store().history(limit)]
-    if profile_id:
-        items = [item for item in items if item.get('profile_id') == profile_id]
-    return {'items': items}
+@app.get('/history', response_model=HistoryResponse)
+async def history(limit: int = 25, profile_id: Optional[str] = None, cursor: Optional[str] = None) -> Dict[str, Any]:
+    items, next_cursor = get_store().history(limit, profile_id=profile_id, cursor=cursor)
+    result: Dict[str, Any] = {'items': items}
+    if next_cursor:
+        result['next_cursor'] = next_cursor
+    return result
 
 
-@app.get('/profiles')
+@app.get('/profiles', response_model=ProfilesResponse)
 async def profiles() -> Dict[str, Any]:
     store = get_store()
     with store.lock:
-        group_rows = store.conn.execute(
-            'SELECT profile_id, COUNT(*) as sessions, MAX(timestamp) as latest_timestamp FROM sessions GROUP BY profile_id'
+        rows = store.conn.execute(
+            '''
+            SELECT
+                profile_id,
+                COUNT(*) AS sessions,
+                MAX(timestamp) AS latest_timestamp,
+                (SELECT severity FROM sessions s2 WHERE s2.profile_id = s1.profile_id ORDER BY s2.timestamp DESC LIMIT 1) AS latest_severity
+            FROM sessions s1
+            GROUP BY profile_id
+            '''
         ).fetchall()
-    items = []
-    for row in group_rows:
-        profile_id = row['profile_id'] or 'default-profile'
-        with store.lock:
-            latest_row = store.conn.execute(
-                'SELECT severity FROM sessions WHERE profile_id = ? ORDER BY timestamp DESC LIMIT 1',
-                (row['profile_id'],),
-            ).fetchone()
-        items.append({
-            'profile_id': profile_id,
+    items = [
+        {
+            'profile_id': row['profile_id'] or 'default-profile',
             'sessions': row['sessions'],
             'latest_timestamp': row['latest_timestamp'],
-            'latest_severity': latest_row['severity'] if latest_row else None,
-        })
+            'latest_severity': row['latest_severity'],
+        }
+        for row in rows
+    ]
     return {'items': items}
 
 
-@app.get('/session/{session_id}')
+@app.get('/session/{session_id}', response_model=SessionDetailResponse)
 async def session_detail(session_id: str) -> Dict[str, Any]:
     return require_session(session_id)
 
 
-@app.post('/session/{session_id}/notes')
+@app.get('/session/{session_id}/image/{kind}')
+async def session_image(session_id: str, kind: Literal['diagnostic', 'original']) -> FileResponse:
+    """Serve a session image as a file response instead of a data URI."""
+    session_id = validate_session_id(session_id)
+    row = get_store().get_session_row(session_id)
+    if not row:
+        raise HTTPException(status_code=404, detail='Session not found')
+    path_key = f'{kind}_image_path'
+    raw_path = row[path_key]
+    if not raw_path:
+        raise HTTPException(status_code=404, detail=f'No {kind} image for this session')
+    file_path = Path(raw_path)
+    if not file_path.is_absolute():
+        file_path = (BASE_DIR / file_path).resolve()
+    managed_roots = (UPLOAD_DIR.resolve(), OUTPUT_DIR.resolve(), REPORT_DIR.resolve())
+    if not any(str(file_path).startswith(str(r)) for r in managed_roots):
+        raise HTTPException(status_code=403, detail='Access denied')
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail='Image file not found on disk')
+    return FileResponse(file_path, media_type='image/jpeg')
+
+
+@app.post('/session/{session_id}/notes', response_model=NotesResponse)
 async def update_session_notes(session_id: str, request: NotesRequest) -> Dict[str, Any]:
     session_id = validate_session_id(session_id)
     session = require_session(session_id)
@@ -1180,7 +1464,7 @@ async def update_session_notes(session_id: str, request: NotesRequest) -> Dict[s
     return {'session_id': session_id, 'note': request.note}
 
 
-@app.get('/compare/{current_session_id}')
+@app.get('/compare/{current_session_id}', response_model=CompareResponse)
 async def compare(current_session_id: str, previous_session_id: Optional[str] = None) -> Dict[str, Any]:
     current = require_session(current_session_id)
     if previous_session_id and previous_session_id == current['session_id']:
@@ -1193,7 +1477,7 @@ async def compare(current_session_id: str, previous_session_id: Optional[str] = 
     }
 
 
-@app.get('/report/{session_id}')
+@app.get('/report/{session_id}', response_model=ReportResponse)
 async def report(session_id: str, previous_session_id: Optional[str] = None) -> Dict[str, Any]:
     session = require_session(session_id)
     if not session.get('results'):
@@ -1216,7 +1500,7 @@ async def report(session_id: str, previous_session_id: Optional[str] = None) -> 
     }
 
 
-@app.post('/export/{session_id}')
+@app.post('/export/{session_id}', response_model=ExportResponse)
 async def export(session_id: str, request: ExportRequest) -> Dict[str, Any]:
     session = require_session(session_id)
     if not session.get('results'):
@@ -1237,8 +1521,10 @@ async def export(session_id: str, request: ExportRequest) -> Dict[str, Any]:
     return payload
 
 
-@app.post('/analyze')
+@app.post('/analyze', response_model=AnalyzeResultResponse)
+@limiter.limit('10/minute')
 async def analyze(
+    request: Request,
     file: UploadFile = File(...),
     session_id: Optional[str] = Form(None),
     profile_id: Optional[str] = Form(None),

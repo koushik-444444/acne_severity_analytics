@@ -9,7 +9,7 @@ export type ClinicalAnalysis = {
   regions: Record<string, RegionStats>
   total_lesions: number
   gags_total_score: number
-  clinical_severity: string
+  clinical_severity: ClinicalSeverity | (string & {})
   symmetry_delta: number
 }
 
@@ -35,9 +35,27 @@ export type ConsensusSummary = {
   lesions?: ConsensusLesion[]
 }
 
+export type SessionStage =
+  | 'idle'
+  | 'queued'
+  | 'uploading'
+  | 'segmenting'
+  | 'cloud_inference'
+  | 'mapping'
+  | 'scoring'
+  | 'completed'
+  | 'failed'
+
+export type ClinicalSeverity =
+  | 'Clear'
+  | 'Mild'
+  | 'Moderate'
+  | 'Severe'
+  | 'Very Severe / Cystic'
+
 export type SessionStatus = {
   session_id?: string
-  stage: string
+  stage: SessionStage | (string & {})
   detail: string
   progress: number
   updated_at?: string
@@ -142,4 +160,9 @@ export type PrivacyConfig = {
   max_retention_hours: number
   purge_endpoint: string
   stored_fields: string[]
+}
+
+export type HistoryPage = {
+  items: SessionSummary[]
+  next_cursor?: string | null
 }

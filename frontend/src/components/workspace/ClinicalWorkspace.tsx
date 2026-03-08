@@ -1,208 +1,81 @@
-import { useEffect, useMemo, useRef, useState, type MouseEvent as ReactMouseEvent } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Activity, Camera, Eye, EyeOff, Loader2, Maximize2, Minimize2, Search, SearchX, Shield, Sparkles, Trash2 } from 'lucide-react'
 import { motion } from 'framer-motion'
 
 import { api } from '../../services/api'
+import {
+  clamp,
+  describeDelta,
+  formatDate,
+  formatSignedDelta,
+  getConfidenceTextTone,
+  getClinicalDeltaLabel,
+  getDeltaTone,
+  getProfileStorageKey,
+  getSeverityTone,
+  readStorageItem,
+  removeStorageItem,
+  writeStorageItem,
+} from '../../lib/clinical-utils'
+import { useAnalysisWorkflow } from '../../hooks/useAnalysisWorkflow'
+import { useKeyboardShortcuts } from '../../hooks/useKeyboardShortcuts'
+import { useProfileSwitchNotice } from '../../hooks/useProfileSwitchNotice'
+import { useStatusPoller } from '../../hooks/useStatusPoller'
+import { useWorkspacePrefs } from '../../hooks/useWorkspacePrefs'
 import type {
-  AnalyzeResponse,
   ComparePayload,
-  ConsensusLesion,
   PrivacyConfig,
   ProfileSummary,
   RegionStats,
   SessionDetail,
-  SessionStatus,
   SessionSummary,
 } from '../../types/api'
+import { AdvancedImageViewer } from './AdvancedImageViewer'
+import { MetricCard } from './MetricCard'
+import { SplitCompareViewer } from './SplitCompareViewer'
+import type { ViewerState } from './types'
 
 type CompareRegionDelta = NonNullable<ComparePayload>['regions'][string]
-type ViewerMode = 'single' | 'split'
-const UI_PREFS_KEY = 'clearskin-ui-prefs'
 const BASELINE_SESSION_KEY = 'clearskin-baseline-session'
-const ONBOARDING_SEEN_KEY = `${UI_PREFS_KEY}-onboarding-seen`
+const ONBOARDING_SEEN_KEY = 'clearskin-ui-prefs-onboarding-seen'
 const DEFAULT_PROFILE_ID = 'default-profile'
 
-type WorkspaceUiPrefs = {
-  leftRailWidth?: number
-  rightRailWidth?: number
-  compareViewerMode?: ViewerMode
-  showDetectionOverlay?: boolean
-  showCompareOverlay?: boolean
-  exportPreset?: 'clinical' | 'compact' | 'presentation'
-}
-
-function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleString()
-  } catch {
-    return iso
-  }
-}
-
-function getSeverityTone(severity: string) {
-  const normalized = severity.toLowerCase()
-  if (normalized.includes('very severe') || normalized.includes('cystic')) {
-    return 'border-red-500/35 bg-red-500/15 text-red-200 shadow-[0_0_30px_rgba(239,68,68,0.12)]'
-  }
-  if (normalized.includes('severe')) {
-    return 'border-orange-500/35 bg-orange-500/15 text-orange-200 shadow-[0_0_30px_rgba(249,115,22,0.12)]'
-  }
-  if (normalized.includes('moderate')) {
-    return 'border-amber-500/35 bg-amber-500/15 text-amber-200 shadow-[0_0_30px_rgba(245,158,11,0.12)]'
-  }
-  if (normalized.includes('mild')) {
-    return 'border-cyan-400/35 bg-cyan-400/10 text-cyan-200 shadow-[0_0_30px_rgba(0,242,255,0.10)]'
-  }
-  return 'border-white/10 bg-white/5 text-zinc-200'
-}
-
-type ViewerState = {
-  scale: number
-  x: number
-  y: number
-}
-
-type ActiveCaseProfileGuard = {
-  sessionId: string
-  sessionProfileId: string
-  requestedProfileId: string
-}
-
-function clamp(value: number, min: number, max: number) {
-  return Math.min(max, Math.max(min, value))
-}
-
-function getProfileStorageKey(baseKey: string, profileId: string) {
-  return `${baseKey}:${profileId || DEFAULT_PROFILE_ID}`
-}
-
-function formatSignedDelta(value: number, suffix = '') {
-  return `${value > 0 ? '+' : ''}${value}${suffix}`
-}
-
-function getClinicalDeltaStatus(value: number, betterWhenLower = true): 'improved' | 'stable' | 'worsened' {
-  if (value === 0) {
-    return 'stable'
-  }
-
-  const improved = betterWhenLower ? value < 0 : value > 0
-  return improved ? 'improved' : 'worsened'
-}
-
-function getClinicalDeltaLabel(value: number, betterWhenLower = true) {
-  const status = getClinicalDeltaStatus(value, betterWhenLower)
-  if (status === 'stable') {
-    return 'Stable'
-  }
-  return status === 'improved' ? 'Improved' : 'Worsened'
-}
-
-function getDeltaTone(value: number, betterWhenLower = true) {
-  if (value === 0) {
-    return 'border-white/10 bg-white/5 text-zinc-200'
-  }
-
-  const improved = betterWhenLower ? value < 0 : value > 0
-  return improved
-    ? 'border-emerald-400/25 bg-emerald-400/10 text-emerald-100'
-    : 'border-rose-400/25 bg-rose-400/10 text-rose-100'
-}
-
-function describeDelta(value: number, label: string, betterWhenLower = true) {
-  if (value === 0) {
-    return `${label} remained stable`
-  }
-
-  const status = getClinicalDeltaStatus(value, betterWhenLower)
-  const magnitude = Math.abs(value)
-  return status === 'improved'
-    ? `${label} improved by ${magnitude}`
-    : `${label} worsened by ${magnitude}`
-}
-
-function readStorageItem(key: string) {
-  try {
-    return window.localStorage.getItem(key)
-  } catch {
-    return null
-  }
-}
-
-function writeStorageItem(key: string, value: string) {
-  try {
-    window.localStorage.setItem(key, value)
-  } catch {
-    // ignore storage write failures
-  }
-}
-
-function removeStorageItem(key: string) {
-  try {
-    window.localStorage.removeItem(key)
-  } catch {
-    // ignore storage removal failures
-  }
-}
-
-function loadUiPrefs(profileId: string): WorkspaceUiPrefs | null {
-  const storageKey = getProfileStorageKey(UI_PREFS_KEY, profileId)
-  const raw = readStorageItem(storageKey)
-  if (!raw) {
-    return null
-  }
-
-  try {
-    return JSON.parse(raw) as WorkspaceUiPrefs
-  } catch {
-    removeStorageItem(storageKey)
-    return null
-  }
-}
-
 export function ClinicalWorkspace() {
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
-  const [sessionId, setSessionId] = useState<string | null>(null)
-  const [status, setStatus] = useState<SessionStatus | null>(null)
+  const [caseState, dispatch] = useAnalysisWorkflow()
+  const {
+    isAnalyzing, selectedFile, previewUrl, sessionId,
+    active, compare, previousSession, noteDraft,
+    activeLesionKey, profileGuard, error,
+    isExporting, isSavingNotes, isLoadingSession, isPurging,
+  } = caseState
+
   const [history, setHistory] = useState<SessionSummary[]>([])
   const [profiles, setProfiles] = useState<ProfileSummary[]>([])
   const [activeProfileId, setActiveProfileId] = useState<string>(DEFAULT_PROFILE_ID)
-  const [active, setActive] = useState<AnalyzeResponse | null>(null)
-  const [compare, setCompare] = useState<ComparePayload | null>(null)
-  const [previousSession, setPreviousSession] = useState<SessionDetail | null>(null)
   const [baselineSession, setBaselineSession] = useState<SessionSummary | null>(null)
   const [privacy, setPrivacy] = useState<PrivacyConfig | null>(null)
   const [privacyMode, setPrivacyMode] = useState(false)
   const [retentionHours, setRetentionHours] = useState(72)
-  const [showDetectionOverlay, setShowDetectionOverlay] = useState(true)
-  const [showCompareOverlay, setShowCompareOverlay] = useState(true)
-  const [compareViewerMode, setCompareViewerMode] = useState<ViewerMode>('single')
   const [compareFullscreen, setCompareFullscreen] = useState(false)
-  const [leftRailWidth, setLeftRailWidth] = useState(320)
-  const [rightRailWidth, setRightRailWidth] = useState(380)
   const [mainViewer, setMainViewer] = useState<ViewerState>({ scale: 1, x: 0, y: 0 })
   const [compareViewer, setCompareViewer] = useState<ViewerState>({ scale: 1, x: 0, y: 0 })
   const [isFullscreen, setIsFullscreen] = useState(false)
-  const [activeLesionKey, setActiveLesionKey] = useState<string | null>(null)
   const [lesionRegionFilter, setLesionRegionFilter] = useState<string>('all')
   const [lesionConfidenceFilter, setLesionConfidenceFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all')
-  const [noteDraft, setNoteDraft] = useState('')
-  const [exportPreset, setExportPreset] = useState<'clinical' | 'compact' | 'presentation'>('clinical')
   const [showOnboarding, setShowOnboarding] = useState(false)
-  const [prefsHydrated, setPrefsHydrated] = useState(false)
-  const [profileSwitchNotice, setProfileSwitchNotice] = useState<{ from: string; to: string } | null>(null)
-  const [profileGuard, setProfileGuard] = useState<ActiveCaseProfileGuard | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isExporting, setIsExporting] = useState(false)
-  const [isSavingNotes, setIsSavingNotes] = useState(false)
-  const [isLoadingSession, setIsLoadingSession] = useState(false)
-  const [isPurging, setIsPurging] = useState(false)
   const workspaceRef = useRef<HTMLDivElement | null>(null)
-  const hasHydratedInitialProfileRef = useRef(false)
-  const previousProfileRef = useRef(activeProfileId)
-  const profileNoticeTimerRef = useRef<number | null>(null)
-  const prefsSaveTimerRef = useRef<number | null>(null)
+
+  const {
+    leftRailWidth, setLeftRailWidth,
+    rightRailWidth, setRightRailWidth,
+    compareViewerMode, setCompareViewerMode,
+    showDetectionOverlay, setShowDetectionOverlay,
+    showCompareOverlay, setShowCompareOverlay,
+    exportPreset, setExportPreset,
+  } = useWorkspacePrefs(activeProfileId)
+
+  const [status, setStatus] = useStatusPoller(sessionId, isAnalyzing)
+  const profileSwitchNotice = useProfileSwitchNotice(activeProfileId)
 
   useEffect(() => {
     setShowOnboarding(readStorageItem(ONBOARDING_SEEN_KEY) !== 'true')
@@ -221,7 +94,7 @@ export function ClinicalWorkspace() {
       })
       .catch((err) => {
         if (activeRequest) {
-          setError(err instanceof Error ? err.message : 'Failed to initialize workspace')
+          dispatch({ type: 'SET_ERROR', error: err instanceof Error ? err.message : 'Failed to initialize workspace' })
         }
       })
 
@@ -231,28 +104,18 @@ export function ClinicalWorkspace() {
   }, [])
 
   useEffect(() => {
-    setPrefsHydrated(false)
     setBaselineSession(null)
-
-    const storedPrefs = loadUiPrefs(activeProfileId)
-    setLeftRailWidth(storedPrefs?.leftRailWidth ?? 320)
-    setRightRailWidth(storedPrefs?.rightRailWidth ?? 380)
-    setCompareViewerMode(storedPrefs?.compareViewerMode ?? 'single')
-    setShowDetectionOverlay(storedPrefs?.showDetectionOverlay ?? true)
-    setShowCompareOverlay(storedPrefs?.showCompareOverlay ?? true)
-    setExportPreset(storedPrefs?.exportPreset ?? 'clinical')
-    setPrefsHydrated(true)
 
     let activeRequest = true
     const baselineStorageKey = getProfileStorageKey(BASELINE_SESSION_KEY, activeProfileId)
 
     void Promise.all([api.getHistory(30, activeProfileId), api.getProfiles()])
-      .then(([historyItems, profileItems]) => {
+      .then(([historyPage, profileItems]) => {
         if (!activeRequest) {
           return
         }
 
-        setHistory(historyItems)
+        setHistory(historyPage.items)
         setProfiles(profileItems)
 
         const storedBaseline = readStorageItem(baselineStorageKey)
@@ -260,7 +123,7 @@ export function ClinicalWorkspace() {
           return
         }
 
-        const match = historyItems.find((item) => item.session_id === storedBaseline)
+        const match = historyPage.items.find((item) => item.session_id === storedBaseline)
         if (match) {
           setBaselineSession(match)
           return
@@ -270,7 +133,7 @@ export function ClinicalWorkspace() {
       })
       .catch((err) => {
         if (activeRequest) {
-          setError(err instanceof Error ? err.message : 'Failed to load profile workspace')
+          dispatch({ type: 'SET_ERROR', error: err instanceof Error ? err.message : 'Failed to load profile workspace' })
         }
       })
 
@@ -278,102 +141,6 @@ export function ClinicalWorkspace() {
       activeRequest = false
     }
   }, [activeProfileId])
-
-  useEffect(() => {
-    if (!hasHydratedInitialProfileRef.current) {
-      hasHydratedInitialProfileRef.current = true
-      previousProfileRef.current = activeProfileId
-      return
-    }
-
-    const previousProfileId = previousProfileRef.current
-    if (previousProfileId === activeProfileId) {
-      return
-    }
-
-    setProfileSwitchNotice({ from: previousProfileId, to: activeProfileId })
-    previousProfileRef.current = activeProfileId
-
-    if (profileNoticeTimerRef.current !== null) {
-      window.clearTimeout(profileNoticeTimerRef.current)
-    }
-
-    profileNoticeTimerRef.current = window.setTimeout(() => {
-      setProfileSwitchNotice(null)
-      profileNoticeTimerRef.current = null
-    }, 2600)
-  }, [activeProfileId])
-
-  useEffect(() => {
-    return () => {
-      if (profileNoticeTimerRef.current !== null) {
-        window.clearTimeout(profileNoticeTimerRef.current)
-      }
-    }
-  }, [])
-
-  useEffect(() => {
-    if (!prefsHydrated) {
-      return
-    }
-
-    if (prefsSaveTimerRef.current !== null) {
-      window.clearTimeout(prefsSaveTimerRef.current)
-    }
-
-    prefsSaveTimerRef.current = window.setTimeout(() => {
-      writeStorageItem(
-        getProfileStorageKey(UI_PREFS_KEY, activeProfileId),
-        JSON.stringify({
-          leftRailWidth,
-          rightRailWidth,
-          compareViewerMode,
-          showDetectionOverlay,
-          showCompareOverlay,
-          exportPreset,
-        } satisfies WorkspaceUiPrefs),
-      )
-      prefsSaveTimerRef.current = null
-    }, 300)
-
-    return () => {
-      if (prefsSaveTimerRef.current !== null) {
-        window.clearTimeout(prefsSaveTimerRef.current)
-      }
-    }
-  }, [activeProfileId, prefsHydrated, leftRailWidth, rightRailWidth, compareViewerMode, showDetectionOverlay, showCompareOverlay, exportPreset])
-
-  useEffect(() => {
-    if (!sessionId || !isAnalyzing) return
-    let cancelled = false
-
-    const pollStatus = async () => {
-      while (!cancelled) {
-        try {
-          const nextStatus = await api.getStatus(sessionId)
-          if (cancelled) {
-            return
-          }
-          setStatus(nextStatus)
-          if (nextStatus.completed || nextStatus.failed) {
-            return
-          }
-        } catch {
-          if (cancelled) {
-            return
-          }
-        }
-
-        await new Promise((resolve) => window.setTimeout(resolve, 1500))
-      }
-    }
-
-    void pollStatus()
-
-    return () => {
-      cancelled = true
-    }
-  }, [sessionId, isAnalyzing])
 
   const regionDeltaCards = useMemo<[string, CompareRegionDelta][]>(() => {
     if (!compare?.regions) return []
@@ -426,8 +193,8 @@ export function ClinicalWorkspace() {
     ?? DEFAULT_PROFILE_ID
 
   const refreshHistory = async () => {
-    const [items, profileItems] = await Promise.all([api.getHistory(30, activeProfileId), api.getProfiles()])
-    setHistory(items)
+    const [historyPage, profileItems] = await Promise.all([api.getHistory(30, activeProfileId), api.getProfiles()])
+    setHistory(historyPage.items)
     setProfiles(profileItems)
   }
 
@@ -449,26 +216,23 @@ export function ClinicalWorkspace() {
       nextCompare = await api.getCompare(currentSessionId)
     }
 
-    setCompare(nextCompare)
-
+    let nextPrevious: SessionDetail | null = null
     if (nextCompare?.previous_session_id) {
-      const previous = await api.getSession(nextCompare.previous_session_id)
-      setPreviousSession(previous)
-    } else {
-      setPreviousSession(null)
+      nextPrevious = await api.getSession(nextCompare.previous_session_id)
     }
 
+    dispatch({ type: 'SET_COMPARE', compare: nextCompare, previousSession: nextPrevious })
     return nextCompare
   }
 
   const handleFileChange = (event: import('react').ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0] ?? null
-    setSelectedFile(file)
-    setPreviewUrl((oldUrl) => {
-      if (oldUrl) URL.revokeObjectURL(oldUrl)
-      return file ? URL.createObjectURL(file) : null
+    if (previewUrl) URL.revokeObjectURL(previewUrl)
+    dispatch({
+      type: 'SELECT_FILE',
+      file,
+      previewUrl: file ? URL.createObjectURL(file) : null,
     })
-    setError(null)
   }
 
   useEffect(() => {
@@ -481,8 +245,7 @@ export function ClinicalWorkspace() {
   const handleStart = async () => {
     if (!selectedFile) return
     try {
-      setError(null)
-      setIsAnalyzing(true)
+      dispatch({ type: 'START_ANALYSIS' })
       setStatus({
         stage: 'warming_up',
         detail: 'Booting segmentation + cloud engines for first analysis',
@@ -494,7 +257,7 @@ export function ClinicalWorkspace() {
         retention_hours: retentionHours,
       })
       const resolvedProfileId = start.profile_id ?? activeProfileId
-      setSessionId(start.session_id)
+      dispatch({ type: 'SET_SESSION', sessionId: start.session_id })
       if (resolvedProfileId !== activeProfileId) {
         setActiveProfileId(resolvedProfileId)
       }
@@ -508,7 +271,7 @@ export function ClinicalWorkspace() {
       form.append('retention_hours', String(retentionHours))
 
       const result = await api.analyze(form)
-      setActive(result)
+      dispatch({ type: 'ANALYSIS_COMPLETE', active: result })
       await loadCompareContext(result.session_id, {
         previousSessionId: baselineSession?.session_id,
         fallbackCompare: result.compare,
@@ -516,19 +279,17 @@ export function ClinicalWorkspace() {
       setStatus(result.status)
       setShowDetectionOverlay(true)
       setCompareViewerMode('single')
-      setActiveLesionKey(null)
-      setProfileGuard(null)
       await refreshHistory()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Analysis failed')
+      dispatch({ type: 'ANALYSIS_FAILED', error: err instanceof Error ? err.message : 'Analysis failed' })
     } finally {
-      setIsAnalyzing(false)
+      dispatch({ type: 'ANALYSIS_FINISHED' })
     }
   }
 
   const handleSelectHistory = async (item: SessionSummary) => {
     try {
-      setIsLoadingSession(true)
+      dispatch({ type: 'LOAD_SESSION_START' })
       const session = await api.getSession(item.session_id)
       const sessionProfileId = item.profile_id ?? DEFAULT_PROFILE_ID
       if (sessionProfileId !== activeProfileId) {
@@ -537,77 +298,63 @@ export function ClinicalWorkspace() {
       const comparePayload = await loadCompareContext(item.session_id, {
         previousSessionId: baselineSession?.session_id,
       })
-      setSessionId(item.session_id)
-      setActive({
-        session_id: session.session_id,
-        status: session.status ?? { stage: 'completed', detail: 'Loaded from archive', progress: 100 },
-        severity: session.severity,
-        gags_score: session.gags_score,
-        lesion_count: session.lesion_count,
-        symmetry_delta: session.symmetry_delta,
-        results: session.results ?? {},
-        compare: comparePayload,
-        diagnostic_image: session.diagnostic_image ?? null,
-        original_image: session.original_image ?? null,
+      dispatch({
+        type: 'LOAD_SESSION_COMPLETE',
+        sessionId: item.session_id,
+        active: {
+          session_id: session.session_id,
+          status: session.status ?? { stage: 'completed', detail: 'Loaded from archive', progress: 100 },
+          severity: session.severity,
+          gags_score: session.gags_score,
+          lesion_count: session.lesion_count,
+          symmetry_delta: session.symmetry_delta,
+          results: session.results ?? {},
+          compare: comparePayload,
+          diagnostic_image: session.diagnostic_image ?? null,
+          original_image: session.original_image ?? null,
+        },
+        noteDraft: session.note ?? '',
       })
-      setNoteDraft(session.note ?? '')
       setStatus(session.status ?? null)
       setShowDetectionOverlay(true)
       setCompareViewerMode('single')
-      setActiveLesionKey(null)
-      setProfileGuard(null)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load session')
-    } finally {
-      setIsLoadingSession(false)
+      dispatch({ type: 'LOAD_SESSION_FAILED', error: err instanceof Error ? err.message : 'Failed to load session' })
     }
   }
 
   const handlePurge = async (item: SessionSummary) => {
     if (!window.confirm('Permanently delete this session? This cannot be undone.')) return
     try {
-      setIsPurging(true)
+      dispatch({ type: 'PURGE_START' })
       await api.purgeSession(item.session_id)
       if (active?.session_id === item.session_id) {
-        setActive(null)
-        setCompare(null)
-        setPreviousSession(null)
-        setSessionId(null)
+        dispatch({ type: 'PURGE_ACTIVE_CLEARED' })
         setStatus(null)
       }
       await refreshHistory()
+      dispatch({ type: 'PURGE_COMPLETE' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to purge session')
-    } finally {
-      setIsPurging(false)
+      dispatch({ type: 'PURGE_FAILED', error: err instanceof Error ? err.message : 'Failed to purge session' })
     }
   }
 
   const resetCaseWorkspace = () => {
-    setActive(null)
-    setCompare(null)
-    setPreviousSession(null)
-    setSelectedFile(null)
-    setPreviewUrl(null)
-    setSessionId(null)
+    dispatch({ type: 'RESET_CASE' })
     setStatus(null)
-    setNoteDraft('')
-    setActiveLesionKey(null)
-    setProfileGuard(null)
   }
 
   const handleExport = async () => {
     if (!active?.session_id) return
     try {
-      setIsExporting(true)
+      dispatch({ type: 'EXPORT_START' })
       const bundle = await api.exportBundle(active.session_id, exportPreset, compare?.previous_session_id)
       if (bundle.pdf_data_uri) {
         window.open(bundle.pdf_data_uri, '_blank')
       }
+      dispatch({ type: 'EXPORT_COMPLETE' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Export failed')
-    } finally {
-      setIsExporting(false)
+      dispatch({ type: 'EXPORT_FAILED', error: err instanceof Error ? err.message : 'Export failed' })
     }
   }
 
@@ -619,7 +366,7 @@ export function ClinicalWorkspace() {
       try {
         await loadCompareContext(active.session_id, { previousSessionId: item.session_id })
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to load baseline comparison')
+        dispatch({ type: 'SET_ERROR', error: err instanceof Error ? err.message : 'Failed to load baseline comparison' })
       }
     }
   }
@@ -632,7 +379,7 @@ export function ClinicalWorkspace() {
       try {
         await loadCompareContext(active.session_id)
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to restore default comparison')
+        dispatch({ type: 'SET_ERROR', error: err instanceof Error ? err.message : 'Failed to restore default comparison' })
       }
     }
   }
@@ -645,17 +392,18 @@ export function ClinicalWorkspace() {
   const saveNotes = async () => {
     if (!active?.session_id) return
     try {
-      setIsSavingNotes(true)
+      dispatch({ type: 'SAVE_NOTES_START' })
       await api.updateSessionNotes(active.session_id, noteDraft)
+      dispatch({ type: 'SAVE_NOTES_COMPLETE' })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save notes')
-    } finally {
-      setIsSavingNotes(false)
+      dispatch({ type: 'SAVE_NOTES_FAILED', error: err instanceof Error ? err.message : 'Failed to save notes' })
     }
   }
 
   const resetMainViewer = () => setMainViewer({ scale: 1, x: 0, y: 0 })
   const resetCompareViewer = () => setCompareViewer({ scale: 1, x: 0, y: 0 })
+  const handleLesionHover = (key: string | null) => dispatch({ type: 'SET_ACTIVE_LESION', key })
+  const handleNoteDraftChange = (draft: string) => dispatch({ type: 'SET_NOTE_DRAFT', draft })
 
   const toggleFullscreen = async () => {
     if (!workspaceRef.current) return
@@ -674,27 +422,16 @@ export function ClinicalWorkspace() {
     return () => document.removeEventListener('fullscreenchange', onFullScreenChange)
   }, [])
 
-  useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement
-      if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT' || target.isContentEditable) return
-      if (!active) return
-      if (event.key === '+') setMainViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))
-      if (event.key === '-') setMainViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))
-      if (event.key.toLowerCase() === 'r') {
-        resetMainViewer()
-        resetCompareViewer()
-      }
-      if (event.key.toLowerCase() === 'o') setShowDetectionOverlay((value) => !value)
-      if (event.key.toLowerCase() === 'c' && compare) setCompareViewerMode((mode) => (mode === 'single' ? 'split' : 'single'))
-      if (event.key.toLowerCase() === 'f') {
-        event.preventDefault()
-        void toggleFullscreen()
-      }
-    }
-    window.addEventListener('keydown', onKeyDown)
-    return () => window.removeEventListener('keydown', onKeyDown)
-  }, [active, compare])
+  useKeyboardShortcuts({
+    active,
+    compare,
+    setMainViewer,
+    resetMainViewer,
+    resetCompareViewer,
+    setShowDetectionOverlay,
+    setCompareViewerMode,
+    toggleFullscreen,
+  })
 
   return (
     <section ref={workspaceRef} className="medical-grid relative bg-black py-32">
@@ -734,6 +471,8 @@ export function ClinicalWorkspace() {
             initial={{ opacity: 0, y: -12 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
+            role="status"
+            aria-live="polite"
             className="pointer-events-none absolute right-8 top-10 z-20 rounded-2xl border border-cyan-400/15 bg-black/75 px-4 py-3 shadow-[0_0_30px_rgba(0,242,255,0.08)] backdrop-blur"
           >
             <div className="terminal-text text-[9px] tracking-[0.3em] text-cyan-400/80">PROFILE SWITCHED</div>
@@ -747,6 +486,7 @@ export function ClinicalWorkspace() {
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
+            role="alert"
             className="mb-6 flex flex-col gap-4 rounded-[1.5rem] border border-amber-400/20 bg-amber-400/8 px-5 py-4 text-sm text-amber-50 shadow-[0_0_30px_rgba(251,191,36,0.08)] lg:flex-row lg:items-center lg:justify-between"
           >
             <div>
@@ -759,7 +499,7 @@ export function ClinicalWorkspace() {
               <button
                 onClick={() => {
                   setActiveProfileId(profileGuard.sessionProfileId)
-                  setProfileGuard(null)
+                  dispatch({ type: 'SET_PROFILE_GUARD', guard: null })
                 }}
                 className="rounded-full border border-amber-200/30 px-4 py-2 text-[11px] font-medium text-amber-50 hover:bg-amber-200/10"
               >
@@ -793,15 +533,16 @@ export function ClinicalWorkspace() {
                   const nextProfileId = e.target.value
                   setActiveProfileId(nextProfileId)
                   if (active?.session_id && activeSessionProfileId !== nextProfileId) {
-                    setProfileGuard({
+                    dispatch({ type: 'SET_PROFILE_GUARD', guard: {
                       sessionId: active.session_id,
                       sessionProfileId: activeSessionProfileId,
                       requestedProfileId: nextProfileId,
-                    })
+                    } })
                   } else {
-                    setProfileGuard(null)
+                    dispatch({ type: 'SET_PROFILE_GUARD', guard: null })
                   }
                 }}
+                aria-label="Patient profile"
                 className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
               >
                 {(profiles.length ? profiles : [{ profile_id: DEFAULT_PROFILE_ID, sessions: 0, latest_timestamp: '', latest_severity: null }]).map((profile) => (
@@ -863,6 +604,7 @@ export function ClinicalWorkspace() {
               max={420}
               value={leftRailWidth}
               onChange={(e) => setLeftRailWidth(Number(e.target.value))}
+              aria-label="Left panel width"
               className="mt-4 w-full accent-cyan-400"
             />
           </aside>
@@ -977,16 +719,16 @@ export function ClinicalWorkspace() {
                           {showDetectionOverlay ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                           {showDetectionOverlay ? 'Detection overlay' : 'Original image'}
                         </button>
-                        <button onClick={() => setMainViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+                        <button aria-label="Zoom in" onClick={() => setMainViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                           <Search className="h-4 w-4" />
                         </button>
-                        <button onClick={() => setMainViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+                        <button aria-label="Zoom out" onClick={() => setMainViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                           <SearchX className="h-4 w-4" />
                         </button>
                         <button onClick={resetMainViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                           Reset
                         </button>
-                        <button onClick={() => void toggleFullscreen()} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+                        <button aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'} onClick={() => void toggleFullscreen()} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                           {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
                         </button>
                       </div>
@@ -1010,7 +752,7 @@ export function ClinicalWorkspace() {
                       heightClass="h-[520px]"
                       lesions={showDetectionOverlay ? lesionOverlayItems : []}
                       activeLesionKey={activeLesionKey}
-                      onLesionHover={setActiveLesionKey}
+                      onLesionHover={handleLesionHover}
                     />
                   </div>
 
@@ -1113,10 +855,10 @@ export function ClinicalWorkspace() {
                           >
                             {showCompareOverlay ? 'Detection pair' : 'Original pair'}
                           </button>
-                          <button onClick={() => setCompareViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+                          <button aria-label="Zoom in compare" onClick={() => setCompareViewer((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                             <Search className="h-4 w-4" />
                           </button>
-                          <button onClick={() => setCompareViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+                          <button aria-label="Zoom out compare" onClick={() => setCompareViewer((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
                             <SearchX className="h-4 w-4" />
                           </button>
                           <button onClick={resetCompareViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
@@ -1144,7 +886,7 @@ export function ClinicalWorkspace() {
                         heightClass="h-[420px]"
                         lesions={showCompareOverlay ? lesionOverlayItems : []}
                         activeLesionKey={activeLesionKey}
-                        onLesionHover={setActiveLesionKey}
+                        onLesionHover={handleLesionHover}
                       />
                     </div>
                     <div className="rounded-[1.75rem] border border-white/5 bg-black/30 p-4">
@@ -1219,7 +961,7 @@ export function ClinicalWorkspace() {
                         heightClass="h-[640px]"
                         lesions={showCompareOverlay ? lesionOverlayItems : []}
                         activeLesionKey={activeLesionKey}
-                        onLesionHover={setActiveLesionKey}
+                        onLesionHover={handleLesionHover}
                       />
                       {previousImage ? (
                         <AdvancedImageViewer
@@ -1337,6 +1079,7 @@ export function ClinicalWorkspace() {
                       <select
                         value={exportPreset}
                         onChange={(e) => setExportPreset(e.target.value as 'clinical' | 'compact' | 'presentation')}
+                        aria-label="Export preset"
                         className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
                       >
                         <option value="clinical">Clinical</option>
@@ -1365,6 +1108,7 @@ export function ClinicalWorkspace() {
                       <select
                         value={lesionRegionFilter}
                         onChange={(e) => setLesionRegionFilter(e.target.value)}
+                        aria-label="Filter by lesion region"
                         className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
                       >
                         <option value="all">All regions</option>
@@ -1375,6 +1119,7 @@ export function ClinicalWorkspace() {
                       <select
                         value={lesionConfidenceFilter}
                         onChange={(e) => setLesionConfidenceFilter(e.target.value as 'all' | 'high' | 'medium' | 'low')}
+                        aria-label="Filter by confidence tier"
                         className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
                       >
                         <option value="all">All confidence tiers</option>
@@ -1387,8 +1132,8 @@ export function ClinicalWorkspace() {
                       {filteredLesionOverlayItems.slice(0, 12).map((lesion) => (
                         <button
                           key={lesion.key}
-                          onMouseEnter={() => setActiveLesionKey(lesion.key)}
-                          onMouseLeave={() => setActiveLesionKey(null)}
+                          onMouseEnter={() => handleLesionHover(lesion.key)}
+                          onMouseLeave={() => handleLesionHover(null)}
                           className={`rounded-xl border bg-white/3 p-4 text-left text-sm transition-all ${activeLesionKey === lesion.key ? 'border-cyan-400/40 bg-cyan-400/8 shadow-[0_0_25px_rgba(0,242,255,0.12)]' : 'border-white/5'}`}
                         >
                           <div className="mb-2 flex items-center justify-between">
@@ -1407,7 +1152,7 @@ export function ClinicalWorkspace() {
                   <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">SESSION NOTES</div>
                   <textarea
                     value={noteDraft}
-                    onChange={(e) => setNoteDraft(e.target.value)}
+                    onChange={(e) => handleNoteDraftChange(e.target.value)}
                     placeholder="Add dermatologist notes, case observations, or treatment context..."
                     className="min-h-[140px] w-full rounded-xl border border-white/10 bg-black/40 px-4 py-3 text-sm text-white outline-none"
                   />
@@ -1421,10 +1166,16 @@ export function ClinicalWorkspace() {
               </div>
             )}
 
-            {error && <div className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
+            {error && <div role="alert" className="mt-6 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">{error}</div>}
 
             {showOnboarding && (
-              <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-label="Workspace onboarding"
+                className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 p-6 backdrop-blur-sm"
+                onKeyDown={(e) => { if (e.key === 'Escape') dismissOnboarding() }}
+              >
                 <div className="holographic-panel max-w-2xl rounded-[2rem] p-8">
                   <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">WORKSPACE ONBOARDING</div>
                   <h3 className="mb-4 text-3xl font-bold tracking-tight">How to use the clinical workspace</h3>
@@ -1437,6 +1188,7 @@ export function ClinicalWorkspace() {
                   </div>
                   <div className="mt-6 flex justify-end">
                     <button
+                      autoFocus
                       onClick={dismissOnboarding}
                       className="rounded-full bg-cyan-400 px-5 py-2 text-sm font-semibold text-black"
                     >
@@ -1482,230 +1234,14 @@ export function ClinicalWorkspace() {
                 min={320}
                 max={520}
                 value={rightRailWidth}
-                onChange={(e) => setRightRailWidth(Number(e.target.value))}
-                className="mt-4 w-full accent-cyan-400"
+              onChange={(e) => setRightRailWidth(Number(e.target.value))}
+              aria-label="Right panel width"
+              className="mt-4 w-full accent-cyan-400"
               />
             </div>
           </aside>
         </div>
       </div>
     </section>
-  )
-}
-
-function MetricCard({ label, value, accent = false, tone }: { label: string; value: string; accent?: boolean; tone?: string }) {
-  return (
-    <div className={`rounded-[1.5rem] border border-white/5 bg-white/3 p-6 ${tone ?? ''}`}>
-      <div className="terminal-text mb-2 text-[9px] text-zinc-500">{label}</div>
-      <div className={accent ? 'text-3xl font-bold text-cyan-400' : 'text-3xl font-bold text-white'}>{value}</div>
-    </div>
-  )
-}
-
-function getConfidenceTextTone(confidence: number) {
-  if (confidence >= 0.7) return 'text-cyan-300'
-  if (confidence >= 0.4) return 'text-amber-300'
-  return 'text-zinc-300'
-}
-
-function AdvancedImageViewer({
-  src,
-  alt,
-  state,
-  onChange,
-  heightClass,
-  lesions = [],
-  activeLesionKey = null,
-  onLesionHover,
-}: {
-  src: string
-  alt: string
-  state: ViewerState
-  onChange: (next: ViewerState) => void
-  heightClass: string
-  lesions?: Array<ConsensusLesion & { key: string }>
-  activeLesionKey?: string | null
-  onLesionHover?: (key: string | null) => void
-}) {
-  const dragRef = useRef<{ x: number; y: number } | null>(null)
-  const minimapDragRef = useRef(false)
-  const imgRef = useRef<HTMLImageElement | null>(null)
-  const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
-  const [naturalDims, setNaturalDims] = useState<{ w: number; h: number } | null>(null)
-
-  const startDrag = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (state.scale <= 1) return
-    dragRef.current = { x: event.clientX - state.x, y: event.clientY - state.y }
-  }
-
-  const onMove = (event: ReactMouseEvent<HTMLDivElement>) => {
-    if (!dragRef.current || state.scale <= 1) return
-    onChange({
-      ...state,
-      x: event.clientX - dragRef.current.x,
-      y: event.clientY - dragRef.current.y,
-    })
-  }
-
-  const stopDrag = () => {
-    dragRef.current = null
-    minimapDragRef.current = false
-  }
-
-  const moveFromMinimap = (event: ReactMouseEvent<HTMLDivElement>) => {
-    const rect = event.currentTarget.getBoundingClientRect()
-    const relX = (event.clientX - rect.left) / rect.width
-    const relY = (event.clientY - rect.top) / rect.height
-    onChange({
-      ...state,
-      x: (0.5 - relX) * 120,
-      y: (0.5 - relY) * 120,
-    })
-  }
-
-  return (
-    <div
-      className={`relative overflow-hidden rounded-[1.25rem] border border-white/5 bg-black ${heightClass}`}
-      onMouseMove={onMove}
-      onMouseUp={stopDrag}
-      onMouseLeave={stopDrag}
-    >
-      <div className="pointer-events-none absolute left-4 top-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-400 backdrop-blur">
-        zoom {state.scale.toFixed(2)}x
-      </div>
-      <div className="pointer-events-none absolute left-4 bottom-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-400 backdrop-blur">
-        {cursor ? `x ${cursor.x.toFixed(0)} · y ${cursor.y.toFixed(0)}` : 'x -- · y --'}
-      </div>
-      <div
-        className="absolute bottom-4 right-4 z-10 h-24 w-24 overflow-hidden rounded-lg border border-white/10 bg-black/60 backdrop-blur"
-        onMouseDown={() => {
-          minimapDragRef.current = true
-        }}
-        onMouseMove={(event) => {
-          if (minimapDragRef.current) moveFromMinimap(event)
-        }}
-        onMouseUp={stopDrag}
-      >
-        {src ? (
-          <>
-            <img src={src} alt="navigator" className="h-full w-full object-cover opacity-60" />
-            <div
-              className="absolute border border-cyan-300/80 bg-cyan-400/10"
-              style={{
-                left: `${clamp(50 - state.x / 8, 5, 75)}%`,
-                top: `${clamp(50 - state.y / 8, 5, 75)}%`,
-                width: `${clamp(100 / state.scale, 18, 100)}%`,
-                height: `${clamp(100 / state.scale, 18, 100)}%`,
-                transform: 'translate(-50%, -50%)',
-              }}
-            />
-          </>
-        ) : null}
-      </div>
-      {src ? (
-        <div
-          role="presentation"
-          onMouseDown={startDrag}
-          onDoubleClick={() => onChange({ scale: 1, x: 0, y: 0 })}
-          className="flex h-full w-full cursor-grab items-center justify-center active:cursor-grabbing"
-          onMouseMove={(event) => {
-            onMove(event)
-            const rect = event.currentTarget.getBoundingClientRect()
-            setCursor({ x: event.clientX - rect.left, y: event.clientY - rect.top })
-          }}
-        >
-          <div className="relative max-h-full max-w-full">
-            <img
-              src={src}
-              alt={alt}
-              ref={imgRef}
-              className="max-h-full max-w-full object-contain select-none transition-transform duration-200"
-              style={{ transform: `translate(${state.x}px, ${state.y}px) scale(${state.scale})` }}
-              draggable={false}
-              onLoad={(e) => {
-                const img = e.currentTarget
-                setNaturalDims({ w: img.naturalWidth, h: img.naturalHeight })
-              }}
-            />
-            {lesions.length > 0 && naturalDims && (
-              <div className="pointer-events-none absolute inset-0">
-                {lesions.map((lesion) => {
-                  const [x1, y1, x2, y2] = lesion.bbox
-                  const pctLeft = (x1 / naturalDims.w) * 100
-                  const pctTop = (y1 / naturalDims.h) * 100
-                  const pctWidth = (Math.max(0, x2 - x1) / naturalDims.w) * 100
-                  const pctHeight = (Math.max(0, y2 - y1) / naturalDims.h) * 100
-                  const isActive = activeLesionKey === lesion.key
-                  const tone = lesion.confidence >= 0.7
-                    ? 'border-cyan-300/90 shadow-[0_0_20px_rgba(0,242,255,0.25)]'
-                    : lesion.confidence >= 0.4
-                      ? 'border-amber-300/90 shadow-[0_0_18px_rgba(245,158,11,0.18)]'
-                      : 'border-white/70 shadow-[0_0_12px_rgba(255,255,255,0.10)]'
-
-                  return (
-                    <button
-                      key={lesion.key}
-                      type="button"
-                      onMouseEnter={() => onLesionHover?.(lesion.key)}
-                      onMouseLeave={() => onLesionHover?.(null)}
-                      className={`pointer-events-auto absolute border transition-all ${tone} ${isActive ? 'scale-[1.02] bg-cyan-400/10' : 'bg-transparent'}`}
-                      style={{
-                        left: `${pctLeft}%`,
-                        top: `${pctTop}%`,
-                        width: `${pctWidth}%`,
-                        height: `${pctHeight}%`,
-                        transform: `translate(${state.x}px, ${state.y}px) scale(${state.scale})`,
-                        transformOrigin: 'top left',
-                      }}
-                    >
-                      <span className={`absolute -top-5 left-0 rounded bg-black/70 px-1 py-0.5 text-[8px] text-white backdrop-blur ${isActive ? 'opacity-100' : 'opacity-0'}`}>
-                        {lesion.region} {lesion.confidence.toFixed(2)}
-                      </span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="flex h-full items-center justify-center text-sm text-zinc-500">No image available</div>
-      )}
-    </div>
-  )
-}
-
-function SplitCompareViewer({
-  beforeSrc,
-  afterSrc,
-  state,
-  onChange,
-}: {
-  beforeSrc: string
-  afterSrc: string
-  state: ViewerState
-  onChange: (next: ViewerState) => void
-}) {
-  const [divider, setDivider] = useState(50)
-
-  return (
-    <div className="relative h-[480px] overflow-hidden rounded-[1.25rem] border border-white/5 bg-black">
-      <AdvancedImageViewer src={beforeSrc} alt="Previous compare" state={state} onChange={onChange} heightClass="h-[480px]" />
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" style={{ clipPath: `inset(0 ${100 - divider}% 0 0)` }}>
-        <AdvancedImageViewer src={afterSrc} alt="Current compare" state={state} onChange={onChange} heightClass="h-[480px]" />
-      </div>
-      <div className="absolute inset-y-0 z-20 w-px bg-cyan-400/70" style={{ left: `${divider}%` }} />
-      <div className="pointer-events-none absolute left-4 top-4 z-30 rounded-full border border-white/10 bg-black/60 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-300 backdrop-blur">
-        prior / current compare
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={100}
-        value={divider}
-        onChange={(event) => setDivider(Number(event.target.value))}
-        className="absolute bottom-4 left-1/2 z-30 w-64 -translate-x-1/2 accent-cyan-400"
-      />
-    </div>
   )
 }

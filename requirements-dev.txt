@@ -1,0 +1,11 @@
+# Development / CLI-only dependencies
+# These are NOT required by the API server (api_bridge.py).
+# Install with: pip install -r requirements-dev.txt
+-r requirements.txt
+
+matplotlib>=3.4.0
+gdown>=4.7.0
+pandas>=2.0.0
+ultralytics>=8.0.0
+sahi>=0.11.0
+ensemble-boxes>=1.0.0

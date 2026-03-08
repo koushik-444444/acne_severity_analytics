@@ -25,7 +25,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       if (this.props.fallback) return this.props.fallback
 
       return (
-        <div className="mx-auto max-w-xl px-6 py-24 text-center">
+        <div role="alert" className="mx-auto max-w-xl px-6 py-24 text-center">
           <div className="rounded-2xl border border-red-500/20 bg-red-500/5 px-8 py-12">
             <p className="metadata-micro mb-4 text-red-400">Runtime Error</p>
             <p className="mb-4 text-sm text-zinc-300">

@@ -42,9 +42,15 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-8 border-t border-white/5 pt-12 sm:flex-row">
           <p className="terminal-text text-[9px] tracking-[0.2em] text-zinc-700">© {new Date().getFullYear()} CLEARSKIN_AI_CORE. ALL_RIGHTS_RESERVED.</p>
           <div className="flex gap-10">
-            <X className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
-            <Activity className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
-            <Database className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
+            <a href="#" aria-label="Follow us on X">
+              <X className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
+            </a>
+            <a href="#" aria-label="System status">
+              <Activity className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
+            </a>
+            <a href="#" aria-label="Data transparency">
+              <Database className="h-4 w-4 cursor-pointer text-zinc-700 transition-colors hover:text-cyan-400" />
+            </a>
           </div>
         </div>
       </div>

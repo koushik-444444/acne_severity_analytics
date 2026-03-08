@@ -2,17 +2,17 @@ import type {
   AnalysisStartResponse,
   AnalyzeResponse,
   ComparePayload,
+  HistoryPage,
   PrivacyConfig,
   ProfileSummary,
   SessionDetail,
   SessionStatus,
-  SessionSummary,
 } from '../types/api'
 
 const API_BASE = (import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000').replace(/\/$/, '')
 
-async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal): Promise<T> {
-  const timeoutSignal = AbortSignal.timeout(30_000)
+async function request<T>(path: string, init?: RequestInit, signal?: AbortSignal, timeoutMs = 30_000): Promise<T> {
+  const timeoutSignal = AbortSignal.timeout(timeoutMs)
   const combinedSignal = signal
     ? AbortSignal.any([signal, timeoutSignal])
     : timeoutSignal
@@ -46,7 +46,7 @@ export const api = {
     request<AnalyzeResponse>('/analyze', {
       method: 'POST',
       body: payload,
-    }),
+    }, undefined, 120_000),
 
   getLatestStatus: async () => {
     const data = await request<{ status: SessionStatus }>('/status/latest')
@@ -55,10 +55,11 @@ export const api = {
 
   getStatus: (sessionId: string) => request<SessionStatus>(`/status/${sessionId}`),
 
-  getHistory: async (limit = 30, profileId?: string) => {
-    const suffix = profileId ? `&profile_id=${encodeURIComponent(profileId)}` : ''
-    const data = await request<{ items: SessionSummary[] }>(`/history?limit=${limit}${suffix}`)
-    return data.items
+  getHistory: async (limit = 30, profileId?: string, cursor?: string): Promise<HistoryPage> => {
+    const params = new URLSearchParams({ limit: String(limit) })
+    if (profileId) params.set('profile_id', profileId)
+    if (cursor) params.set('cursor', cursor)
+    return request<HistoryPage>(`/history?${params.toString()}`)
   },
 
   getProfiles: async () => {
@@ -78,15 +79,15 @@ export const api = {
 
   purgeSession: (sessionId: string) =>
     request<{ purged: boolean; session_id: string }>(`/privacy/purge/${sessionId}`, {
-      method: 'POST',
+      method: 'DELETE',
     }),
 
-  getHealth: () => request<{ status: string; version: string }>('/health'),
+  getHealth: () => request<{ status: string; version: string }>('/health', undefined, undefined, 10_000),
 
-  getVersion: () => request<{ app: string; version: string }>('/version'),
+  getVersion: () => request<{ app: string; version: string }>('/version', undefined, undefined, 10_000),
 
   getReport: (sessionId: string, previousSessionId?: string) =>
-    request(`/report/${sessionId}${previousSessionId ? `?previous_session_id=${encodeURIComponent(previousSessionId)}` : ''}`),
+    request<{ session_id: string; report: Record<string, unknown> }>(`/report/${sessionId}${previousSessionId ? `?previous_session_id=${encodeURIComponent(previousSessionId)}` : ''}`),
 
   exportBundle: (
     sessionId: string,
