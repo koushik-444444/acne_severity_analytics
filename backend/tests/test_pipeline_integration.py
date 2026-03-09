@@ -55,10 +55,30 @@ def client(tmp_path, monkeypatch):
     monkeypatch.setattr('api_bridge.get_cloud_engine', lambda: mock_cloud)
     monkeypatch.setattr('api_bridge.get_store', lambda: store)
     
+    # Initialize app.state.resources to satisfy the API endpoints
+    app.state.resources = {
+        'pipeline': mock_pipeline,
+        'cloud_engine': mock_cloud,
+        'store': store
+    }
+    
     # Mock visualizers and runtime imports to avoid heavy deps
     monkeypatch.setattr('api_bridge.ensure_runtime_imports', lambda: None)
     monkeypatch.setattr('api_bridge.draw_lesion_boxes', MagicMock(side_effect=lambda img, **kwargs: img))
-    monkeypatch.setattr('api_bridge.EnsembleLesionMapper', MagicMock)
+    
+    mock_mapper_inst = MagicMock()
+    mock_mapper_inst.ensemble_map_multi_scale.return_value = {
+        'forehead': [], 'nose': [], 'left_cheek': [], 'right_cheek': [], 'chin': [],
+        '_pipeline_metrics': {'total_time': 100}
+    }
+    mock_mapper_inst.get_clinical_report.return_value = {
+        'clinical_severity': 'Mild',
+        'gags_total_score': 5,
+        'total_lesions': 3,
+        'symmetry_delta': 0.1,
+        'regions': {}
+    }
+    monkeypatch.setattr('api_bridge.EnsembleLesionMapper', MagicMock(return_value=mock_mapper_inst))
 
     from api_bridge import limiter
     limiter.reset()
@@ -96,8 +116,8 @@ def test_analyze_full_pipeline_success(client):
     assert response.status_code == 200
     data = response.json()
     assert data['session_id'] == session_id
-    assert 'clinical_analysis' in data
-    assert data['clinical_analysis']['total_lesions'] > 0
+    assert 'results' in data
+    assert data['lesion_count'] > 0
     
     # Check status was updated
     status_resp = client.get(f'/status/{session_id}')
