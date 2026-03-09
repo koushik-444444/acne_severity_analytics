@@ -22,3 +22,7 @@ backend/sessions.db
 backend/backend.log
 backend/.venv/
 backend/venv/
+backend/weights/
+
+*.env
+**/*.log

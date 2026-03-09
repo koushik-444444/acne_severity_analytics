@@ -11,7 +11,7 @@ from fastapi.testclient import TestClient
 os.environ['ROBOFLOW_API_KEY'] = 'test-key-for-api-tests'
 
 
-from api_bridge import app, BridgeStore, DB_PATH
+from api_bridge import app, BridgeStore, DB_PATH, limiter
 
 
 @pytest.fixture(autouse=True)
@@ -28,6 +28,9 @@ def _isolate_db(tmp_path, monkeypatch):
     monkeypatch.setattr('api_bridge.UPLOAD_DIR', test_uploads)
     monkeypatch.setattr('api_bridge.OUTPUT_DIR', test_outputs)
     monkeypatch.setattr('api_bridge.REPORT_DIR', test_reports)
+
+    # Reset rate limiter storage between tests to prevent cross-test interference
+    limiter.reset()
 
     store = BridgeStore(test_db)
     app.state.resources = {
@@ -115,6 +118,29 @@ def test_analysis_start_invalid_session_id(client):
     assert r.status_code == 400
 
 
+def test_analysis_start_invalid_profile_id(client):
+    """Profile IDs with special chars should be rejected."""
+    r = client.post('/analysis/start', json={
+        'session_id': 'profile-test',
+        'profile_id': '<script>alert(1)</script>',
+        'privacy_mode': False,
+        'retention_hours': 72,
+    })
+    assert r.status_code == 400
+
+
+def test_analysis_start_valid_profile_id(client):
+    """Valid profile IDs with alphanumeric, dots, dashes, underscores."""
+    r = client.post('/analysis/start', json={
+        'session_id': 'profile-valid-test',
+        'profile_id': 'user.name_01',
+        'privacy_mode': False,
+        'retention_hours': 72,
+    })
+    assert r.status_code == 200
+    assert r.json()['profile_id'] == 'user.name_01'
+
+
 def test_history_empty(client):
     r = client.get('/history')
     assert r.status_code == 200
@@ -133,6 +159,18 @@ def test_history_returns_sessions(client):
     items = r.json()['items']
     assert len(items) >= 1
     assert items[0]['session_id'] == 'hist-test'
+
+
+def test_history_invalid_profile_id(client):
+    """History filter with invalid profile_id should be rejected."""
+    r = client.get('/history?profile_id=<script>')
+    assert r.status_code == 400
+
+
+def test_history_invalid_cursor(client):
+    """History with SQL-injection cursor should be rejected."""
+    r = client.get("/history?cursor='; DROP TABLE sessions;--")
+    assert r.status_code == 400
 
 
 def test_profiles_empty(client):
@@ -198,8 +236,18 @@ def test_security_headers(client):
     r = client.get('/')
     assert r.headers.get('X-Content-Type-Options') == 'nosniff'
     assert r.headers.get('X-Frame-Options') == 'DENY'
-    assert r.headers.get('X-XSS-Protection') == '1; mode=block'
     assert r.headers.get('Referrer-Policy') == 'strict-origin-when-cross-origin'
+    assert r.headers.get('Content-Security-Policy') == "default-src 'none'; frame-ancestors 'none'"
+    assert r.headers.get('Permissions-Policy') == 'camera=(), microphone=(), geolocation=()'
+    assert r.headers.get('Cache-Control') == 'no-store'
+    # X-XSS-Protection should NOT be present (removed as deprecated)
+    assert 'X-XSS-Protection' not in r.headers
+
+
+def test_security_headers_no_hsts_localhost(client):
+    """HSTS should NOT be set for localhost requests."""
+    r = client.get('/', headers={'Host': 'localhost:8000'})
+    assert 'Strict-Transport-Security' not in r.headers
 
 
 def test_compare_session_not_found(client):

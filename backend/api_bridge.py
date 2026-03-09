@@ -327,6 +327,22 @@ def validate_session_id(session_id: str) -> str:
     return session_id
 
 
+def validate_profile_id(profile_id: str) -> str:
+    """Validate profile_id: alphanumeric, dashes, underscores, dots; max 64 chars."""
+    if not re.fullmatch(r'[A-Za-z0-9_.\-]{1,64}', profile_id):
+        raise HTTPException(status_code=400, detail='Invalid profile_id format')
+    return profile_id
+
+
+def validate_cursor(cursor: str) -> str:
+    """Validate pagination cursor: ISO-8601 timestamp format, max 64 chars."""
+    if len(cursor) > 64:
+        raise HTTPException(status_code=400, detail='Invalid cursor format')
+    if not re.fullmatch(r'[\d\-T:+.Z ]{1,64}', cursor):
+        raise HTTPException(status_code=400, detail='Invalid cursor format')
+    return cursor
+
+
 def normalize_retention(hours: int) -> int:
     return max(1, min(int(hours), MAX_RETENTION_HOURS))
 
@@ -358,7 +374,7 @@ def file_to_data_uri(path: Optional[str], mime: str) -> Optional[str]:
     if not file_path.is_absolute():
         file_path = (BASE_DIR / file_path).resolve()
     managed_roots = (UPLOAD_DIR.resolve(), OUTPUT_DIR.resolve(), REPORT_DIR.resolve())
-    if not any(str(file_path).startswith(str(r)) for r in managed_roots):
+    if not any(file_path.is_relative_to(r) for r in managed_roots):
         return None
     if not file_path.exists():
         return None
@@ -384,9 +400,6 @@ def validate_upload(upload: UploadFile, payload: bytes) -> None:
             status_code=415,
             detail='Only JPEG, PNG, and WEBP images are supported',
         )
-    MAGIC_BYTES = {b'\xff\xd8\xff': 'image/jpeg', b'\x89PNG': 'image/png', b'RIFF': 'image/webp'}
-    if not any(payload.startswith(sig) for sig in MAGIC_BYTES):
-        raise HTTPException(status_code=400, detail='File content does not match declared type')
     if not payload:
         raise HTTPException(status_code=400, detail='Uploaded file is empty')
     if len(payload) > MAX_UPLOAD_BYTES:
@@ -394,6 +407,21 @@ def validate_upload(upload: UploadFile, payload: bytes) -> None:
             status_code=413,
             detail=f'File exceeds {MAX_UPLOAD_BYTES} byte limit',
         )
+    # Detect actual content type from magic bytes
+    MAGIC_BYTES = {b'\xff\xd8\xff': 'image/jpeg', b'\x89PNG': 'image/png'}
+    detected_type: Optional[str] = None
+    for sig, mime in MAGIC_BYTES.items():
+        if payload.startswith(sig):
+            detected_type = mime
+            break
+    # WEBP: RIFF container with WEBP identifier at bytes 8-12
+    if payload[:4] == b'RIFF' and len(payload) >= 12 and payload[8:12] == b'WEBP':
+        detected_type = 'image/webp'
+    if detected_type is None:
+        raise HTTPException(status_code=400, detail='File content does not match a supported image format')
+    # Cross-validate: declared Content-Type must match detected type
+    if upload.content_type != detected_type:
+        raise HTTPException(status_code=400, detail='Declared Content-Type does not match file content')
 
 
 def decode_image(payload: bytes) -> np.ndarray:
@@ -1494,8 +1522,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=['*'],
-    allow_headers=['*'],
+    allow_methods=['GET', 'POST', 'DELETE', 'OPTIONS'],
+    allow_headers=['Content-Type', 'Accept'],
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
@@ -1505,8 +1533,14 @@ async def add_security_headers(request: Request, call_next) -> Response:
     response = await call_next(request)
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'DENY'
-    response.headers['X-XSS-Protection'] = '1; mode=block'
     response.headers['Referrer-Policy'] = 'strict-origin-when-cross-origin'
+    response.headers['Content-Security-Policy'] = "default-src 'none'; frame-ancestors 'none'"
+    response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
+    response.headers['Cache-Control'] = 'no-store'
+    # Add HSTS only for non-localhost origins (production deployments)
+    host = request.headers.get('host', '')
+    if host and not host.startswith('localhost') and not host.startswith('127.0.0.1'):
+        response.headers['Strict-Transport-Security'] = 'max-age=63072000; includeSubDomains'
     return response
 
 
@@ -1612,20 +1646,21 @@ async def purge_session(session_id: str) -> Dict[str, Any]:
 
 
 @app.post('/analysis/start', response_model=AnalysisStartResponse)
-async def analysis_start(request: AnalysisStartRequest) -> Dict[str, Any]:
+@limiter.limit('10/minute')
+async def analysis_start(request: Request, body: AnalysisStartRequest) -> Dict[str, Any]:
     store = get_store()
-    session_id = validate_session_id(request.session_id or uuid.uuid4().hex)
+    session_id = validate_session_id(body.session_id or uuid.uuid4().hex)
     if store.get_session_row(session_id):
         raise HTTPException(status_code=409, detail='Session already exists')
-    stub = session_stub(session_id, request.privacy_mode, request.retention_hours)
-    stub['profile_id'] = request.profile_id or 'default-profile'
+    stub = session_stub(session_id, body.privacy_mode, body.retention_hours)
+    stub['profile_id'] = validate_profile_id(body.profile_id) if body.profile_id else 'default-profile'
     store.upsert_session(stub)
     status = store.set_status(session_id, 'queued', 'Analysis session created', 0)
     return {
         'session_id': session_id,
         'profile_id': stub['profile_id'],
-        'privacy_mode': request.privacy_mode,
-        'retention_hours': normalize_retention(request.retention_hours),
+        'privacy_mode': body.privacy_mode,
+        'retention_hours': normalize_retention(body.retention_hours),
         'status': status,
     }
 
@@ -1668,6 +1703,10 @@ async def session_status(session_id: str) -> Dict[str, Any]:
 
 @app.get('/history', response_model=HistoryResponse)
 async def history(limit: int = 25, profile_id: Optional[str] = None, cursor: Optional[str] = None) -> Dict[str, Any]:
+    if profile_id:
+        validate_profile_id(profile_id)
+    if cursor:
+        validate_cursor(cursor)
     items, next_cursor = get_store().history(limit, profile_id=profile_id, cursor=cursor)
     result: Dict[str, Any] = {'items': items}
     if next_cursor:
@@ -1722,7 +1761,7 @@ async def session_image(session_id: str, kind: Literal['diagnostic', 'original']
     if not file_path.is_absolute():
         file_path = (BASE_DIR / file_path).resolve()
     managed_roots = (UPLOAD_DIR.resolve(), OUTPUT_DIR.resolve(), REPORT_DIR.resolve())
-    if not any(str(file_path).startswith(str(r)) for r in managed_roots):
+    if not any(file_path.is_relative_to(r) for r in managed_roots):
         raise HTTPException(status_code=403, detail='Access denied')
     if not file_path.exists():
         raise HTTPException(status_code=404, detail='Image file not found on disk')
@@ -1757,7 +1796,8 @@ async def compare(current_session_id: str, previous_session_id: Optional[str] = 
 
 
 @app.get('/report/{session_id}', response_model=ReportResponse)
-async def report(session_id: str, previous_session_id: Optional[str] = None) -> Dict[str, Any]:
+@limiter.limit('15/minute')
+async def report(request: Request, session_id: str, previous_session_id: Optional[str] = None) -> Dict[str, Any]:
     session = require_session(session_id)
     if not session.get('results'):
         raise HTTPException(status_code=409, detail='Analysis not completed for this session')
@@ -1781,29 +1821,31 @@ async def report(session_id: str, previous_session_id: Optional[str] = None) -> 
 
 
 @app.post('/export/{session_id}', response_model=ExportResponse)
-async def export(session_id: str, request: ExportRequest) -> Dict[str, Any]:
+@limiter.limit('10/minute')
+async def export(request: Request, session_id: str, body: ExportRequest) -> Dict[str, Any]:
     session = require_session(session_id)
     if not session.get('results'):
         raise HTTPException(status_code=409, detail='Analysis not completed for this session')
-    if request.previous_session_id and request.previous_session_id == session['session_id']:
+    if body.previous_session_id and body.previous_session_id == session['session_id']:
         previous = None
     else:
-        previous = require_session(request.previous_session_id) if request.previous_session_id else get_store().previous_session(session['session_id'])
-    compare_data = annotate_compare_payload(compare_payload(previous, session), bool(request.previous_session_id))
+        previous = require_session(body.previous_session_id) if body.previous_session_id else get_store().previous_session(session['session_id'])
+    compare_data = annotate_compare_payload(compare_payload(previous, session), bool(body.previous_session_id))
     loop = asyncio.get_event_loop()
-    pdf_path = await loop.run_in_executor(None, write_pdf_report, session, compare_data, request.preset)
+    pdf_path = await loop.run_in_executor(None, write_pdf_report, session, compare_data, body.preset)
     payload: Dict[str, Any] = {
         'session_id': session['session_id'],
         'pdf_path': str(pdf_path),
-        'preset': request.preset,
+        'preset': body.preset,
     }
-    if request.include_pdf_data:
+    if body.include_pdf_data:
         payload['pdf_data_uri'] = file_to_data_uri(str(pdf_path), 'application/pdf')
     return payload
 
 
 @app.get('/metrics')
-async def metrics() -> Dict[str, Any]:
+@limiter.limit('30/minute')
+async def metrics(request: Request) -> Dict[str, Any]:
     """Aggregated system metrics: API usage, pipeline timing, detection stats.
 
     Returns:
@@ -1937,7 +1979,7 @@ async def analyze(
         profile_id = existing['profile_id'] if 'profile_id' in existing.keys() else profile_id
     else:
         stub = session_stub(session_id, privacy_mode, retention_hours)
-        stub['profile_id'] = profile_id or 'default-profile'
+        stub['profile_id'] = validate_profile_id(profile_id) if profile_id else 'default-profile'
         store.upsert_session(stub)
         profile_id = stub['profile_id']
 
