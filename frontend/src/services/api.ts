@@ -2,10 +2,13 @@ import type {
   AnalysisStartResponse,
   AnalyzeResponse,
   ComparePayload,
+  ExportPreset,
+  ExportResponse,
   HistoryPage,
   MetricsResponse,
   PrivacyConfig,
   ProfileSummary,
+  ReportResponse,
   SessionDetail,
   SessionStatus,
 } from '../types/api'
@@ -115,14 +118,14 @@ export const api = {
   getVersion: () => request<{ app: string; version: string }>('/version', undefined, undefined, 10_000),
 
   getReport: (sessionId: string, previousSessionId?: string) =>
-    request<{ session_id: string; report: Record<string, unknown> }>(`/report/${sessionId}${previousSessionId ? `?previous_session_id=${encodeURIComponent(previousSessionId)}` : ''}`),
+    request<ReportResponse>(`/report/${sessionId}${previousSessionId ? `?previous_session_id=${encodeURIComponent(previousSessionId)}` : ''}`),
 
   exportBundle: (
     sessionId: string,
-    preset: 'clinical' | 'compact' | 'presentation' = 'clinical',
+    preset: ExportPreset = 'clinical',
     previousSessionId?: string,
   ) =>
-    request<{ session_id: string; pdf_path: string; pdf_data_uri?: string }>(`/export/${sessionId}`, {
+    request<ExportResponse>(`/export/${sessionId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ include_pdf_data: true, preset, previous_session_id: previousSessionId }),

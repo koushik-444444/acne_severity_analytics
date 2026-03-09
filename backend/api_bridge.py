@@ -19,8 +19,11 @@ from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
+from reportlab.lib import colors as rl_colors
 from reportlab.lib.pagesizes import letter
+from reportlab.lib.units import inch
 from reportlab.pdfgen import canvas
+from reportlab.platypus import Table, TableStyle
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
@@ -993,15 +996,43 @@ def summarize_stream_provenance(cloud_results: Dict[str, Any]) -> Dict[str, Any]
 
 
 def write_pdf_report(session: Dict[str, Any], compare: Optional[Dict[str, Any]], preset: str = 'clinical') -> Path:
+    """Generate a professional clinical PDF report for an analysis session.
+
+    Args:
+        session: Full session dict with results, severity, gags_score, etc.
+        compare: Optional comparison payload against a previous session.
+        preset: Report style — 'clinical' (full), 'compact' (one-page), or 'presentation'.
+
+    Returns:
+        Path to the generated PDF file.
+    """
     report_path = REPORT_DIR / f"{session['session_id']}_{preset}_report.pdf"
     results = session.get('results') or {}
     clinical = results.get('clinical_analysis', {})
     consensus = results.get('consensus_summary', {})
     regions = clinical.get('regions', {})
+    type_counts = consensus.get('type_counts', {})
+    pipeline_metrics = results.get('pipeline_metrics') or results.get('lesions', {}).get('_pipeline_metrics', {})
+    timing_ms = results.get('timing_ms', {})
+
+    page_width, page_height = letter
+    left_margin = 54
+    right_margin = 54
+    content_width = page_width - left_margin - right_margin
+    page_num = [1]  # mutable counter for closures
+
+    # --- Color palette (dark text on white) ---
+    CLR_TITLE = (0.1, 0.1, 0.15)
+    CLR_HEADING = (0.12, 0.35, 0.55)
+    CLR_BODY = (0.15, 0.15, 0.2)
+    CLR_MUTED = (0.4, 0.4, 0.45)
+    CLR_ACCENT = (0.0, 0.55, 0.7)
+    CLR_RULE = (0.75, 0.8, 0.85)
+
     pdf = canvas.Canvas(str(report_path), pagesize=letter)
-    pdf.setTitle(f"Acne Diagnostic Report - {session['session_id']}")
-    _, height = letter
-    content_width = 508
+    pdf.setTitle(f'Acne Diagnostic Report - {session["session_id"]}')
+    pdf.setAuthor('ClearSkin Analytics')
+
     dominant_regions = sorted(
         regions.items(),
         key=lambda item: (item[1].get('gags_score', 0), item[1].get('count', 0)),
@@ -1009,34 +1040,49 @@ def write_pdf_report(session: Dict[str, Any], compare: Optional[Dict[str, Any]],
     )[:3]
     region_changes = top_region_changes(compare) if compare else []
 
+    # --- Helper functions ---
+    def draw_footer() -> None:
+        pdf.setFont('Helvetica', 7)
+        pdf.setFillColorRGB(*CLR_MUTED)
+        pdf.drawString(left_margin, 36, f'ClearSkin Analytics  |  Session {session["session_id"][:16]}...')
+        pdf.drawRightString(page_width - right_margin, 36, f'Page {page_num[0]}')
+        pdf.setStrokeColorRGB(*CLR_RULE)
+        pdf.setLineWidth(0.5)
+        pdf.line(left_margin, 48, page_width - right_margin, 48)
+
+    def new_page() -> float:
+        draw_footer()
+        pdf.showPage()
+        page_num[0] += 1
+        return page_height - 48
+
+    def ensure_space(y: float, needed: float = 80) -> float:
+        if y >= needed + 56:
+            return y
+        return new_page()
+
     def line(
         y: float,
         text: str,
         font: str = 'Helvetica',
         size: int = 10,
-        color: tuple[float, float, float] = (0.92, 0.95, 0.98),
+        color: tuple = CLR_BODY,
     ) -> float:
         pdf.setFillColorRGB(*color)
         pdf.setFont(font, size)
-        pdf.drawString(52, y, text)
-        return y - (size + 5)
+        pdf.drawString(left_margin, y, text)
+        return y - (size + 4)
 
-    def ensure_space(y: float, min_y: float = 96) -> float:
-        if y >= min_y:
-            return y
-        pdf.showPage()
-        return height - 48
-
-    def wrap_text(text: str, font: str = 'Helvetica', size: int = 10) -> List[str]:
+    def wrap_text(text: str, font: str = 'Helvetica', size: int = 10, max_w: float = 0) -> List[str]:
+        w = max_w or content_width
         words = str(text).split()
         if not words:
             return ['']
-
         lines: List[str] = []
         current = words[0]
         for word in words[1:]:
             candidate = f'{current} {word}'
-            if pdf.stringWidth(candidate, font, size) <= content_width:
+            if pdf.stringWidth(candidate, font, size) <= w:
                 current = candidate
             else:
                 lines.append(current)
@@ -1049,7 +1095,7 @@ def write_pdf_report(session: Dict[str, Any], compare: Optional[Dict[str, Any]],
         text: str,
         font: str = 'Helvetica',
         size: int = 10,
-        color: tuple[float, float, float] = (0.82, 0.86, 0.9),
+        color: tuple = CLR_BODY,
     ) -> float:
         for chunk in wrap_text(text, font, size):
             y = ensure_space(y)
@@ -1057,183 +1103,339 @@ def write_pdf_report(session: Dict[str, Any], compare: Optional[Dict[str, Any]],
         return y - 2
 
     def section(y: float, label: str, size: int = 12) -> float:
-        y = ensure_space(y, 120)
-        return line(y, label, 'Helvetica-Bold', size, (0.0, 0.84, 0.9))
+        y = ensure_space(y, 100)
+        y -= 6
+        pdf.setStrokeColorRGB(*CLR_RULE)
+        pdf.setLineWidth(0.5)
+        pdf.line(left_margin, y + size + 8, left_margin + content_width, y + size + 8)
+        y = line(y, label, 'Helvetica-Bold', size, CLR_HEADING)
+        return y - 2
 
     def bullet(y: float, text: str, size: int = 10) -> float:
-        return block(y, f'- {text}', size=size)
+        y = ensure_space(y)
+        pdf.setFillColorRGB(*CLR_ACCENT)
+        pdf.setFont('Helvetica', size)
+        pdf.drawString(left_margin + 4, y, '\xe2\x80\xa2')
+        for i, chunk in enumerate(wrap_text(text, 'Helvetica', size, content_width - 16)):
+            if i > 0:
+                y = ensure_space(y)
+            pdf.setFillColorRGB(*CLR_BODY)
+            pdf.setFont('Helvetica', size)
+            pdf.drawString(left_margin + 16, y, chunk)
+            y -= (size + 4)
+        return y - 1
 
     def metric(y: float, label: str, value: str) -> float:
-        return line(y, f'{label}: {value}', 'Helvetica', 10, (0.92, 0.95, 0.98))
+        y = ensure_space(y)
+        pdf.setFont('Helvetica-Bold', 10)
+        pdf.setFillColorRGB(*CLR_BODY)
+        pdf.drawString(left_margin, y, f'{label}:')
+        label_w = pdf.stringWidth(f'{label}:', 'Helvetica-Bold', 10)
+        pdf.setFont('Helvetica', 10)
+        pdf.drawString(left_margin + label_w + 6, y, value)
+        return y - 14
 
-    title = {
-        'clinical': 'Clinical Acne Analysis Report',
-        'compact': 'Compact Acne Summary',
-        'presentation': 'Presentation Review Deck',
-    }.get(preset, 'Clinical Acne Analysis Report')
-    subtitle = {
-        'clinical': 'Full chart-ready diagnostic worksheet for detailed review.',
-        'compact': 'One-page follow-up snapshot for quick clinician handoff.',
-        'presentation': 'Narrative summary for review meetings and case presentations.',
-    }.get(preset, 'Full chart-ready diagnostic worksheet for detailed review.')
+    def severity_color(sev: str) -> tuple:
+        sev_lower = (sev or '').lower()
+        if 'very severe' in sev_lower or 'cystic' in sev_lower:
+            return (0.7, 0.1, 0.1)
+        if 'severe' in sev_lower:
+            return (0.8, 0.3, 0.0)
+        if 'moderate' in sev_lower:
+            return (0.75, 0.55, 0.0)
+        if 'mild' in sev_lower:
+            return (0.0, 0.6, 0.3)
+        return CLR_BODY
 
-    y = height - 48
-    y = line(y, title, 'Helvetica-Bold', 18, (0.98, 0.99, 1.0))
-    y = block(y, subtitle, 'Helvetica', 10, (0.0, 0.84, 0.9))
-    y = metric(y, 'Session ID', session['session_id'])
-    y = metric(y, 'Profile ID', session.get('profile_id') or 'default-profile')
-    y = metric(y, 'Timestamp', session['timestamp'])
+    def draw_table(y: float, headers: List[str], rows: List[List[str]],
+                   col_widths: Optional[List[float]] = None) -> float:
+        """Draw a simple table and return the new y position."""
+        data = [headers] + rows
+        if col_widths is None:
+            col_widths = [content_width / len(headers)] * len(headers)
+        table_height = len(data) * 18
+        y = ensure_space(y, table_height + 20)
+        t = Table(data, colWidths=col_widths, rowHeights=[18] * len(data))
+        t.setStyle(TableStyle([
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 9),
+            ('TEXTCOLOR', (0, 0), (-1, 0), rl_colors.HexColor('#1E5A8C')),
+            ('TEXTCOLOR', (0, 1), (-1, -1), rl_colors.HexColor('#262630')),
+            ('BACKGROUND', (0, 0), (-1, 0), rl_colors.HexColor('#E8EEF4')),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [rl_colors.white, rl_colors.HexColor('#F5F7FA')]),
+            ('GRID', (0, 0), (-1, -1), 0.5, rl_colors.HexColor('#C0C8D0')),
+            ('ALIGN', (1, 0), (-1, -1), 'RIGHT'),
+            ('TOPPADDING', (0, 0), (-1, -1), 2),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
+            ('LEFTPADDING', (0, 0), (-1, -1), 6),
+            ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+        ]))
+        tw, th = t.wrap(content_width, page_height)
+        t.drawOn(pdf, left_margin, y - th)
+        return y - th - 8
 
+    def draw_diagnostic_image(y: float) -> float:
+        """Embed the diagnostic image if available."""
+        diag_path = session.get('diagnostic_image_path')
+        if not diag_path:
+            return y
+        img_file = Path(diag_path)
+        if not img_file.exists():
+            return y
+        y = ensure_space(y, 260)
+        try:
+            max_img_w = content_width * 0.75
+            max_img_h = 220
+            img = cv2.imread(str(img_file))
+            if img is None:
+                return y
+            ih, iw = img.shape[:2]
+            scale = min(max_img_w / iw, max_img_h / ih, 1.0)
+            draw_w = iw * scale
+            draw_h = ih * scale
+            # Center the image
+            x_offset = left_margin + (content_width - draw_w) / 2
+            pdf.drawImage(str(img_file), x_offset, y - draw_h,
+                          width=draw_w, height=draw_h, preserveAspectRatio=True)
+            y -= draw_h + 6
+            pdf.setFont('Helvetica', 8)
+            pdf.setFillColorRGB(*CLR_MUTED)
+            caption = 'Diagnostic overlay with detected lesion bounding boxes'
+            cw = pdf.stringWidth(caption, 'Helvetica', 8)
+            pdf.drawString(left_margin + (content_width - cw) / 2, y, caption)
+            y -= 14
+        except Exception:
+            pass
+        return y
+
+    # ================================================================
+    # TITLE BLOCK (all presets)
+    # ================================================================
+    y = page_height - 48
+    pdf.setFillColorRGB(*CLR_TITLE)
+    pdf.setFont('Helvetica-Bold', 20)
+
+    title_map = {
+        'clinical': 'Acne Severity Analysis Report',
+        'compact': 'Acne Summary Report',
+        'presentation': 'Case Presentation Report',
+    }
+    subtitle_map = {
+        'clinical': 'Full diagnostic worksheet with regional GAGS scoring and lesion classification.',
+        'compact': 'One-page follow-up snapshot for quick clinical reference.',
+        'presentation': 'Narrative summary for case conferences and review meetings.',
+    }
+    pdf.drawString(left_margin, y, title_map.get(preset, 'Acne Severity Analysis Report'))
+    y -= 26
+    pdf.setFont('Helvetica', 10)
+    pdf.setFillColorRGB(*CLR_MUTED)
+    pdf.drawString(left_margin, y, subtitle_map.get(preset, ''))
+    y -= 18
+
+    # Metadata line
+    ts_display = session.get('timestamp', 'N/A')
+    if len(ts_display) > 19:
+        ts_display = ts_display[:19].replace('T', ' ')
+    y = metric(y, 'Session', session['session_id'])
+    y = metric(y, 'Profile', session.get('profile_id') or 'default-profile')
+    y = metric(y, 'Date', ts_display)
+    y -= 4
+
+    # ================================================================
+    # SEVERITY BADGE
+    # ================================================================
+    sev = str(session.get('severity') or 'Unknown')
+    gags = session.get('gags_score') or 0
+    lesion_count = session.get('lesion_count') or 0
+    sym_delta = session.get('symmetry_delta') or 0
+
+    y = ensure_space(y, 50)
+    # Draw severity highlight box
+    box_h = 36
+    pdf.setStrokeColorRGB(*CLR_RULE)
+    pdf.setLineWidth(1)
+    sev_clr = severity_color(sev)
+    pdf.setFillColorRGB(sev_clr[0], sev_clr[1], sev_clr[2], 0.08)
+    pdf.roundRect(left_margin, y - box_h + 6, content_width, box_h, 4, stroke=1, fill=1)
+    pdf.setFont('Helvetica-Bold', 14)
+    pdf.setFillColorRGB(*sev_clr)
+    pdf.drawString(left_margin + 10, y - 12, sev.upper())
+    pdf.setFont('Helvetica', 10)
+    pdf.setFillColorRGB(*CLR_BODY)
+    stats_text = f'GAGS Score: {gags}   |   Lesions: {lesion_count}   |   Symmetry Delta: {sym_delta}%'
+    pdf.drawString(left_margin + 10, y - 26, stats_text)
+    y -= box_h + 10
+
+    # ================================================================
+    # COMPACT PRESET — one-page summary
+    # ================================================================
     if preset == 'compact':
-        y = section(y, 'At a Glance', 13)
-        y = metric(y, 'Severity', str(session.get('severity') or 'Unknown'))
-        y = metric(y, 'GAGS Score', str(session.get('gags_score') or 0))
-        y = metric(y, 'Lesion Count', str(session.get('lesion_count') or 0))
-        y = metric(y, 'Symmetry Delta', f"{session.get('symmetry_delta') or 0}%")
-        y = metric(y, 'Consensus', str(consensus.get('summary', 'N/A')))
+        y = section(y, 'Consensus Summary')
+        y = block(y, consensus.get('summary', 'N/A'))
 
         if dominant_regions:
-            y = section(y, 'Top Burden Regions', 12)
-            for region, values in dominant_regions[:2]:
-                y = bullet(
-                    y,
-                    (
-                        f"{region}: {values.get('count', 0)} lesions, "
-                        f"GAGS {values.get('gags_score', 0)}"
-                    ),
-                )
+            y = section(y, 'Top Burden Regions')
+            for region, values in dominant_regions[:3]:
+                y = bullet(y, f'{region}: {values.get("count", 0)} lesions, GAGS {values.get("gags_score", 0)}')
 
         if compare:
-            y = section(y, 'Longitudinal Snapshot', 12)
-            y = block(y, comparison_summary(compare), 'Helvetica', 10, (0.92, 0.95, 0.98))
-            y = bullet(
-                y,
-                (
-                    f"Lesions {format_signed_delta(compare.get('lesion_delta', 0))} "
-                    f"({get_delta_status(float(compare.get('lesion_delta', 0)))})"
-                ),
-            )
-            y = bullet(
-                y,
-                (
-                    f"GAGS {format_signed_delta(compare.get('gags_delta', 0))} "
-                    f"({get_delta_status(float(compare.get('gags_delta', 0)))})"
-                ),
-            )
+            y = section(y, 'Longitudinal Snapshot')
+            y = block(y, comparison_summary(compare))
+            y = bullet(y, f'Lesions {format_signed_delta(compare.get("lesion_delta", 0))} ({get_delta_status(float(compare.get("lesion_delta", 0)))})')
+            y = bullet(y, f'GAGS {format_signed_delta(compare.get("gags_delta", 0))} ({get_delta_status(float(compare.get("gags_delta", 0)))})')
 
         if session.get('note'):
-            y = section(y, 'Session Note', 12)
-            y = block(y, str(session.get('note')), 'Helvetica', 10, (0.92, 0.95, 0.98))
+            y = section(y, 'Session Note')
+            y = block(y, str(session['note']))
 
+        draw_footer()
         pdf.save()
         return report_path
 
-    y = section(y, 'Clinical Snapshot', 13)
-    y = metric(y, 'Severity', str(session.get('severity') or 'Unknown'))
-    y = metric(y, 'GAGS Score', str(session.get('gags_score') or 0))
-    y = metric(y, 'Lesion Count', str(session.get('lesion_count') or 0))
-    y = metric(y, 'Symmetry Delta', f"{session.get('symmetry_delta') or 0}%")
-    y = metric(y, 'Privacy Mode', 'Enabled' if session.get('privacy_mode') else 'Disabled')
-    y = metric(y, 'Retention Hours', str(session.get('retention_hours')))
-    y = block(y, f"Consensus Summary: {consensus.get('summary', 'N/A')}", 'Helvetica', 10, (0.92, 0.95, 0.98))
+    # ================================================================
+    # CLINICAL / PRESENTATION — full multi-page report
+    # ================================================================
+
+    # --- Diagnostic Image ---
+    y = draw_diagnostic_image(y)
+
+    # --- Consensus ---
+    y = section(y, 'Consensus Summary')
+    y = block(y, consensus.get('summary', 'N/A'))
 
     if session.get('note'):
-        y = section(y, 'Session Note', 12)
-        y = block(y, str(session.get('note')), 'Helvetica', 10, (0.92, 0.95, 0.98))
+        y = section(y, 'Session Note')
+        y = block(y, str(session['note']))
 
-    y = section(y, 'Regional Findings', 12)
-    for region, values in regions.items():
-        y = block(
-            y,
-            (
-                f"- {region}: count={values.get('count', 0)}, lpi={values.get('lpi', 0)}, "
-                f"area_px={values.get('area_px', 0)}, gags={values.get('gags_score', 0)}"
-            ),
-            'Helvetica',
-            10,
-            (0.82, 0.86, 0.9),
-        )
+    # --- Regional GAGS Table ---
+    if regions:
+        y = section(y, 'Regional GAGS Breakdown')
+        headers = ['Region', 'Lesions', 'LPI', 'Area (px)', 'GAGS Score']
+        rows = []
+        for rname, rvals in regions.items():
+            rows.append([
+                rname.replace('_', ' ').title(),
+                str(rvals.get('count', 0)),
+                str(round(rvals.get('lpi', 0), 1)),
+                str(rvals.get('area_px', 0)),
+                str(rvals.get('gags_score', 0)),
+            ])
+        # Sort by GAGS score descending
+        rows.sort(key=lambda r: int(r[4]), reverse=True)
+        # Add total row
+        total_lesions = sum(int(r[1]) for r in rows)
+        total_gags = sum(int(r[4]) for r in rows)
+        rows.append(['TOTAL', str(total_lesions), '', '', str(total_gags)])
+        col_widths = [content_width * 0.28, content_width * 0.15, content_width * 0.17,
+                      content_width * 0.22, content_width * 0.18]
+        y = draw_table(y, headers, rows, col_widths)
 
+    # --- Lesion Type Distribution ---
+    if type_counts:
+        y = section(y, 'Lesion Type Distribution')
+        type_headers = ['Type', 'Count', 'Percentage']
+        total_typed = sum(type_counts.values()) or 1
+        type_rows = []
+        for tname, tcount in sorted(type_counts.items(), key=lambda x: x[1], reverse=True):
+            pct = f'{(tcount / total_typed) * 100:.1f}%'
+            type_rows.append([tname.title(), str(tcount), pct])
+        type_rows.append(['Total', str(sum(type_counts.values())), '100%'])
+        type_col_widths = [content_width * 0.40, content_width * 0.30, content_width * 0.30]
+        y = draw_table(y, type_headers, type_rows, type_col_widths)
+
+    # --- Temporal Comparison ---
     if compare:
-        y = section(y, 'Temporal Comparison', 12)
-        y = metric(y, 'Comparison Target', compare_target_label(compare))
-        y = metric(y, 'Previous Session', str(compare.get('previous_session_id', 'N/A')))
-        y = block(y, f"Clinical Summary: {comparison_summary(compare)}", 'Helvetica', 10, (0.92, 0.95, 0.98))
-        severity = compare.get('severity_change', {})
-        y = metric(y, 'Severity Change', f"{severity.get('from', 'Unknown')} -> {severity.get('to', 'Unknown')}")
-        lesion_delta = float(compare.get('lesion_delta', 0))
-        gags_delta = float(compare.get('gags_delta', 0))
-        symmetry_delta = float(compare.get('symmetry_delta_change', 0))
-        y = metric(y, 'Lesion Delta', f"{format_signed_delta(lesion_delta)} ({get_delta_status(lesion_delta)})")
-        y = metric(y, 'GAGS Delta', f"{format_signed_delta(gags_delta)} ({get_delta_status(gags_delta)})")
-        y = metric(y, 'Symmetry Delta Change', f"{format_signed_delta(symmetry_delta, '%')} ({get_delta_status(symmetry_delta)})")
-        region_changes = top_region_changes(compare)
+        y = section(y, 'Temporal Comparison')
+        y = metric(y, 'Compared against', compare_target_label(compare))
+        y = metric(y, 'Previous session', str(compare.get('previous_session_id', 'N/A')))
+        y = block(y, comparison_summary(compare))
+        sev_change = compare.get('severity_change', {})
+        y = metric(y, 'Severity change', f'{sev_change.get("from", "?")} -> {sev_change.get("to", "?")}')
+        ld = float(compare.get('lesion_delta', 0))
+        gd = float(compare.get('gags_delta', 0))
+        sd = float(compare.get('symmetry_delta_change', 0))
+        y = metric(y, 'Lesion delta', f'{format_signed_delta(ld)} ({get_delta_status(ld)})')
+        y = metric(y, 'GAGS delta', f'{format_signed_delta(gd)} ({get_delta_status(gd)})')
+        y = metric(y, 'Symmetry delta change', f'{format_signed_delta(sd, "%")} ({get_delta_status(sd)})')
         if region_changes:
-            y = section(y, 'Key Regional Changes', 11)
+            y -= 4
             for region, values in region_changes:
-                y = block(
+                y = bullet(
                     y,
-                    (
-                        f"- {region}: {get_delta_status(values.get('count_delta', 0))} "
-                        f"({format_signed_delta(values.get('count_delta', 0))} lesions, "
-                        f"LPI {format_signed_delta(values.get('lpi_delta', 0))})"
-                    ),
-                    'Helvetica',
-                    10,
-                    (0.82, 0.86, 0.9),
+                    f'{region}: {get_delta_status(values.get("count_delta", 0))} '
+                    f'({format_signed_delta(values.get("count_delta", 0))} lesions, '
+                    f'LPI {format_signed_delta(values.get("lpi_delta", 0))})',
                 )
 
+    # --- Pipeline Metadata (clinical only) ---
+    if preset == 'clinical' and (pipeline_metrics or timing_ms):
+        y = section(y, 'Pipeline Metadata')
+        y = metric(y, 'Model A', MODEL_A_ID)
+        y = metric(y, 'Model B', MODEL_B_ID)
+        if pipeline_metrics:
+            y = metric(y, 'Raw detections', str(pipeline_metrics.get('raw_detections', 'N/A')))
+            y = metric(y, 'Post-NMS', str(pipeline_metrics.get('post_nms', 'N/A')))
+            y = metric(y, 'Post-gating', str(pipeline_metrics.get('post_gating', 'N/A')))
+            tc = pipeline_metrics.get('type_coverage', {})
+            if tc:
+                y = metric(y, 'Type coverage', f'direct={tc.get("direct", 0)}, proximity={tc.get("proximity", 0)}, none={tc.get("none", 0)}')
+        if timing_ms:
+            total_ms = timing_ms.get('total', 0)
+            y = metric(y, 'Segmentation time', f'{total_ms:.0f}ms')
+        cloud_timing = results.get('cloud_timing', {})
+        if cloud_timing:
+            total_cloud = sum(v for v in cloud_timing.values() if isinstance(v, (int, float)))
+            y = metric(y, 'Cloud inference time', f'{total_cloud:.0f}ms')
+
+    # --- Presentation extras ---
     if preset == 'presentation':
-        pdf.showPage()
-        y = height - 48
-        y = line(y, 'Presentation Review Deck', 'Helvetica-Bold', 18, (0.98, 0.99, 1.0))
-        y = block(y, 'High-level narrative for case conferences, slide handoff, and executive review.', 'Helvetica', 10, (0.0, 0.84, 0.9))
         y = section(y, 'Clinical Headline', 14)
         y = block(
             y,
-            (
-                f"This case is currently graded {session.get('severity') or 'Unknown'} with a GAGS score of "
-                f"{session.get('gags_score') or 0} across {session.get('lesion_count') or 0} verified lesions."
-            ),
-            'Helvetica',
-            11,
-            (0.92, 0.95, 0.98),
+            f'This case is currently graded {sev} with a GAGS score of '
+            f'{gags} across {lesion_count} verified lesions.',
+            'Helvetica', 11,
         )
-        y = section(y, 'Why This Case Matters', 13)
-        y = bullet(y, f"Consensus readout: {consensus.get('summary', 'N/A')}", 10)
+        y = section(y, 'Key Observations', 13)
+        y = bullet(y, f'Consensus: {consensus.get("summary", "N/A")}')
         if dominant_regions:
             y = bullet(
                 y,
                 'Top burden regions: ' + ', '.join(
-                    f"{region} (GAGS {values.get('gags_score', 0)})"
-                    for region, values in dominant_regions
+                    f'{r} (GAGS {v.get("gags_score", 0)})' for r, v in dominant_regions
                 ),
-                10,
             )
         if compare:
             y = section(y, 'Longitudinal Story', 13)
-            y = block(y, comparison_summary(compare), 'Helvetica', 11, (0.92, 0.95, 0.98))
-            y = bullet(
-                y,
-                (
-                    f"Severity shifted from {compare.get('severity_change', {}).get('from', 'Unknown')} "
-                    f"to {compare.get('severity_change', {}).get('to', 'Unknown')}"
-                ),
-                10,
-            )
+            y = block(y, comparison_summary(compare), 'Helvetica', 11)
+            sev_change = compare.get('severity_change', {})
+            y = bullet(y, f'Severity shifted from {sev_change.get("from", "?")} to {sev_change.get("to", "?")}')
             for region, values in region_changes[:2]:
                 y = bullet(
                     y,
-                    (
-                        f"{region} trend: {get_delta_status(values.get('count_delta', 0))} with "
-                        f"{format_signed_delta(values.get('count_delta', 0))} lesion change"
-                    ),
-                    10,
+                    f'{region}: {get_delta_status(values.get("count_delta", 0))} with '
+                    f'{format_signed_delta(values.get("count_delta", 0))} lesion change',
                 )
         if session.get('note'):
             y = section(y, 'Presenter Note', 13)
-            y = block(y, str(session.get('note')), 'Helvetica', 10, (0.92, 0.95, 0.98))
+            y = block(y, str(session['note']))
 
+    # --- Disclaimer ---
+    y = ensure_space(y, 50)
+    y -= 10
+    pdf.setStrokeColorRGB(*CLR_RULE)
+    pdf.setLineWidth(0.5)
+    pdf.line(left_margin, y + 4, left_margin + content_width, y + 4)
+    y = block(
+        y,
+        'DISCLAIMER: This report is generated by an automated AI analysis pipeline and is intended '
+        'for informational purposes only. It does not constitute medical advice. Consult a qualified '
+        'dermatologist for clinical decisions.',
+        'Helvetica', 8, CLR_MUTED,
+    )
+
+    draw_footer()
     pdf.save()
     return report_path
 

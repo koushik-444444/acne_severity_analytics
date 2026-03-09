@@ -173,6 +173,26 @@ export type HistoryPage = {
   next_cursor?: string | null
 }
 
+export type ExportPreset = 'clinical' | 'compact' | 'presentation'
+
+export type ExportResponse = {
+  session_id: string
+  pdf_path: string
+  preset: string
+  pdf_data_uri?: string
+}
+
+export type ReportResponse = {
+  session_id: string
+  report: {
+    clinical_analysis: Record<string, unknown>
+    consensus_summary: Record<string, unknown>
+    compare: Record<string, unknown> | null
+    pdf_path: string
+    pdf_data_uri?: string
+  }
+}
+
 export type LatencyStats = {
   count: number
   mean_ms: number

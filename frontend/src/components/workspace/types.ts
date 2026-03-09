@@ -1,3 +1,5 @@
+import type { ExportPreset } from '../../types/api'
+
 export type ViewerState = {
   scale: number
   x: number
@@ -12,5 +14,5 @@ export type WorkspaceUiPrefs = {
   compareViewerMode?: ViewerMode
   showDetectionOverlay?: boolean
   showCompareOverlay?: boolean
-  exportPreset?: 'clinical' | 'compact' | 'presentation'
+  exportPreset?: ExportPreset
 }

@@ -376,7 +376,24 @@ export function ClinicalWorkspace() {
       dispatch({ type: 'EXPORT_START' })
       const bundle = await api.exportBundle(active.session_id, exportPreset, compare?.previous_session_id)
       if (bundle.pdf_data_uri) {
-        window.open(bundle.pdf_data_uri, '_blank')
+        // Convert data URI to Blob for reliable download
+        const match = bundle.pdf_data_uri.match(/^data:([^;]+);base64,(.+)$/)
+        if (match && match[1] && match[2]) {
+          const byteChars = atob(match[2])
+          const byteArray = new Uint8Array(byteChars.length)
+          for (let i = 0; i < byteChars.length; i++) {
+            byteArray[i] = byteChars.charCodeAt(i)
+          }
+          const blob = new Blob([byteArray], { type: match[1] })
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `acne_report_${active.session_id.slice(0, 8)}_${exportPreset}.pdf`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }
       }
       dispatch({ type: 'EXPORT_COMPLETE' })
     } catch (err) {

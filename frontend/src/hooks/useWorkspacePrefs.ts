@@ -6,6 +6,7 @@ import {
   removeStorageItem,
   writeStorageItem,
 } from '../lib/clinical-utils'
+import type { ExportPreset } from '../types/api'
 import type { ViewerMode, WorkspaceUiPrefs } from '../components/workspace/types'
 
 const UI_PREFS_KEY = 'clearskin-ui-prefs'
@@ -35,7 +36,7 @@ export function useWorkspacePrefs(activeProfileId: string) {
   const [compareViewerMode, setCompareViewerMode] = useState<ViewerMode>('single')
   const [showDetectionOverlay, setShowDetectionOverlay] = useState(true)
   const [showCompareOverlay, setShowCompareOverlay] = useState(true)
-  const [exportPreset, setExportPreset] = useState<'clinical' | 'compact' | 'presentation'>('clinical')
+  const [exportPreset, setExportPreset] = useState<ExportPreset>('clinical')
   const [prefsHydrated, setPrefsHydrated] = useState(false)
   const saveTimerRef = useRef<number | null>(null)
 
