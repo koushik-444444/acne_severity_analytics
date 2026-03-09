@@ -16,6 +16,7 @@ backend/uploads/
 backend/output/
 backend/outputs/
 backend/sessions.db
+backend/usage.db
 
 # Logs and local artifacts
 *.log

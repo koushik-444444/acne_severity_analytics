@@ -4,6 +4,8 @@ Calculates Precision, Recall, and mAP@50 using Statistical Adaptive Gating.
 
 Phase 5: Added timing instrumentation, per-image stats, JSON output.
 Phase 7: Configurable SAG_Z_THRESHOLD, NMS_IOU_THRESHOLD, match IoU.
+Phase 8: Added --filter-list for curated real-image subsets, segmentation
+         mode tracking (full vs fallback) in per-image stats.
 """
 import os
 import sys
@@ -29,7 +31,7 @@ from utils import calculate_iou
 
 
 def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=None,
-             sag_z=None, nms_iou=None):
+             sag_z=None, nms_iou=None, filter_list=None):
     """Run validation benchmark on labeled images.
 
     Args:
@@ -40,6 +42,9 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
         output_json: Optional path to save detailed results as JSON.
         sag_z: Override SAG_Z_THRESHOLD for this run.
         nms_iou: Override NMS_IOU_THRESHOLD for this run.
+        filter_list: Optional path to a JSON file containing a list of
+            filenames to process (e.g. from face_scan_full.json).  When
+            provided, only images in this list are processed.
 
     Returns:
         Dict with aggregate and per-image statistics.
@@ -66,8 +71,26 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
     print(f"[Validator] SAG_Z_THRESHOLD={effective_sag_z}, NMS_IOU_THRESHOLD={effective_nms_iou}, match_iou={iou_threshold}")
     pipeline = FaceSegmentationPipeline(smooth_edges=True)
     cloud_engine = CloudInferenceEngine(api_key=ROBOFLOW_API_KEY)
-    
-    image_files = [f for f in os.listdir(image_dir) if f.endswith(('.jpg', '.png', '.jpeg'))][:limit]
+
+    # Build image file list — optionally filtered by a pre-curated list
+    if filter_list:
+        with open(filter_list) as fl:
+            filter_data = json.load(fl)
+        # Support both a flat list of filenames and the face_scan_full.json format
+        if isinstance(filter_data, list):
+            allowed = set(filter_data)
+        elif isinstance(filter_data, dict) and 'files' in filter_data:
+            allowed = set(
+                d['file'] if isinstance(d, dict) else d
+                for d in filter_data['files']
+            )
+        else:
+            allowed = set()
+        image_files = [f for f in sorted(os.listdir(image_dir))
+                       if f.endswith(('.jpg', '.png', '.jpeg')) and f in allowed][:limit]
+        print(f"[Validator] Filter list: {len(allowed)} entries, selected {len(image_files)} images (limit={limit})")
+    else:
+        image_files = [f for f in os.listdir(image_dir) if f.endswith(('.jpg', '.png', '.jpeg'))][:limit]
     
     stats = {"tp": 0, "fp": 0, "fn": 0, "ious": []}
     per_image = []
@@ -88,6 +111,11 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
 
         # 1. Pipeline Segmentation (Required for SAG baselines)
         result = pipeline.segment(image)
+
+        # Determine segmentation mode: full (MediaPipe landmarks detected)
+        # vs fallback (parsing-only, no face detected by MediaPipe).
+        seg_timing = result.get("timing", {})
+        seg_mode = "full" if "geometry" in seg_timing else "fallback"
 
         t_seg = time.perf_counter()
 
@@ -164,6 +192,7 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
         img_fp = len(all_preds) - img_tp
         img_stats = {
             'image': img_name,
+            'seg_mode': seg_mode,
             'gt_count': len(all_gt),
             'pred_count': len(all_preds),
             'tp': img_tp,
@@ -185,6 +214,12 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
     f1 = 2 * p * r / (p + r) if (p + r) > 0 else 0
     mean_iou = float(np.mean(stats["ious"])) if stats["ious"] else 0.0
 
+    # Segmentation mode breakdown
+    seg_mode_counts = {'full': 0, 'fallback': 0}
+    for img_stat in per_image:
+        mode = img_stat.get('seg_mode', 'fallback')
+        seg_mode_counts[mode] = seg_mode_counts.get(mode, 0) + 1
+
     # Timing aggregation
     avg_timing = {}
     if timing_samples:
@@ -194,6 +229,7 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
 
     print(f"\n=== CLINICAL VALIDATION (SAG OPTIMIZED) ===")
     print(f"  Images processed: {len(per_image)}")
+    print(f"  Seg modes: full={seg_mode_counts['full']}, fallback={seg_mode_counts['fallback']}")
     print(f"  Precision: {p:.4f}")
     print(f"  Recall:    {r:.4f}")
     print(f"  F1-Score:  {f1:.4f}")
@@ -210,6 +246,7 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
             'sag_z_threshold': effective_sag_z,
             'nms_iou_threshold': effective_nms_iou,
             'limit': limit,
+            'filter_list': filter_list,
             'images_processed': len(per_image),
             'model_a_id': MODEL_A_ID,
             'model_b_id': MODEL_B_ID,
@@ -222,6 +259,7 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
             'tp': stats['tp'],
             'fp': stats['fp'],
             'fn': stats['fn'],
+            'seg_mode_counts': seg_mode_counts,
         },
         'timing': avg_timing,
         'per_image': per_image,
@@ -248,7 +286,10 @@ if __name__ == "__main__":
                         help="Override NMS_IOU_THRESHOLD (default from env or 0.30)")
     parser.add_argument("--output", type=str, default=None,
                         help="Path to save JSON results file")
+    parser.add_argument("--filter-list", type=str, default=None,
+                        help="Path to JSON file listing filenames to process")
     args = parser.parse_args()
     validate(args.images, args.labels, iou_threshold=args.match_iou,
              limit=args.limit, output_json=args.output,
-             sag_z=args.sag_z, nms_iou=args.nms_iou)
+             sag_z=args.sag_z, nms_iou=args.nms_iou,
+             filter_list=args.filter_list)

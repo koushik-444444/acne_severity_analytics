@@ -1,0 +1,4443 @@
+{
+  "config": {
+    "image_dir": "E:\\data_generation\\dataset\\original\\images\\val",
+    "label_dir": "E:\\data_generation\\dataset\\original\\labels\\val",
+    "iou_threshold": 0.45,
+    "sag_z_threshold": 0.5,
+    "nms_iou_threshold": 0.3,
+    "limit": 116,
+    "filter_list": "face_scan_full.json",
+    "images_processed": 116,
+    "model_a_id": "runner-e0dmy/acne-ijcab/2",
+    "model_b_id": "acne-project-2auvb/acne-detection-v2/1"
+  },
+  "aggregate": {
+    "precision": 0.1283,
+    "recall": 0.1304,
+    "f1_score": 0.1293,
+    "mean_iou": 0.67,
+    "tp": 106,
+    "fp": 720,
+    "fn": 707,
+    "seg_mode_counts": {
+      "full": 90,
+      "fallback": 26
+    }
+  },
+  "timing": {
+    "segmentation_ms_mean": 777.1,
+    "cloud_ms_mean": 6115.8,
+    "mapping_ms_mean": 28.2,
+    "total_ms_mean": 6922.6
+  },
+  "per_image": [
+    {
+      "image": "01F3MMWQ8CPEGRTX4RR44TCJH8_jpeg_jpg.rf.cf87620dbc9b7f5e0598fda75e7f6834.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 4,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 4,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1054.8,
+        "cloud_ms": 5904.3,
+        "mapping_ms": 53.6,
+        "total_ms": 7014.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 8
+        },
+        "post_nms": 11,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2298.9,
+        "model_b_ms": 2553.9,
+        "total_wall_ms": 5904.1
+      }
+    },
+    {
+      "image": "01F3MMWSAGG0C6JYE1NYSM6GM4_jpeg.rf.82cdd59d23ebc3a4873551ea4c7d8d38.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 4,
+      "pred_count": 7,
+      "tp": 2,
+      "fp": 5,
+      "fn": 2,
+      "mean_iou": 0.6366,
+      "timing": {
+        "segmentation_ms": 959.0,
+        "cloud_ms": 5515.6,
+        "mapping_ms": 36.1,
+        "total_ms": 6512.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2224.1,
+        "model_b_ms": 2571.9,
+        "total_wall_ms": 5515.4
+      }
+    },
+    {
+      "image": "01F3MMYACD6GHPPGMBJ8SE65WG_jpeg_jpg.rf.0654c17d9a24d7afc9cc868151d5ca6f.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 2,
+      "pred_count": 22,
+      "tp": 2,
+      "fp": 20,
+      "fn": 0,
+      "mean_iou": 0.8824,
+      "timing": {
+        "segmentation_ms": 892.4,
+        "cloud_ms": 5602.6,
+        "mapping_ms": 42.7,
+        "total_ms": 6539.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 25,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 20
+        },
+        "post_nms": 23,
+        "post_gating": 22,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 20,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1546.4,
+        "model_b_ms": 2874.7,
+        "total_wall_ms": 5602.5
+      }
+    },
+    {
+      "image": "05ae6d60-df34-4286-8c95-e213785dc9d2_jpg.rf.02acdf772156680d3326576c60f526f7.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 3,
+      "pred_count": 12,
+      "tp": 0,
+      "fp": 12,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 867.1,
+        "cloud_ms": 5425.9,
+        "mapping_ms": 38.6,
+        "total_ms": 6334.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 14
+        },
+        "post_nms": 13,
+        "post_gating": 12,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 12,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2221.4,
+        "model_b_ms": 1751.1,
+        "total_wall_ms": 5425.7
+      }
+    },
+    {
+      "image": "10_jpg.rf.947e6a09f3b9244e457db510b9e0b19c.jpg",
+      "seg_mode": "full",
+      "gt_count": 18,
+      "pred_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 16,
+      "mean_iou": 0.464,
+      "timing": {
+        "segmentation_ms": 1126.2,
+        "cloud_ms": 6396.8,
+        "mapping_ms": 16.6,
+        "total_ms": 7542.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 10,
+          "model_b": 3
+        },
+        "post_nms": 11,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 6
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2848.6,
+        "model_b_ms": 2480.1,
+        "total_wall_ms": 6396.7
+      }
+    },
+    {
+      "image": "119_jpg.rf.b727ed742f4b2b26cef2bee53a604867.jpg",
+      "seg_mode": "full",
+      "gt_count": 24,
+      "pred_count": 5,
+      "tp": 0,
+      "fp": 5,
+      "fn": 24,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1036.3,
+        "cloud_ms": 5177.1,
+        "mapping_ms": 36.9,
+        "total_ms": 6252.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 4
+        },
+        "post_nms": 9,
+        "post_gating": 5,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 1,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2134.1,
+        "model_b_ms": 1854.3,
+        "total_wall_ms": 5176.7
+      }
+    },
+    {
+      "image": "120_jpg.rf.77ed377ec9b7a13466edc6bac6e16976.jpg",
+      "seg_mode": "full",
+      "gt_count": 17,
+      "pred_count": 6,
+      "tp": 0,
+      "fp": 6,
+      "fn": 17,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1017.1,
+        "cloud_ms": 5794.8,
+        "mapping_ms": 39.4,
+        "total_ms": 6853.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 18,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 13,
+          "model_b": 5
+        },
+        "post_nms": 15,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1658.1,
+        "model_b_ms": 2688.3,
+        "total_wall_ms": 5794.7
+      }
+    },
+    {
+      "image": "159_jpg.rf.269f07bf90b2c897d6157445b284a77d.jpg",
+      "seg_mode": "full",
+      "gt_count": 44,
+      "pred_count": 12,
+      "tp": 0,
+      "fp": 12,
+      "fn": 44,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1026.7,
+        "cloud_ms": 6753.6,
+        "mapping_ms": 46.2,
+        "total_ms": 7830.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 25,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 16,
+          "model_b": 9
+        },
+        "post_nms": 19,
+        "post_gating": 12,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 4
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3258.8,
+        "model_b_ms": 3184.5,
+        "total_wall_ms": 6753.5
+      }
+    },
+    {
+      "image": "163_jpg.rf.9dc2d066cfa3f0c6b3eca17c478e26d2.jpg",
+      "seg_mode": "full",
+      "gt_count": 24,
+      "pred_count": 9,
+      "tp": 0,
+      "fp": 9,
+      "fn": 24,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1029.7,
+        "cloud_ms": 5033.5,
+        "mapping_ms": 44.7,
+        "total_ms": 6110.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 7
+        },
+        "post_nms": 11,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1785.4,
+        "model_b_ms": 1895.3,
+        "total_wall_ms": 5033.4
+      }
+    },
+    {
+      "image": "18_jpeg.rf.974adfbea308db4efbf2842c7b6b314b.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 1,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 895.9,
+        "cloud_ms": 5566.9,
+        "mapping_ms": 15.4,
+        "total_ms": 6479.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 0,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 0
+        },
+        "post_nms": 0,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2246.6,
+        "model_b_ms": 1989.6,
+        "total_wall_ms": 5566.7
+      }
+    },
+    {
+      "image": "20230418_134720_jpg.rf.63898d64e1286719bb473fcf64caa15f.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 2,
+      "pred_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 1,
+      "mean_iou": 0.5893,
+      "timing": {
+        "segmentation_ms": 948.5,
+        "cloud_ms": 5778.6,
+        "mapping_ms": 55.8,
+        "total_ms": 6784.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 10
+        },
+        "post_nms": 13,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1575.5,
+        "model_b_ms": 2482.6,
+        "total_wall_ms": 5778.4
+      }
+    },
+    {
+      "image": "20230418_143915_jpg.rf.d1f27cd4551a8833f1449c87e35b25d4.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 3,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 901.6,
+        "cloud_ms": 5785.1,
+        "mapping_ms": 37.5,
+        "total_ms": 6725.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1996.9,
+        "model_b_ms": 2071.0,
+        "total_wall_ms": 5785.0
+      }
+    },
+    {
+      "image": "20230612_183415_jpg.rf.e4988842108f56e326d4cccc9a7d2410.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 5,
+      "pred_count": 6,
+      "tp": 1,
+      "fp": 5,
+      "fn": 4,
+      "mean_iou": 0.5688,
+      "timing": {
+        "segmentation_ms": 923.0,
+        "cloud_ms": 5989.3,
+        "mapping_ms": 30.1,
+        "total_ms": 6943.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 8,
+          "model_b": 3
+        },
+        "post_nms": 8,
+        "post_gating": 6,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 2,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2532.9,
+        "model_b_ms": 2401.0,
+        "total_wall_ms": 5989.2
+      }
+    },
+    {
+      "image": "20230612_183531_jpg.rf.b06514fe6b9699059090ec438491bc52.jpg",
+      "seg_mode": "full",
+      "gt_count": 11,
+      "pred_count": 9,
+      "tp": 0,
+      "fp": 9,
+      "fn": 11,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1049.9,
+        "cloud_ms": 6850.4,
+        "mapping_ms": 18.1,
+        "total_ms": 7920.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 8
+        },
+        "post_nms": 10,
+        "post_gating": 9,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3067.6,
+        "model_b_ms": 3671.7,
+        "total_wall_ms": 6850.2
+      }
+    },
+    {
+      "image": "20230612_183540_jpg.rf.16d56b1c0e2d790ac8c05d3af02e1435.jpg",
+      "seg_mode": "full",
+      "gt_count": 10,
+      "pred_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 9,
+      "mean_iou": 0.473,
+      "timing": {
+        "segmentation_ms": 1062.9,
+        "cloud_ms": 5502.8,
+        "mapping_ms": 25.8,
+        "total_ms": 6593.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 8,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 8,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 1,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1815.6,
+        "model_b_ms": 1605.2,
+        "total_wall_ms": 5502.7
+      }
+    },
+    {
+      "image": "20230612_183801_jpg.rf.9e2c9caf0e3736e9faead9674199cc0b.jpg",
+      "seg_mode": "full",
+      "gt_count": 9,
+      "pred_count": 6,
+      "tp": 0,
+      "fp": 6,
+      "fn": 9,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1019.3,
+        "cloud_ms": 7748.5,
+        "mapping_ms": 13.7,
+        "total_ms": 8783.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 7
+        },
+        "post_nms": 9,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2260.0,
+        "model_b_ms": 3381.5,
+        "total_wall_ms": 7748.3
+      }
+    },
+    {
+      "image": "20230616_164120_jpg.rf.3bd1da320ee04cbce13c9447494fd77b.jpg",
+      "seg_mode": "full",
+      "gt_count": 6,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 6,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1041.9,
+        "cloud_ms": 5298.2,
+        "mapping_ms": 32.0,
+        "total_ms": 6374.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 4
+        },
+        "post_nms": 9,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1154.2,
+        "model_b_ms": 1821.2,
+        "total_wall_ms": 5298.0
+      }
+    },
+    {
+      "image": "20230616_164132_jpg.rf.94f4b645fbc41d989a305c57dc27591f.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 7,
+      "pred_count": 17,
+      "tp": 0,
+      "fp": 17,
+      "fn": 7,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 905.8,
+        "cloud_ms": 6607.0,
+        "mapping_ms": 47.3,
+        "total_ms": 7561.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 17
+        },
+        "post_nms": 17,
+        "post_gating": 17,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 17,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2466.6,
+        "model_b_ms": 2704.1,
+        "total_wall_ms": 6606.9
+      }
+    },
+    {
+      "image": "20230616_170028_jpg.rf.437d3faabc224c6a1b29463d383043ce.jpg",
+      "seg_mode": "full",
+      "gt_count": 8,
+      "pred_count": 11,
+      "tp": 2,
+      "fp": 9,
+      "fn": 6,
+      "mean_iou": 0.5896,
+      "timing": {
+        "segmentation_ms": 1041.6,
+        "cloud_ms": 5046.9,
+        "mapping_ms": 33.4,
+        "total_ms": 6123.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 12,
+          "model_b": 4
+        },
+        "post_nms": 14,
+        "post_gating": 11,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 2,
+          "none": 6
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1535.6,
+        "model_b_ms": 1771.4,
+        "total_wall_ms": 5046.8
+      }
+    },
+    {
+      "image": "20230616_172226_jpg.rf.35ff2971bf148717a66b6b225cf2cc67.jpg",
+      "seg_mode": "full",
+      "gt_count": 25,
+      "pred_count": 7,
+      "tp": 0,
+      "fp": 7,
+      "fn": 25,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 997.3,
+        "cloud_ms": 17588.3,
+        "mapping_ms": 45.9,
+        "total_ms": 18633.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 6
+        },
+        "post_nms": 11,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 13606.3,
+        "model_b_ms": 2375.1,
+        "total_wall_ms": 17588.2
+      }
+    },
+    {
+      "image": "247_jpg.rf.9cce7d06412be9a2f6f8abb05eb1b13c.jpg",
+      "seg_mode": "full",
+      "gt_count": 47,
+      "pred_count": 14,
+      "tp": 4,
+      "fp": 10,
+      "fn": 43,
+      "mean_iou": 0.5062,
+      "timing": {
+        "segmentation_ms": 1422.8,
+        "cloud_ms": 6292.2,
+        "mapping_ms": 51.3,
+        "total_ms": 7770.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 23,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 18,
+          "model_b": 5
+        },
+        "post_nms": 21,
+        "post_gating": 14,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 2,
+          "none": 7
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2516.3,
+        "model_b_ms": 1828.1,
+        "total_wall_ms": 6292.0
+      }
+    },
+    {
+      "image": "3_jpg.rf.c3cf0235f0a4a51c745e11b9fd9aff43.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 4,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 4,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1041.8,
+        "cloud_ms": 5749.1,
+        "mapping_ms": 63.3,
+        "total_ms": 6856.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 3
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2292.2,
+        "model_b_ms": 3040.1,
+        "total_wall_ms": 5748.9
+      }
+    },
+    {
+      "image": "48_jpg.rf.54779a0e0a1eaba5cf632f957892c27d.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 2,
+      "pred_count": 1,
+      "tp": 1,
+      "fp": 0,
+      "fn": 1,
+      "mean_iou": 0.5861,
+      "timing": {
+        "segmentation_ms": 1031.8,
+        "cloud_ms": 5129.7,
+        "mapping_ms": 32.9,
+        "total_ms": 6195.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 1,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 871.6,
+        "model_b_ms": 2188.9,
+        "total_wall_ms": 5129.5
+      }
+    },
+    {
+      "image": "67013_png.rf.ecc11dfd9dbd034309bd7252c3c50471.jpg",
+      "seg_mode": "full",
+      "gt_count": 28,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 28,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1262.9,
+        "cloud_ms": 5859.2,
+        "mapping_ms": 35.5,
+        "total_ms": 7160.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 0,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 0
+        },
+        "post_nms": 0,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3112.6,
+        "model_b_ms": 2606.7,
+        "total_wall_ms": 5859.0
+      }
+    },
+    {
+      "image": "67300_png.rf.bc68fcff3fef6908f14bd62ab6aae99c.jpg",
+      "seg_mode": "full",
+      "gt_count": 10,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 10,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1153.1,
+        "cloud_ms": 7387.3,
+        "mapping_ms": 46.0,
+        "total_ms": 8588.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 1,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1908.8,
+        "model_b_ms": 3999.5,
+        "total_wall_ms": 7387.1
+      }
+    },
+    {
+      "image": "C0018492-Acne_jpg.rf.0ff68b0d26908dfef22393148de06c2c.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1338.2,
+        "cloud_ms": 5148.9,
+        "mapping_ms": 60.6,
+        "total_ms": 6549.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 8,
+          "model_b": 3
+        },
+        "post_nms": 9,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1351.2,
+        "model_b_ms": 2280.6,
+        "total_wall_ms": 5148.8
+      }
+    },
+    {
+      "image": "R-28-_jpg.rf.22dfaaf8d752e241ceab2431dc802e6c.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 3,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "mean_iou": 0.533,
+      "timing": {
+        "segmentation_ms": 1160.2,
+        "cloud_ms": 4680.4,
+        "mapping_ms": 85.2,
+        "total_ms": 5927.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 11,
+          "model_b": 2
+        },
+        "post_nms": 12,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1665.7,
+        "model_b_ms": 1006.6,
+        "total_wall_ms": 4680.2
+      }
+    },
+    {
+      "image": "a6b3cac3-5ed2-4702-92fe-a8e4fc47cc65_jpg.rf.bb0f9425dd9cbd93715fb5d5081c7a6d.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 11,
+      "pred_count": 11,
+      "tp": 2,
+      "fp": 9,
+      "fn": 9,
+      "mean_iou": 0.7242,
+      "timing": {
+        "segmentation_ms": 1171.7,
+        "cloud_ms": 5205.2,
+        "mapping_ms": 81.3,
+        "total_ms": 6460.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 10
+        },
+        "post_nms": 12,
+        "post_gating": 11,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 10,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2366.3,
+        "model_b_ms": 2404.1,
+        "total_wall_ms": 5204.9
+      }
+    },
+    {
+      "image": "acne-excoriated-30_jpg.rf.d44f5d64bb1622e8d463309d7ca82cf2.jpg",
+      "seg_mode": "full",
+      "gt_count": 14,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 13,
+      "mean_iou": 0.5691,
+      "timing": {
+        "segmentation_ms": 1226.3,
+        "cloud_ms": 5009.8,
+        "mapping_ms": 30.1,
+        "total_ms": 6268.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 1
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1818.7,
+        "model_b_ms": 2316.7,
+        "total_wall_ms": 5009.5
+      }
+    },
+    {
+      "image": "bh65_jpg.rf.eca9234ff609fea8d4651125d9c817aa.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 102,
+      "pred_count": 28,
+      "tp": 1,
+      "fp": 27,
+      "fn": 101,
+      "mean_iou": 0.8027,
+      "timing": {
+        "segmentation_ms": 987.7,
+        "cloud_ms": 6031.3,
+        "mapping_ms": 26.0,
+        "total_ms": 7055.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 87,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 33,
+          "model_b": 54
+        },
+        "post_nms": 83,
+        "post_gating": 28,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 28,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2715.0,
+        "model_b_ms": 1794.8,
+        "total_wall_ms": 6031.2
+      }
+    },
+    {
+      "image": "cyst-17-_jpg.rf.16a0f291b0200dcc134cbb98e642fa89.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 997.8,
+        "cloud_ms": 5555.5,
+        "mapping_ms": 45.6,
+        "total_ms": 6600.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2612.6,
+        "model_b_ms": 2626.8,
+        "total_wall_ms": 5555.3
+      }
+    },
+    {
+      "image": "cystic_acne_-136-_jpg.rf.8ddb04a38c3da1db8ecebea599643168.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 9,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 9,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1009.7,
+        "cloud_ms": 5436.2,
+        "mapping_ms": 6.3,
+        "total_ms": 6453.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 21,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 16,
+          "model_b": 5
+        },
+        "post_nms": 14,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2288.8,
+        "model_b_ms": 1096.3,
+        "total_wall_ms": 5436.1
+      }
+    },
+    {
+      "image": "db11e934-bd1d-4fe3-8b02-10433a366a53_jpg.rf.3fa34760dfc924ab1e5d037c0e60d79e.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1193.2,
+        "cloud_ms": 4955.6,
+        "mapping_ms": 35.6,
+        "total_ms": 6186.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 2,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 0
+        },
+        "post_nms": 2,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1727.2,
+        "model_b_ms": 1964.9,
+        "total_wall_ms": 4955.5
+      }
+    },
+    {
+      "image": "levle0_112_jpg.rf.c0e5c18635318807645d303f5579d675.jpg",
+      "seg_mode": "full",
+      "gt_count": 0,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1192.5,
+        "cloud_ms": 7339.0,
+        "mapping_ms": 42.5,
+        "total_ms": 8575.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3044.4,
+        "model_b_ms": 3904.9,
+        "total_wall_ms": 7338.8
+      }
+    },
+    {
+      "image": "levle0_129_jpg.rf.844057d904abb18dc0db19fa7a007060.jpg",
+      "seg_mode": "full",
+      "gt_count": 0,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1255.0,
+        "cloud_ms": 5443.8,
+        "mapping_ms": 25.8,
+        "total_ms": 6725.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 2,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2324.3,
+        "model_b_ms": 2495.6,
+        "total_wall_ms": 5443.7
+      }
+    },
+    {
+      "image": "levle0_144_jpg.rf.cc526676bd10124d8f43a7e0fcb8cfc0.jpg",
+      "seg_mode": "full",
+      "gt_count": 0,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1185.5,
+        "cloud_ms": 6759.2,
+        "mapping_ms": 42.6,
+        "total_ms": 7989.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 2,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1999.9,
+        "model_b_ms": 2848.5,
+        "total_wall_ms": 6759.0
+      }
+    },
+    {
+      "image": "levle0_158_jpg.rf.59b677fb6582884c6c72e4705e3ccbb1.jpg",
+      "seg_mode": "full",
+      "gt_count": 0,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1405.4,
+        "cloud_ms": 5911.6,
+        "mapping_ms": 40.8,
+        "total_ms": 7359.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 1
+        },
+        "post_nms": 3,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1157.2,
+        "model_b_ms": 2982.2,
+        "total_wall_ms": 5911.4
+      }
+    },
+    {
+      "image": "levle0_16_jpg.rf.450cc99d0030e63279b65b678ed41714.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 0,
+      "mean_iou": 0.6545,
+      "timing": {
+        "segmentation_ms": 1216.4,
+        "cloud_ms": 5583.5,
+        "mapping_ms": 36.4,
+        "total_ms": 6838.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 5
+        },
+        "post_nms": 6,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2379.0,
+        "model_b_ms": 2089.3,
+        "total_wall_ms": 5583.3
+      }
+    },
+    {
+      "image": "levle0_16_jpg.rf.e0e390d04eaddbd533d75047e9123275.jpg",
+      "seg_mode": "full",
+      "gt_count": 0,
+      "pred_count": 5,
+      "tp": 0,
+      "fp": 5,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1194.2,
+        "cloud_ms": 5410.8,
+        "mapping_ms": 33.4,
+        "total_ms": 6639.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 5
+        },
+        "post_nms": 6,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1454.7,
+        "model_b_ms": 2541.9,
+        "total_wall_ms": 5410.6
+      }
+    },
+    {
+      "image": "levle0_189_jpg.rf.cca168aa0116a67eec0df3c19fcbdd75.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 0,
+      "mean_iou": 0.6292,
+      "timing": {
+        "segmentation_ms": 1072.8,
+        "cloud_ms": 5942.0,
+        "mapping_ms": 61.8,
+        "total_ms": 7078.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 9,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 4
+        },
+        "post_nms": 7,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1236.9,
+        "model_b_ms": 2854.9,
+        "total_wall_ms": 5941.8
+      }
+    },
+    {
+      "image": "levle0_314_jpg.rf.acb80aecfc78af5fe8a4556c543a9e8a.jpg",
+      "seg_mode": "full",
+      "gt_count": 4,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 3,
+      "mean_iou": 0.6947,
+      "timing": {
+        "segmentation_ms": 1147.1,
+        "cloud_ms": 6144.0,
+        "mapping_ms": 40.2,
+        "total_ms": 7333.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 35,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 35
+        },
+        "post_nms": 30,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2240.5,
+        "model_b_ms": 2441.0,
+        "total_wall_ms": 6143.8
+      }
+    },
+    {
+      "image": "levle0_334_jpg.rf.029db45e4993508f836663b93ffbeb40.jpg",
+      "seg_mode": "full",
+      "gt_count": 4,
+      "pred_count": 7,
+      "tp": 3,
+      "fp": 4,
+      "fn": 1,
+      "mean_iou": 0.6671,
+      "timing": {
+        "segmentation_ms": 1207.9,
+        "cloud_ms": 6107.1,
+        "mapping_ms": 30.7,
+        "total_ms": 7347.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 8,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 7
+        },
+        "post_nms": 7,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3149.5,
+        "model_b_ms": 2486.0,
+        "total_wall_ms": 6106.9
+      }
+    },
+    {
+      "image": "levle0_362_jpg.rf.49a03c9d48fe6d13ba46956478ed94fa.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 5,
+      "tp": 0,
+      "fp": 5,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1134.4,
+        "cloud_ms": 6089.4,
+        "mapping_ms": 30.7,
+        "total_ms": 7255.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 9,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 6
+        },
+        "post_nms": 7,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2604.3,
+        "model_b_ms": 3119.5,
+        "total_wall_ms": 6089.3
+      }
+    },
+    {
+      "image": "levle0_362_jpg.rf.e6ac5648068036ffa12211d9c6f77d33.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1103.1,
+        "cloud_ms": 6229.5,
+        "mapping_ms": 30.9,
+        "total_ms": 7364.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 8,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2257.6,
+        "model_b_ms": 2177.7,
+        "total_wall_ms": 6229.3
+      }
+    },
+    {
+      "image": "levle0_363_jpg.rf.ee2e801deebee48fefd929097f5089b9.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1188.9,
+        "cloud_ms": 6923.7,
+        "mapping_ms": 29.8,
+        "total_ms": 8143.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 1,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2819.4,
+        "model_b_ms": 3107.0,
+        "total_wall_ms": 6923.6
+      }
+    },
+    {
+      "image": "levle0_371_jpg.rf.c9ef01f526b324a41c8336401ce43847.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "mean_iou": 0.724,
+      "timing": {
+        "segmentation_ms": 1278.7,
+        "cloud_ms": 5873.1,
+        "mapping_ms": 33.5,
+        "total_ms": 7187.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 2
+        },
+        "post_nms": 5,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1418.6,
+        "model_b_ms": 2752.6,
+        "total_wall_ms": 5872.9
+      }
+    },
+    {
+      "image": "levle0_388_jpg.rf.046b3dba80433751ef29303c9a9ad480.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1137.2,
+        "cloud_ms": 7009.2,
+        "mapping_ms": 36.8,
+        "total_ms": 8184.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 3
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2589.3,
+        "model_b_ms": 3559.2,
+        "total_wall_ms": 7008.9
+      }
+    },
+    {
+      "image": "levle0_399_jpg.rf.22e3971b4b14ad05b7ffc911fc5a639b.jpg",
+      "seg_mode": "full",
+      "gt_count": 7,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 7,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1159.6,
+        "cloud_ms": 6361.3,
+        "mapping_ms": 33.6,
+        "total_ms": 7556.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 5,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2495.8,
+        "model_b_ms": 3677.4,
+        "total_wall_ms": 6361.1
+      }
+    },
+    {
+      "image": "levle0_417_jpg.rf.a1bd3983d39644ca3e79d8df715252a0.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 1155.3,
+        "cloud_ms": 6781.0,
+        "mapping_ms": 19.4,
+        "total_ms": 7956.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 5
+        },
+        "post_nms": 5,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2605.4,
+        "model_b_ms": 1443.2,
+        "total_wall_ms": 6780.9
+      }
+    },
+    {
+      "image": "levle0_424_jpg.rf.5547f1a4d9bd6324e375f2b22aab2dad.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 545.2,
+        "cloud_ms": 6939.1,
+        "mapping_ms": 18.2,
+        "total_ms": 7503.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 13
+        },
+        "post_nms": 11,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3590.8,
+        "model_b_ms": 2882.9,
+        "total_wall_ms": 6939.0
+      }
+    },
+    {
+      "image": "levle0_426_png.rf.4a69466d2272afb5f1c46830b1131ca9.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 6,
+      "tp": 1,
+      "fp": 5,
+      "fn": 0,
+      "mean_iou": 0.6422,
+      "timing": {
+        "segmentation_ms": 533.4,
+        "cloud_ms": 4340.9,
+        "mapping_ms": 22.1,
+        "total_ms": 4897.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 5
+        },
+        "post_nms": 7,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1247.4,
+        "model_b_ms": 1470.8,
+        "total_wall_ms": 4340.8
+      }
+    },
+    {
+      "image": "levle0_443_jpg.rf.b795acec3e7ae79ee618b3d888ff25d4.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 2,
+      "mean_iou": 0.7401,
+      "timing": {
+        "segmentation_ms": 536.5,
+        "cloud_ms": 5453.9,
+        "mapping_ms": 24.2,
+        "total_ms": 6015.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 22,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 19
+        },
+        "post_nms": 17,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1573.6,
+        "model_b_ms": 2251.7,
+        "total_wall_ms": 5453.7
+      }
+    },
+    {
+      "image": "levle0_446_jpg.rf.961718465377c9bc55c4aac515fa8498.jpg",
+      "seg_mode": "full",
+      "gt_count": 4,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 3,
+      "mean_iou": 0.6333,
+      "timing": {
+        "segmentation_ms": 536.2,
+        "cloud_ms": 6390.7,
+        "mapping_ms": 20.7,
+        "total_ms": 6948.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3012.5,
+        "model_b_ms": 3441.0,
+        "total_wall_ms": 6390.6
+      }
+    },
+    {
+      "image": "levle0_447_jpg.rf.e4e6227f9da7ba50dc14dbc18f7e5dd7.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.6376,
+      "timing": {
+        "segmentation_ms": 551.6,
+        "cloud_ms": 5981.8,
+        "mapping_ms": 21.8,
+        "total_ms": 6556.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 7
+        },
+        "post_nms": 8,
+        "post_gating": 7,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2446.1,
+        "model_b_ms": 2513.9,
+        "total_wall_ms": 5981.7
+      }
+    },
+    {
+      "image": "levle0_487_jpg.rf.0ad36ea3e144f6c3a260f623862ecd78.jpg",
+      "seg_mode": "full",
+      "gt_count": 8,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 7,
+      "mean_iou": 0.7677,
+      "timing": {
+        "segmentation_ms": 531.9,
+        "cloud_ms": 6599.2,
+        "mapping_ms": 19.4,
+        "total_ms": 7151.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 3
+        },
+        "post_nms": 6,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 998.7,
+        "model_b_ms": 3342.0,
+        "total_wall_ms": 6599.1
+      }
+    },
+    {
+      "image": "levle0_503_jpg.rf.24d7235b964e2296d0fbea96d20cfb30.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.7218,
+      "timing": {
+        "segmentation_ms": 538.6,
+        "cloud_ms": 5765.9,
+        "mapping_ms": 21.5,
+        "total_ms": 6326.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 9
+        },
+        "post_nms": 9,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2277.3,
+        "model_b_ms": 2769.9,
+        "total_wall_ms": 5765.8
+      }
+    },
+    {
+      "image": "levle0_503_jpg.rf.c652e23135da3638fae5f55832cfe84f.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.7325,
+      "timing": {
+        "segmentation_ms": 539.3,
+        "cloud_ms": 6406.9,
+        "mapping_ms": 25.0,
+        "total_ms": 6972.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 9
+        },
+        "post_nms": 9,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1550.6,
+        "model_b_ms": 2518.5,
+        "total_wall_ms": 6406.7
+      }
+    },
+    {
+      "image": "levle0_521_jpg.rf.ab727d93763f28c8cf8e7bb8328fe965.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 539.3,
+        "cloud_ms": 6796.7,
+        "mapping_ms": 19.3,
+        "total_ms": 7356.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 4
+        },
+        "post_nms": 4,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1337.9,
+        "model_b_ms": 2812.7,
+        "total_wall_ms": 6796.6
+      }
+    },
+    {
+      "image": "levle0_527_jpg.rf.2064ed7cffd491d4983cb06199c4140c.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 2,
+      "mean_iou": 0.7255,
+      "timing": {
+        "segmentation_ms": 529.1,
+        "cloud_ms": 5692.1,
+        "mapping_ms": 17.6,
+        "total_ms": 6239.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 12,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 7
+        },
+        "post_nms": 9,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2613.6,
+        "model_b_ms": 2308.1,
+        "total_wall_ms": 5692.0
+      }
+    },
+    {
+      "image": "levle0_54_jpg.rf.6817adcd5efab11785708a322caf3442.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 538.6,
+        "cloud_ms": 17252.6,
+        "mapping_ms": 18.1,
+        "total_ms": 17810.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 12
+        },
+        "post_nms": 13,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 13327.1,
+        "model_b_ms": 13313.1,
+        "total_wall_ms": 17252.5
+      }
+    },
+    {
+      "image": "levle0_85_jpg.rf.847454c47753dfc3ce5e41ffdeec3665.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 527.1,
+        "cloud_ms": 5382.5,
+        "mapping_ms": 10.7,
+        "total_ms": 5921.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 16
+        },
+        "post_nms": 16,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1214.0,
+        "model_b_ms": 2218.1,
+        "total_wall_ms": 5382.4
+      }
+    },
+    {
+      "image": "levle1_112_jpg.rf.aa4439233e7a271be43ff5f9d039a7f8.jpg",
+      "seg_mode": "full",
+      "gt_count": 4,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 4,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 527.7,
+        "cloud_ms": 5903.8,
+        "mapping_ms": 7.1,
+        "total_ms": 6439.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 3
+        },
+        "post_nms": 4,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2834.8,
+        "model_b_ms": 2298.4,
+        "total_wall_ms": 5903.6
+      }
+    },
+    {
+      "image": "levle1_145_jpg.rf.4bf821ee3526ca0c57c187707b48a6c8.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.7991,
+      "timing": {
+        "segmentation_ms": 529.8,
+        "cloud_ms": 5396.7,
+        "mapping_ms": 21.1,
+        "total_ms": 5948.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 8
+        },
+        "post_nms": 9,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2323.3,
+        "model_b_ms": 1940.2,
+        "total_wall_ms": 5396.6
+      }
+    },
+    {
+      "image": "levle1_180_jpg.rf.a4f5833248c5a1a7135c63a8fe8e3e1c.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 1,
+      "mean_iou": 0.7047,
+      "timing": {
+        "segmentation_ms": 543.3,
+        "cloud_ms": 6178.9,
+        "mapping_ms": 22.2,
+        "total_ms": 6745.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 7
+        },
+        "post_nms": 7,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2565.7,
+        "model_b_ms": 2093.2,
+        "total_wall_ms": 6178.8
+      }
+    },
+    {
+      "image": "levle1_241_jpg.rf.095ad8c11dcd6d05b53fdab3c2ce3519.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.7066,
+      "timing": {
+        "segmentation_ms": 540.5,
+        "cloud_ms": 6093.6,
+        "mapping_ms": 19.3,
+        "total_ms": 6654.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 1
+        },
+        "post_nms": 5,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3061.7,
+        "model_b_ms": 3249.2,
+        "total_wall_ms": 6093.5
+      }
+    },
+    {
+      "image": "levle1_248_jpg.rf.0e7fa0289c393797efeed1101c97b683.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.5646,
+      "timing": {
+        "segmentation_ms": 538.4,
+        "cloud_ms": 6080.5,
+        "mapping_ms": 18.0,
+        "total_ms": 6638.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1954.6,
+        "model_b_ms": 3076.6,
+        "total_wall_ms": 6080.4
+      }
+    },
+    {
+      "image": "levle1_248_jpg.rf.2380d655044c687a19732ed625c4fd86.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.896,
+      "timing": {
+        "segmentation_ms": 541.7,
+        "cloud_ms": 5983.4,
+        "mapping_ms": 22.5,
+        "total_ms": 6548.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 6
+        },
+        "post_nms": 8,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2546.7,
+        "model_b_ms": 2205.3,
+        "total_wall_ms": 5983.3
+      }
+    },
+    {
+      "image": "levle1_265_jpg.rf.4c4a868f6a216403f6b6c764af5380fd.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.7986,
+      "timing": {
+        "segmentation_ms": 532.9,
+        "cloud_ms": 5377.7,
+        "mapping_ms": 5.2,
+        "total_ms": 5916.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 2
+        },
+        "post_nms": 2,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1210.0,
+        "model_b_ms": 2162.7,
+        "total_wall_ms": 5377.4
+      }
+    },
+    {
+      "image": "levle1_265_png_jpg.rf.d4b256daecbdbbf1c14c883209a331bf.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "mean_iou": 0.696,
+      "timing": {
+        "segmentation_ms": 536.5,
+        "cloud_ms": 6411.9,
+        "mapping_ms": 7.0,
+        "total_ms": 6956.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 3
+        },
+        "post_nms": 4,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2694.3,
+        "model_b_ms": 1795.2,
+        "total_wall_ms": 6411.8
+      }
+    },
+    {
+      "image": "levle1_337_jpg.rf.1a6d207252dc4ba4a329d51fe0ecc00e.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 569.4,
+        "cloud_ms": 6043.2,
+        "mapping_ms": 21.5,
+        "total_ms": 6635.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 12,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 7
+        },
+        "post_nms": 8,
+        "post_gating": 8,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 1,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3020.1,
+        "model_b_ms": 1585.7,
+        "total_wall_ms": 6043.1
+      }
+    },
+    {
+      "image": "levle1_433_png.rf.91e923a69dcbfb081930e1ba7f0520da.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 0,
+      "mean_iou": 0.8259,
+      "timing": {
+        "segmentation_ms": 540.0,
+        "cloud_ms": 5906.9,
+        "mapping_ms": 18.3,
+        "total_ms": 6466.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 4
+        },
+        "post_nms": 5,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2214.9,
+        "model_b_ms": 2942.9,
+        "total_wall_ms": 5906.8
+      }
+    },
+    {
+      "image": "levle1_472_jpg.rf.ae01b602d07d605aea6be963a795dd94.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 1,
+      "mean_iou": 0.6403,
+      "timing": {
+        "segmentation_ms": 537.6,
+        "cloud_ms": 4964.1,
+        "mapping_ms": 22.3,
+        "total_ms": 5525.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 12
+        },
+        "post_nms": 14,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1487.2,
+        "model_b_ms": 2110.0,
+        "total_wall_ms": 4963.9
+      }
+    },
+    {
+      "image": "levle1_474_jpg.rf.50a244dfe68f1a13883640a3da4890ec.jpg",
+      "seg_mode": "full",
+      "gt_count": 6,
+      "pred_count": 9,
+      "tp": 1,
+      "fp": 8,
+      "fn": 5,
+      "mean_iou": 0.5729,
+      "timing": {
+        "segmentation_ms": 541.8,
+        "cloud_ms": 5163.7,
+        "mapping_ms": 18.6,
+        "total_ms": 5725.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 23,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 14,
+          "model_b": 9
+        },
+        "post_nms": 16,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1320.5,
+        "model_b_ms": 2247.2,
+        "total_wall_ms": 5163.5
+      }
+    },
+    {
+      "image": "levle1_483_jpg.rf.d62c086971ee6a1e81b760faeae8d7d4.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 0,
+      "mean_iou": 0.7632,
+      "timing": {
+        "segmentation_ms": 536.9,
+        "cloud_ms": 7116.0,
+        "mapping_ms": 21.7,
+        "total_ms": 7675.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 2
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3528.8,
+        "model_b_ms": 3257.9,
+        "total_wall_ms": 7115.9
+      }
+    },
+    {
+      "image": "levle1_531_jpg.rf.82f06c982ae177c6c0de472404368863.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 614.6,
+        "cloud_ms": 5741.3,
+        "mapping_ms": 22.4,
+        "total_ms": 6379.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 11,
+          "model_b": 5
+        },
+        "post_nms": 15,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 4
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2598.0,
+        "model_b_ms": 2645.9,
+        "total_wall_ms": 5741.2
+      }
+    },
+    {
+      "image": "levle1_539_jpg.rf.23165cd5634649a8ec4bd6acfbf503d9.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 548.8,
+        "cloud_ms": 6454.3,
+        "mapping_ms": 20.1,
+        "total_ms": 7024.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 3
+        },
+        "post_nms": 8,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3060.4,
+        "model_b_ms": 2058.0,
+        "total_wall_ms": 6454.1
+      }
+    },
+    {
+      "image": "levle1_542_jpg.rf.54211b1539803abebfbdd3c10cfa40d0.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 1,
+      "mean_iou": 0.6122,
+      "timing": {
+        "segmentation_ms": 555.9,
+        "cloud_ms": 6270.1,
+        "mapping_ms": 21.5,
+        "total_ms": 6848.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 3
+        },
+        "post_nms": 6,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3076.2,
+        "model_b_ms": 2783.2,
+        "total_wall_ms": 6270.1
+      }
+    },
+    {
+      "image": "levle1_542_jpg.rf.cda2ffbd0702caedb5fbfe6d55fb9b1b.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 544.8,
+        "cloud_ms": 6085.8,
+        "mapping_ms": 21.1,
+        "total_ms": 6652.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 3
+        },
+        "post_nms": 6,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2718.9,
+        "model_b_ms": 2897.5,
+        "total_wall_ms": 6085.7
+      }
+    },
+    {
+      "image": "levle1_543_jpg.rf.3d18caf3f59ef56fe2a9cace99a6e74c.jpg",
+      "seg_mode": "full",
+      "gt_count": 8,
+      "pred_count": 9,
+      "tp": 3,
+      "fp": 6,
+      "fn": 5,
+      "mean_iou": 0.6962,
+      "timing": {
+        "segmentation_ms": 561.3,
+        "cloud_ms": 5142.7,
+        "mapping_ms": 22.6,
+        "total_ms": 5727.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 12,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 9,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 1,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1589.9,
+        "model_b_ms": 2095.4,
+        "total_wall_ms": 5142.6
+      }
+    },
+    {
+      "image": "levle1_594_jpg.rf.597f6369b5e83e1f74ba81f3a3b7ca07.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 9,
+      "tp": 0,
+      "fp": 9,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 584.8,
+        "cloud_ms": 5528.5,
+        "mapping_ms": 30.5,
+        "total_ms": 6145.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 11,
+          "model_b": 5
+        },
+        "post_nms": 11,
+        "post_gating": 9,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 1,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2469.5,
+        "model_b_ms": 1680.1,
+        "total_wall_ms": 5528.2
+      }
+    },
+    {
+      "image": "levle1_623_jpg.rf.992fd8ffd7226c657c43c53bd4943629.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 13,
+      "tp": 2,
+      "fp": 11,
+      "fn": 1,
+      "mean_iou": 0.6436,
+      "timing": {
+        "segmentation_ms": 1351.9,
+        "cloud_ms": 6787.9,
+        "mapping_ms": 22.1,
+        "total_ms": 8162.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 19,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 13
+        },
+        "post_nms": 17,
+        "post_gating": 13,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 10,
+          "proximity": 1,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2495.0,
+        "model_b_ms": 3468.5,
+        "total_wall_ms": 6787.8
+      }
+    },
+    {
+      "image": "levle1_623_jpg.rf.b5cae824737da85911dd48569f9a13fd.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 16,
+      "tp": 2,
+      "fp": 14,
+      "fn": 1,
+      "mean_iou": 0.649,
+      "timing": {
+        "segmentation_ms": 550.0,
+        "cloud_ms": 4624.5,
+        "mapping_ms": 22.5,
+        "total_ms": 5198.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 20,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 14
+        },
+        "post_nms": 18,
+        "post_gating": 16,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 13,
+          "proximity": 1,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1912.8,
+        "model_b_ms": 1425.5,
+        "total_wall_ms": 4624.4
+      }
+    },
+    {
+      "image": "levle2_109_jpg.rf.93773b7ee773e33213c6abd1a7274def.jpg",
+      "seg_mode": "full",
+      "gt_count": 8,
+      "pred_count": 18,
+      "tp": 5,
+      "fp": 13,
+      "fn": 3,
+      "mean_iou": 0.6048,
+      "timing": {
+        "segmentation_ms": 584.9,
+        "cloud_ms": 6464.1,
+        "mapping_ms": 23.4,
+        "total_ms": 7073.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 30,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 20,
+          "model_b": 10
+        },
+        "post_nms": 21,
+        "post_gating": 18,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 10
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3247.5,
+        "model_b_ms": 2181.6,
+        "total_wall_ms": 6464.0
+      }
+    },
+    {
+      "image": "levle2_110_jpg.rf.18853f9c02faaa4174e4899fa08ca044.jpg",
+      "seg_mode": "full",
+      "gt_count": 9,
+      "pred_count": 18,
+      "tp": 8,
+      "fp": 10,
+      "fn": 1,
+      "mean_iou": 0.7775,
+      "timing": {
+        "segmentation_ms": 553.3,
+        "cloud_ms": 5968.6,
+        "mapping_ms": 23.5,
+        "total_ms": 6546.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 26,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 13,
+          "model_b": 13
+        },
+        "post_nms": 21,
+        "post_gating": 18,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 12,
+          "proximity": 1,
+          "none": 5
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2047.7,
+        "model_b_ms": 2707.6,
+        "total_wall_ms": 5968.5
+      }
+    },
+    {
+      "image": "levle2_114_png_jpg.rf.05d167fc302a0b2ceb8c7799fc5fe392.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 1,
+      "pred_count": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.7955,
+      "timing": {
+        "segmentation_ms": 313.7,
+        "cloud_ms": 5599.5,
+        "mapping_ms": 24.7,
+        "total_ms": 5938.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 8,
+          "model_b": 7
+        },
+        "post_nms": 10,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1604.1,
+        "model_b_ms": 2363.0,
+        "total_wall_ms": 5599.4
+      }
+    },
+    {
+      "image": "levle2_119_jpg.rf.4e370f0aa6014b75357835b776fc52a0.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 10,
+      "tp": 1,
+      "fp": 9,
+      "fn": 0,
+      "mean_iou": 0.7015,
+      "timing": {
+        "segmentation_ms": 528.9,
+        "cloud_ms": 6599.7,
+        "mapping_ms": 20.0,
+        "total_ms": 7149.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 21,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 10,
+          "model_b": 11
+        },
+        "post_nms": 11,
+        "post_gating": 10,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2263.8,
+        "model_b_ms": 3300.0,
+        "total_wall_ms": 6599.4
+      }
+    },
+    {
+      "image": "levle2_134_jpg.rf.e5c58b961f24c10c74fb31a379168965.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 9,
+      "tp": 1,
+      "fp": 8,
+      "fn": 0,
+      "mean_iou": 0.8754,
+      "timing": {
+        "segmentation_ms": 536.9,
+        "cloud_ms": 5784.8,
+        "mapping_ms": 24.4,
+        "total_ms": 6347.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 9,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 2,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2278.1,
+        "model_b_ms": 2874.7,
+        "total_wall_ms": 5784.7
+      }
+    },
+    {
+      "image": "levle2_177_jpg.rf.4065594aac041ab7a5fd32f6ae27cd9e.jpg",
+      "seg_mode": "full",
+      "gt_count": 9,
+      "pred_count": 21,
+      "tp": 2,
+      "fp": 19,
+      "fn": 7,
+      "mean_iou": 0.6134,
+      "timing": {
+        "segmentation_ms": 553.4,
+        "cloud_ms": 6172.4,
+        "mapping_ms": 22.6,
+        "total_ms": 6750.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 38,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 19,
+          "model_b": 19
+        },
+        "post_nms": 26,
+        "post_gating": 21,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 16,
+          "proximity": 1,
+          "none": 4
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1802.2,
+        "model_b_ms": 3275.8,
+        "total_wall_ms": 6172.3
+      }
+    },
+    {
+      "image": "levle2_183_jpg.rf.f1ad82bcc947652b62cc6bc1618ab7b7.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 6,
+      "tp": 1,
+      "fp": 5,
+      "fn": 0,
+      "mean_iou": 0.8724,
+      "timing": {
+        "segmentation_ms": 533.2,
+        "cloud_ms": 6000.3,
+        "mapping_ms": 28.1,
+        "total_ms": 6562.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 7
+        },
+        "post_nms": 10,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2854.8,
+        "model_b_ms": 2989.2,
+        "total_wall_ms": 6000.1
+      }
+    },
+    {
+      "image": "levle2_70_jpg.rf.6def35ef858e4bac954309333f55bf8a.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 15,
+      "tp": 2,
+      "fp": 13,
+      "fn": 0,
+      "mean_iou": 0.8202,
+      "timing": {
+        "segmentation_ms": 538.3,
+        "cloud_ms": 5547.1,
+        "mapping_ms": 23.2,
+        "total_ms": 6109.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 26,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 17,
+          "model_b": 9
+        },
+        "post_nms": 20,
+        "post_gating": 15,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 2,
+          "none": 4
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2640.7,
+        "model_b_ms": 1725.1,
+        "total_wall_ms": 5547.0
+      }
+    },
+    {
+      "image": "levle2_78_jpg.rf.5950226a0c7a8e6a26e64cf927350905.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 14,
+      "tp": 0,
+      "fp": 14,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 533.1,
+        "cloud_ms": 5587.2,
+        "mapping_ms": 23.5,
+        "total_ms": 6145.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 20,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 13,
+          "model_b": 7
+        },
+        "post_nms": 17,
+        "post_gating": 14,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 1,
+          "none": 7
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2674.1,
+        "model_b_ms": 2767.2,
+        "total_wall_ms": 5587.1
+      }
+    },
+    {
+      "image": "levle3_107_jpg.rf.ceb1e8bc32584c6ae4772591a82cf534.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 7,
+      "pred_count": 11,
+      "tp": 2,
+      "fp": 9,
+      "fn": 5,
+      "mean_iou": 0.7784,
+      "timing": {
+        "segmentation_ms": 468.9,
+        "cloud_ms": 4625.3,
+        "mapping_ms": 10.2,
+        "total_ms": 5105.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 20,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 13,
+          "model_b": 7
+        },
+        "post_nms": 15,
+        "post_gating": 11,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 1,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1477.9,
+        "model_b_ms": 1246.4,
+        "total_wall_ms": 4625.1
+      }
+    },
+    {
+      "image": "levle3_130_jpg.rf.1ed123e759ff742049555cf5a786fb4d.jpg",
+      "seg_mode": "full",
+      "gt_count": 8,
+      "pred_count": 27,
+      "tp": 6,
+      "fp": 21,
+      "fn": 2,
+      "mean_iou": 0.6918,
+      "timing": {
+        "segmentation_ms": 538.4,
+        "cloud_ms": 5479.1,
+        "mapping_ms": 24.4,
+        "total_ms": 6043.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 48,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 37,
+          "model_b": 11
+        },
+        "post_nms": 41,
+        "post_gating": 27,
+        "proximity_propagated": 4,
+        "type_coverage": {
+          "direct": 10,
+          "proximity": 4,
+          "none": 13
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2128.9,
+        "model_b_ms": 1313.9,
+        "total_wall_ms": 5479.0
+      }
+    },
+    {
+      "image": "levle3_25_jpg.rf.ab096275fb7449f710ddc836057d9121.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 53,
+      "pred_count": 18,
+      "tp": 6,
+      "fp": 12,
+      "fn": 47,
+      "mean_iou": 0.6326,
+      "timing": {
+        "segmentation_ms": 448.9,
+        "cloud_ms": 6165.2,
+        "mapping_ms": 37.0,
+        "total_ms": 6653.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 47,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 37,
+          "model_b": 10
+        },
+        "post_nms": 40,
+        "post_gating": 18,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 0,
+          "none": 9
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3128.6,
+        "model_b_ms": 2877.6,
+        "total_wall_ms": 6165.1
+      }
+    },
+    {
+      "image": "levle3_4_jpg.rf.ed29109afbddde50231e943c08bc58b9.jpg",
+      "seg_mode": "full",
+      "gt_count": 61,
+      "pred_count": 6,
+      "tp": 3,
+      "fp": 3,
+      "fn": 58,
+      "mean_iou": 0.5478,
+      "timing": {
+        "segmentation_ms": 532.7,
+        "cloud_ms": 5971.7,
+        "mapping_ms": 7.7,
+        "total_ms": 6513.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 18,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 14,
+          "model_b": 4
+        },
+        "post_nms": 16,
+        "post_gating": 6,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 1,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1994.6,
+        "model_b_ms": 2978.6,
+        "total_wall_ms": 5971.5
+      }
+    },
+    {
+      "image": "levle3_52_jpg.rf.2be295da10dc012a72c9608a26b613da.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 5,
+      "pred_count": 14,
+      "tp": 4,
+      "fp": 10,
+      "fn": 1,
+      "mean_iou": 0.6274,
+      "timing": {
+        "segmentation_ms": 459.7,
+        "cloud_ms": 5465.8,
+        "mapping_ms": 24.6,
+        "total_ms": 5951.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 26,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 18,
+          "model_b": 8
+        },
+        "post_nms": 21,
+        "post_gating": 14,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 6
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2294.5,
+        "model_b_ms": 2566.1,
+        "total_wall_ms": 5465.7
+      }
+    },
+    {
+      "image": "levle3_52_jpg.rf.43fd55beb3e2bdce11e415cd9e7a16b7.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 3,
+      "pred_count": 14,
+      "tp": 0,
+      "fp": 14,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 457.0,
+        "cloud_ms": 5236.5,
+        "mapping_ms": 24.3,
+        "total_ms": 5719.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 26,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 18,
+          "model_b": 8
+        },
+        "post_nms": 21,
+        "post_gating": 14,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 6
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2530.1,
+        "model_b_ms": 2163.7,
+        "total_wall_ms": 5236.4
+      }
+    },
+    {
+      "image": "levle3_72_jpg.rf.c89bc6cb5a780ad952beaff63e712080.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "mean_iou": 0.5765,
+      "timing": {
+        "segmentation_ms": 531.0,
+        "cloud_ms": 5418.4,
+        "mapping_ms": 7.6,
+        "total_ms": 5958.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 29,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 12,
+          "model_b": 17
+        },
+        "post_nms": 23,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1319.6,
+        "model_b_ms": 2453.6,
+        "total_wall_ms": 5418.3
+      }
+    },
+    {
+      "image": "maxresdefault_jpg.rf.365d011d755ba2967f1e3d5aeea8d010.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 2,
+      "pred_count": 51,
+      "tp": 0,
+      "fp": 51,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 488.7,
+        "cloud_ms": 4990.2,
+        "mapping_ms": 37.6,
+        "total_ms": 5518.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 56,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 34,
+          "model_b": 22
+        },
+        "post_nms": 54,
+        "post_gating": 51,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 51,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1803.9,
+        "model_b_ms": 1904.2,
+        "total_wall_ms": 4990.0
+      }
+    },
+    {
+      "image": "pigmentation_0_5103_jpeg.rf.2fe03bba1a6c84a047c8f6bc423c9007.jpg",
+      "seg_mode": "full",
+      "gt_count": 6,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 6,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 527.4,
+        "cloud_ms": 7196.0,
+        "mapping_ms": 10.7,
+        "total_ms": 7735.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 1,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1589.8,
+        "model_b_ms": 2952.8,
+        "total_wall_ms": 7195.9
+      }
+    },
+    {
+      "image": "pustular-1-25-_jpg.rf.2b91eaceec0094e76a1bee3a17999cd4.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 11,
+      "pred_count": 9,
+      "tp": 3,
+      "fp": 6,
+      "fn": 8,
+      "mean_iou": 0.6112,
+      "timing": {
+        "segmentation_ms": 479.2,
+        "cloud_ms": 6701.2,
+        "mapping_ms": 39.2,
+        "total_ms": 7220.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3210.4,
+        "model_b_ms": 2739.6,
+        "total_wall_ms": 6701.1
+      }
+    },
+    {
+      "image": "set2-197-_jpg.rf.dd9675c276348779e88ff7ba4d007ddd.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 1,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 471.0,
+        "cloud_ms": 5083.8,
+        "mapping_ms": 6.4,
+        "total_ms": 5562.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 7
+        },
+        "post_nms": 12,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2163.8,
+        "model_b_ms": 2224.4,
+        "total_wall_ms": 5083.7
+      }
+    },
+    {
+      "image": "set2-259-_jpg.rf.a2ecc2542452268fa371da75057d0ac6.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 6,
+      "pred_count": 7,
+      "tp": 1,
+      "fp": 6,
+      "fn": 5,
+      "mean_iou": 0.5116,
+      "timing": {
+        "segmentation_ms": 459.0,
+        "cloud_ms": 6198.7,
+        "mapping_ms": 19.7,
+        "total_ms": 6678.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 35,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 16,
+          "model_b": 19
+        },
+        "post_nms": 25,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 935.9,
+        "model_b_ms": 2621.8,
+        "total_wall_ms": 6198.6
+      }
+    },
+    {
+      "image": "set2-259-_jpg.rf.c9f485c47197a381cb5f3331cf05b929.jpg",
+      "seg_mode": "fallback",
+      "gt_count": 0,
+      "pred_count": 7,
+      "tp": 0,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 472.7,
+        "cloud_ms": 7363.5,
+        "mapping_ms": 18.7,
+        "total_ms": 7855.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 35,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 16,
+          "model_b": 19
+        },
+        "post_nms": 25,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2899.3,
+        "model_b_ms": 2165.7,
+        "total_wall_ms": 7363.4
+      }
+    },
+    {
+      "image": "whitehead-100_jpg.rf.d4588314f93b398761e6dbc4eebf6f13.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 7,
+      "tp": 0,
+      "fp": 7,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 537.0,
+        "cloud_ms": 6501.2,
+        "mapping_ms": 24.6,
+        "total_ms": 7064.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 9,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 5
+        },
+        "post_nms": 7,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1899.2,
+        "model_b_ms": 1262.9,
+        "total_wall_ms": 6501.1
+      }
+    },
+    {
+      "image": "whitehead-102_jpg.rf.c3c68d645ee124770152dfdca64968ca.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 529.4,
+        "cloud_ms": 6401.5,
+        "mapping_ms": 17.7,
+        "total_ms": 6949.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1834.2,
+        "model_b_ms": 3062.5,
+        "total_wall_ms": 6401.3
+      }
+    },
+    {
+      "image": "whitehead-105_jpg.rf.52e599cc78d5392d290d185cae076c39.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 2,
+      "tp": 0,
+      "fp": 2,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 534.5,
+        "cloud_ms": 5640.5,
+        "mapping_ms": 25.0,
+        "total_ms": 6201.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 5,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 1
+        },
+        "post_nms": 4,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2833.2,
+        "model_b_ms": 2082.1,
+        "total_wall_ms": 5640.4
+      }
+    },
+    {
+      "image": "whitehead-105_jpg.rf.5d132914dbdf4cc23baa799703c2b3f8.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 7,
+      "tp": 0,
+      "fp": 7,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 582.4,
+        "cloud_ms": 5467.8,
+        "mapping_ms": 24.1,
+        "total_ms": 6075.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 8
+        },
+        "post_nms": 9,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2438.2,
+        "model_b_ms": 2107.5,
+        "total_wall_ms": 5467.6
+      }
+    },
+    {
+      "image": "whitehead-129_jpg.rf.8fa39a76d5e0eeae4952bfed7e40ed4d.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 566.0,
+        "cloud_ms": 5541.1,
+        "mapping_ms": 21.1,
+        "total_ms": 6129.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 5,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 3
+        },
+        "post_nms": 4,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1437.9,
+        "model_b_ms": 2591.7,
+        "total_wall_ms": 5541.0
+      }
+    },
+    {
+      "image": "whitehead-131_jpg.rf.6b757663c148546c21d7dfee34d7769e.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 9,
+      "tp": 0,
+      "fp": 9,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 539.0,
+        "cloud_ms": 6097.7,
+        "mapping_ms": 24.7,
+        "total_ms": 6663.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 6
+        },
+        "post_nms": 11,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 3
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2990.9,
+        "model_b_ms": 2377.8,
+        "total_wall_ms": 6097.6
+      }
+    },
+    {
+      "image": "whitehead-135_jpg.rf.53d9293204d73d0142e27f63e8615d70.jpg",
+      "seg_mode": "full",
+      "gt_count": 3,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 538.4,
+        "cloud_ms": 5984.6,
+        "mapping_ms": 16.3,
+        "total_ms": 6540.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 7
+        },
+        "post_nms": 7,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2664.9,
+        "model_b_ms": 2716.0,
+        "total_wall_ms": 5984.5
+      }
+    },
+    {
+      "image": "whitehead-146_jpg.rf.a2b181ca5a052dc7a1dbfce664a40f9e.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 512.7,
+        "cloud_ms": 6309.1,
+        "mapping_ms": 22.8,
+        "total_ms": 6845.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 8
+        },
+        "post_nms": 8,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1725.3,
+        "model_b_ms": 3542.8,
+        "total_wall_ms": 6308.9
+      }
+    },
+    {
+      "image": "whitehead-153_jpg.rf.303dd1d69fef026cc93a002584950224.jpg",
+      "seg_mode": "full",
+      "gt_count": 5,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 555.0,
+        "cloud_ms": 5764.9,
+        "mapping_ms": 23.1,
+        "total_ms": 6344.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 11,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 8
+        },
+        "post_nms": 9,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1630.1,
+        "model_b_ms": 3009.8,
+        "total_wall_ms": 5764.8
+      }
+    },
+    {
+      "image": "whitehead-164_jpg.rf.8fea5740d825ed268fdc3a59da6473f7.jpg",
+      "seg_mode": "full",
+      "gt_count": 4,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 4,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 552.8,
+        "cloud_ms": 5142.2,
+        "mapping_ms": 21.1,
+        "total_ms": 5717.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 9,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 5
+        },
+        "post_nms": 6,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 998.5,
+        "model_b_ms": 1378.5,
+        "total_wall_ms": 5142.1
+      }
+    },
+    {
+      "image": "whitehead-51_jpg.rf.6f6a44a73ad37dc56dbccce135287177.jpg",
+      "seg_mode": "full",
+      "gt_count": 1,
+      "pred_count": 4,
+      "tp": 0,
+      "fp": 4,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 542.3,
+        "cloud_ms": 7004.3,
+        "mapping_ms": 24.1,
+        "total_ms": 7571.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 3
+        },
+        "post_nms": 4,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3486.6,
+        "model_b_ms": 1967.2,
+        "total_wall_ms": 7004.2
+      }
+    },
+    {
+      "image": "whitehead-72_jpg.rf.7af5080fdc2c252d7f67d17a77f2d595.jpg",
+      "seg_mode": "full",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 0,
+      "fp": 3,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 535.0,
+        "cloud_ms": 5987.2,
+        "mapping_ms": 20.0,
+        "total_ms": 6543.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 4
+        },
+        "post_nms": 5,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2855.5,
+        "model_b_ms": 1088.5,
+        "total_wall_ms": 5987.0
+      }
+    }
+  ]
+}

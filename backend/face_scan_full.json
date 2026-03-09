@@ -1,0 +1,1052 @@
+{
+  "detected": 116,
+  "total": 1285,
+  "ratio": 9.0,
+  "with_labels": 116,
+  "files": [
+    {
+      "file": "01F3MMWQ8CPEGRTX4RR44TCJH8_jpeg_jpg.rf.cf87620dbc9b7f5e0598fda75e7f6834.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "01F3MMWSAGG0C6JYE1NYSM6GM4_jpeg.rf.82cdd59d23ebc3a4873551ea4c7d8d38.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "01F3MMYACD6GHPPGMBJ8SE65WG_jpeg_jpg.rf.0654c17d9a24d7afc9cc868151d5ca6f.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "05ae6d60-df34-4286-8c95-e213785dc9d2_jpg.rf.02acdf772156680d3326576c60f526f7.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "10_jpg.rf.947e6a09f3b9244e457db510b9e0b19c.jpg",
+      "has_label": true,
+      "label_count": 18,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "119_jpg.rf.b727ed742f4b2b26cef2bee53a604867.jpg",
+      "has_label": true,
+      "label_count": 24,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "120_jpg.rf.77ed377ec9b7a13466edc6bac6e16976.jpg",
+      "has_label": true,
+      "label_count": 17,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "159_jpg.rf.269f07bf90b2c897d6157445b284a77d.jpg",
+      "has_label": true,
+      "label_count": 44,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "163_jpg.rf.9dc2d066cfa3f0c6b3eca17c478e26d2.jpg",
+      "has_label": true,
+      "label_count": 24,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "18_jpeg.rf.974adfbea308db4efbf2842c7b6b314b.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230418_134720_jpg.rf.63898d64e1286719bb473fcf64caa15f.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230418_143915_jpg.rf.d1f27cd4551a8833f1449c87e35b25d4.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230612_183415_jpg.rf.e4988842108f56e326d4cccc9a7d2410.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230612_183531_jpg.rf.b06514fe6b9699059090ec438491bc52.jpg",
+      "has_label": true,
+      "label_count": 11,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230612_183540_jpg.rf.16d56b1c0e2d790ac8c05d3af02e1435.jpg",
+      "has_label": true,
+      "label_count": 10,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230612_183801_jpg.rf.9e2c9caf0e3736e9faead9674199cc0b.jpg",
+      "has_label": true,
+      "label_count": 9,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230616_164120_jpg.rf.3bd1da320ee04cbce13c9447494fd77b.jpg",
+      "has_label": true,
+      "label_count": 6,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230616_164132_jpg.rf.94f4b645fbc41d989a305c57dc27591f.jpg",
+      "has_label": true,
+      "label_count": 7,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230616_170028_jpg.rf.437d3faabc224c6a1b29463d383043ce.jpg",
+      "has_label": true,
+      "label_count": 8,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "20230616_172226_jpg.rf.35ff2971bf148717a66b6b225cf2cc67.jpg",
+      "has_label": true,
+      "label_count": 25,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "247_jpg.rf.9cce7d06412be9a2f6f8abb05eb1b13c.jpg",
+      "has_label": true,
+      "label_count": 47,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "3_jpg.rf.c3cf0235f0a4a51c745e11b9fd9aff43.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "48_jpg.rf.54779a0e0a1eaba5cf632f957892c27d.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "67013_png.rf.ecc11dfd9dbd034309bd7252c3c50471.jpg",
+      "has_label": true,
+      "label_count": 28,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "67300_png.rf.bc68fcff3fef6908f14bd62ab6aae99c.jpg",
+      "has_label": true,
+      "label_count": 10,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "C0018492-Acne_jpg.rf.0ff68b0d26908dfef22393148de06c2c.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "R-28-_jpg.rf.22dfaaf8d752e241ceab2431dc802e6c.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "a6b3cac3-5ed2-4702-92fe-a8e4fc47cc65_jpg.rf.bb0f9425dd9cbd93715fb5d5081c7a6d.jpg",
+      "has_label": true,
+      "label_count": 11,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "acne-excoriated-30_jpg.rf.d44f5d64bb1622e8d463309d7ca82cf2.jpg",
+      "has_label": true,
+      "label_count": 14,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "bh65_jpg.rf.eca9234ff609fea8d4651125d9c817aa.jpg",
+      "has_label": true,
+      "label_count": 102,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "cyst-17-_jpg.rf.16a0f291b0200dcc134cbb98e642fa89.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "cystic_acne_-136-_jpg.rf.8ddb04a38c3da1db8ecebea599643168.jpg",
+      "has_label": true,
+      "label_count": 9,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "db11e934-bd1d-4fe3-8b02-10433a366a53_jpg.rf.3fa34760dfc924ab1e5d037c0e60d79e.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_112_jpg.rf.c0e5c18635318807645d303f5579d675.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_129_jpg.rf.844057d904abb18dc0db19fa7a007060.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_144_jpg.rf.cc526676bd10124d8f43a7e0fcb8cfc0.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_158_jpg.rf.59b677fb6582884c6c72e4705e3ccbb1.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_16_jpg.rf.450cc99d0030e63279b65b678ed41714.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_16_jpg.rf.e0e390d04eaddbd533d75047e9123275.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_189_jpg.rf.cca168aa0116a67eec0df3c19fcbdd75.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_314_jpg.rf.acb80aecfc78af5fe8a4556c543a9e8a.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_334_jpg.rf.029db45e4993508f836663b93ffbeb40.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_362_jpg.rf.49a03c9d48fe6d13ba46956478ed94fa.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_362_jpg.rf.e6ac5648068036ffa12211d9c6f77d33.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_363_jpg.rf.ee2e801deebee48fefd929097f5089b9.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_371_jpg.rf.c9ef01f526b324a41c8336401ce43847.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_388_jpg.rf.046b3dba80433751ef29303c9a9ad480.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_399_jpg.rf.22e3971b4b14ad05b7ffc911fc5a639b.jpg",
+      "has_label": true,
+      "label_count": 7,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_417_jpg.rf.a1bd3983d39644ca3e79d8df715252a0.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_424_jpg.rf.5547f1a4d9bd6324e375f2b22aab2dad.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_426_png.rf.4a69466d2272afb5f1c46830b1131ca9.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_443_jpg.rf.b795acec3e7ae79ee618b3d888ff25d4.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_446_jpg.rf.961718465377c9bc55c4aac515fa8498.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_447_jpg.rf.e4e6227f9da7ba50dc14dbc18f7e5dd7.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_487_jpg.rf.0ad36ea3e144f6c3a260f623862ecd78.jpg",
+      "has_label": true,
+      "label_count": 8,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_503_jpg.rf.24d7235b964e2296d0fbea96d20cfb30.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_503_jpg.rf.c652e23135da3638fae5f55832cfe84f.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_521_jpg.rf.ab727d93763f28c8cf8e7bb8328fe965.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_527_jpg.rf.2064ed7cffd491d4983cb06199c4140c.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_54_jpg.rf.6817adcd5efab11785708a322caf3442.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle0_85_jpg.rf.847454c47753dfc3ce5e41ffdeec3665.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_112_jpg.rf.aa4439233e7a271be43ff5f9d039a7f8.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_145_jpg.rf.4bf821ee3526ca0c57c187707b48a6c8.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_180_jpg.rf.a4f5833248c5a1a7135c63a8fe8e3e1c.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_241_jpg.rf.095ad8c11dcd6d05b53fdab3c2ce3519.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_248_jpg.rf.0e7fa0289c393797efeed1101c97b683.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_248_jpg.rf.2380d655044c687a19732ed625c4fd86.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_265_jpg.rf.4c4a868f6a216403f6b6c764af5380fd.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_265_png_jpg.rf.d4b256daecbdbbf1c14c883209a331bf.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_337_jpg.rf.1a6d207252dc4ba4a329d51fe0ecc00e.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_433_png.rf.91e923a69dcbfb081930e1ba7f0520da.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_472_jpg.rf.ae01b602d07d605aea6be963a795dd94.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_474_jpg.rf.50a244dfe68f1a13883640a3da4890ec.jpg",
+      "has_label": true,
+      "label_count": 6,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_483_jpg.rf.d62c086971ee6a1e81b760faeae8d7d4.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_531_jpg.rf.82f06c982ae177c6c0de472404368863.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_539_jpg.rf.23165cd5634649a8ec4bd6acfbf503d9.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_542_jpg.rf.54211b1539803abebfbdd3c10cfa40d0.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_542_jpg.rf.cda2ffbd0702caedb5fbfe6d55fb9b1b.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_543_jpg.rf.3d18caf3f59ef56fe2a9cace99a6e74c.jpg",
+      "has_label": true,
+      "label_count": 8,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_594_jpg.rf.597f6369b5e83e1f74ba81f3a3b7ca07.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_623_jpg.rf.992fd8ffd7226c657c43c53bd4943629.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle1_623_jpg.rf.b5cae824737da85911dd48569f9a13fd.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_109_jpg.rf.93773b7ee773e33213c6abd1a7274def.jpg",
+      "has_label": true,
+      "label_count": 8,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_110_jpg.rf.18853f9c02faaa4174e4899fa08ca044.jpg",
+      "has_label": true,
+      "label_count": 9,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_114_png_jpg.rf.05d167fc302a0b2ceb8c7799fc5fe392.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_119_jpg.rf.4e370f0aa6014b75357835b776fc52a0.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_134_jpg.rf.e5c58b961f24c10c74fb31a379168965.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_177_jpg.rf.4065594aac041ab7a5fd32f6ae27cd9e.jpg",
+      "has_label": true,
+      "label_count": 9,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_183_jpg.rf.f1ad82bcc947652b62cc6bc1618ab7b7.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_70_jpg.rf.6def35ef858e4bac954309333f55bf8a.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle2_78_jpg.rf.5950226a0c7a8e6a26e64cf927350905.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_107_jpg.rf.ceb1e8bc32584c6ae4772591a82cf534.jpg",
+      "has_label": true,
+      "label_count": 7,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_130_jpg.rf.1ed123e759ff742049555cf5a786fb4d.jpg",
+      "has_label": true,
+      "label_count": 8,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_25_jpg.rf.ab096275fb7449f710ddc836057d9121.jpg",
+      "has_label": true,
+      "label_count": 53,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_4_jpg.rf.ed29109afbddde50231e943c08bc58b9.jpg",
+      "has_label": true,
+      "label_count": 61,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_52_jpg.rf.2be295da10dc012a72c9608a26b613da.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_52_jpg.rf.43fd55beb3e2bdce11e415cd9e7a16b7.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "levle3_72_jpg.rf.c89bc6cb5a780ad952beaff63e712080.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "maxresdefault_jpg.rf.365d011d755ba2967f1e3d5aeea8d010.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "pigmentation_0_5103_jpeg.rf.2fe03bba1a6c84a047c8f6bc423c9007.jpg",
+      "has_label": true,
+      "label_count": 6,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "pustular-1-25-_jpg.rf.2b91eaceec0094e76a1bee3a17999cd4.jpg",
+      "has_label": true,
+      "label_count": 11,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "set2-197-_jpg.rf.dd9675c276348779e88ff7ba4d007ddd.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "set2-259-_jpg.rf.a2ecc2542452268fa371da75057d0ac6.jpg",
+      "has_label": true,
+      "label_count": 6,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "set2-259-_jpg.rf.c9f485c47197a381cb5f3331cf05b929.jpg",
+      "has_label": true,
+      "label_count": 0,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-100_jpg.rf.d4588314f93b398761e6dbc4eebf6f13.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-102_jpg.rf.c3c68d645ee124770152dfdca64968ca.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-105_jpg.rf.52e599cc78d5392d290d185cae076c39.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-105_jpg.rf.5d132914dbdf4cc23baa799703c2b3f8.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-129_jpg.rf.8fa39a76d5e0eeae4952bfed7e40ed4d.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-131_jpg.rf.6b757663c148546c21d7dfee34d7769e.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-135_jpg.rf.53d9293204d73d0142e27f63e8615d70.jpg",
+      "has_label": true,
+      "label_count": 3,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-146_jpg.rf.a2b181ca5a052dc7a1dbfce664a40f9e.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-153_jpg.rf.303dd1d69fef026cc93a002584950224.jpg",
+      "has_label": true,
+      "label_count": 5,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-164_jpg.rf.8fea5740d825ed268fdc3a59da6473f7.jpg",
+      "has_label": true,
+      "label_count": 4,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-51_jpg.rf.6f6a44a73ad37dc56dbccce135287177.jpg",
+      "has_label": true,
+      "label_count": 1,
+      "image_shape": [
+        640,
+        640
+      ]
+    },
+    {
+      "file": "whitehead-72_jpg.rf.7af5080fdc2c252d7f67d17a77f2d595.jpg",
+      "has_label": true,
+      "label_count": 2,
+      "image_shape": [
+        640,
+        640
+      ]
+    }
+  ]
+}
