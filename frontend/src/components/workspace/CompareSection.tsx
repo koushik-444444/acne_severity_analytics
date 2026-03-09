@@ -173,7 +173,7 @@ function SingleCompare({
           src={currentImage}
           alt="Current acne detection"
           state={compareViewer}
-          onChange={(next) => onCompareViewerChange(next)}
+          onChange={onCompareViewerChange}
           heightClass="h-[420px]"
           lesions={showCompareOverlay ? lesionOverlayItems : []}
           activeLesionKey={activeLesionKey}
@@ -187,7 +187,7 @@ function SingleCompare({
             src={previousImage}
             alt="Previous acne detection"
             state={compareViewer}
-            onChange={(next) => onCompareViewerChange(next)}
+            onChange={onCompareViewerChange}
             heightClass="h-[420px]"
           />
         ) : (
@@ -243,7 +243,7 @@ function SplitCompare({
         beforeSrc={previousImage}
         afterSrc={activeImage}
         state={compareViewer}
-        onChange={(next) => onCompareViewerChange(next)}
+        onChange={onCompareViewerChange}
       />
     </div>
   )
@@ -288,7 +288,7 @@ function FullscreenCompare({
           src={activeImage}
           alt="Current compare workspace"
           state={compareViewer}
-          onChange={(next) => onCompareViewerChange(next)}
+          onChange={onCompareViewerChange}
           heightClass="h-[640px]"
           lesions={showCompareOverlay ? lesionOverlayItems : []}
           activeLesionKey={activeLesionKey}
@@ -299,7 +299,7 @@ function FullscreenCompare({
             src={previousImage}
             alt="Previous compare workspace"
             state={compareViewer}
-            onChange={(next) => onCompareViewerChange(next)}
+            onChange={onCompareViewerChange}
             heightClass="h-[640px]"
           />
         ) : (

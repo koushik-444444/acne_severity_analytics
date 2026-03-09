@@ -84,7 +84,7 @@ export const api = {
     return data.status
   },
 
-  getStatus: (sessionId: string) => request<SessionStatus>(`/status/${sessionId}`),
+  getStatus: (sessionId: string, signal?: AbortSignal) => request<SessionStatus>(`/status/${sessionId}`, undefined, signal),
 
   getHistory: async (limit = 30, profileId?: string, cursor?: string): Promise<HistoryPage> => {
     const params = new URLSearchParams({ limit: String(limit) })

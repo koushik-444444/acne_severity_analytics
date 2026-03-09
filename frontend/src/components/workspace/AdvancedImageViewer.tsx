@@ -155,7 +155,7 @@ export function AdvancedImageViewer({
                         transformOrigin: 'top left',
                       }}
                     >
-                      <span className={`absolute -top-5 left-0 rounded bg-black/70 px-1 py-0.5 text-[8px] text-white backdrop-blur ${isActive ? 'opacity-100' : 'opacity-0'}`}>
+                      <span className={`absolute -top-5 left-0 rounded bg-black/80 px-1 py-0.5 text-[8px] text-white ${isActive ? 'opacity-100' : 'opacity-0'}`}>
                         {lesion.region} {lesion.confidence.toFixed(2)}
                       </span>
                     </button>

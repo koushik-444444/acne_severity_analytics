@@ -1,3 +1,4 @@
+import { memo } from 'react'
 import { Activity, Loader2, Trash2 } from 'lucide-react'
 
 import type { ProfileSummary, SessionSummary } from '../../types/api'
@@ -117,7 +118,7 @@ function EmptyHistoryState() {
   )
 }
 
-function SessionCard({
+const SessionCard = memo(function SessionCard({
   item,
   isBaseline,
   onSelect,
@@ -172,4 +173,4 @@ function SessionCard({
       </div>
     </button>
   )
-}
+})

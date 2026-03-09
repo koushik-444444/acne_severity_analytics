@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Shield } from 'lucide-react'
 import { AnimatePresence, motion } from 'framer-motion'
 
@@ -98,11 +98,10 @@ export function ClinicalWorkspace() {
 
     let activeRequest = true
 
-    void Promise.all([api.getPrivacy(), api.getProfiles()])
-      .then(([privacyConfig, profileItems]) => {
+    void api.getPrivacy()
+      .then((privacyConfig) => {
         if (!activeRequest) return
         setPrivacy(privacyConfig)
-        setProfiles(profileItems)
         setRetentionHours(privacyConfig.default_retention_hours)
       })
       .catch((err) => {
@@ -179,8 +178,11 @@ export function ClinicalWorkspace() {
   const displaySymmetry = active?.symmetry_delta ?? clinicalAnalysis?.symmetry_delta ?? 0
   const severityTone = getSeverityTone(displaySeverity)
 
-  const regionRows = (Object.entries(clinicalAnalysis?.regions ?? {}) as [string, RegionStats][]).sort(
-    (a, b) => (b[1].gags_score ?? 0) - (a[1].gags_score ?? 0),
+  const regionRows = useMemo(
+    () => (Object.entries(clinicalAnalysis?.regions ?? {}) as [string, RegionStats][]).sort(
+      (a, b) => (b[1].gags_score ?? 0) - (a[1].gags_score ?? 0),
+    ),
+    [clinicalAnalysis],
   )
 
   const activeImage = showDetectionOverlay ? active?.diagnostic_image ?? active?.original_image ?? '' : active?.original_image ?? active?.diagnostic_image ?? ''
@@ -188,24 +190,36 @@ export function ClinicalWorkspace() {
     ? previousSession?.diagnostic_image ?? previousSession?.original_image ?? ''
     : previousSession?.original_image ?? previousSession?.diagnostic_image ?? ''
 
-  const lesionOverlayItems = consensusLesions.map((lesion, index) => ({
-    ...lesion,
-    key: `${lesion.region}-${index}`,
-  }))
+  const lesionOverlayItems = useMemo(
+    () => consensusLesions.map((lesion, index) => ({
+      ...lesion,
+      key: `${lesion.region}-${index}`,
+    })),
+    [consensusLesions],
+  )
 
-  const filteredLesionOverlayItems = lesionOverlayItems.filter((lesion) => {
-    const regionPass = lesionRegionFilter === 'all' || lesion.region === lesionRegionFilter
-    const confidencePass =
-      lesionConfidenceFilter === 'all'
-      || (lesionConfidenceFilter === 'high' && lesion.confidence >= 0.7)
-      || (lesionConfidenceFilter === 'medium' && lesion.confidence >= 0.4 && lesion.confidence < 0.7)
-      || (lesionConfidenceFilter === 'low' && lesion.confidence < 0.4)
-    const typePass = lesionTypeFilter === 'all' || (lesion.class_name ?? 'acne') === lesionTypeFilter
-    return regionPass && confidencePass && typePass
-  })
+  const filteredLesionOverlayItems = useMemo(
+    () => lesionOverlayItems.filter((lesion) => {
+      const regionPass = lesionRegionFilter === 'all' || lesion.region === lesionRegionFilter
+      const confidencePass =
+        lesionConfidenceFilter === 'all'
+        || (lesionConfidenceFilter === 'high' && lesion.confidence >= 0.7)
+        || (lesionConfidenceFilter === 'medium' && lesion.confidence >= 0.4 && lesion.confidence < 0.7)
+        || (lesionConfidenceFilter === 'low' && lesion.confidence < 0.4)
+      const typePass = lesionTypeFilter === 'all' || (lesion.class_name ?? 'acne') === lesionTypeFilter
+      return regionPass && confidencePass && typePass
+    }),
+    [lesionOverlayItems, lesionRegionFilter, lesionConfidenceFilter, lesionTypeFilter],
+  )
 
-  const lesionRegions = Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.region))).sort()
-  const lesionTypes = Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.class_name ?? 'acne'))).sort()
+  const lesionRegions = useMemo(
+    () => Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.region))).sort(),
+    [lesionOverlayItems],
+  )
+  const lesionTypes = useMemo(
+    () => Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.class_name ?? 'acne'))).sort(),
+    [lesionOverlayItems],
+  )
   const activeProfileSummary = profiles.find((profile) => profile.profile_id === activeProfileId) ?? null
   const activeSessionProfileId = active?.profile_id
     ?? history.find((item) => item.session_id === active?.session_id)?.profile_id
@@ -213,12 +227,12 @@ export function ClinicalWorkspace() {
 
   // ---------- Handlers ----------
 
-  const refreshHistory = async () => {
+  const refreshHistory = useCallback(async () => {
     const [historyPage, profileItems] = await Promise.all([api.getHistory(30, activeProfileId), api.getProfiles()])
     setHistory(historyPage.items)
     setHistoryCursor(historyPage.next_cursor ?? null)
     setProfiles(profileItems)
-  }
+  }, [activeProfileId])
 
   const loadMoreHistory = useCallback(async () => {
     if (!historyCursor || isLoadingMore) return
@@ -404,23 +418,17 @@ export function ClinicalWorkspace() {
       dispatch({ type: 'EXPORT_START' })
       const bundle = await api.exportBundle(active.session_id, exportPreset, compare?.previous_session_id)
       if (bundle.pdf_data_uri) {
-        const match = bundle.pdf_data_uri.match(/^data:([^;]+);base64,(.+)$/)
-        if (match && match[1] && match[2]) {
-          const byteChars = atob(match[2])
-          const byteArray = new Uint8Array(byteChars.length)
-          for (let i = 0; i < byteChars.length; i++) {
-            byteArray[i] = byteChars.charCodeAt(i)
-          }
-          const blob = new Blob([byteArray], { type: match[1] })
-          const url = URL.createObjectURL(blob)
-          const a = document.createElement('a')
-          a.href = url
-          a.download = `acne_report_${active.session_id.slice(0, 8)}_${exportPreset}.pdf`
-          document.body.appendChild(a)
-          a.click()
-          document.body.removeChild(a)
-          URL.revokeObjectURL(url)
-        }
+        // Async conversion — avoids blocking main thread with synchronous atob + byte loop
+        const response = await fetch(bundle.pdf_data_uri)
+        const blob = await response.blob()
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `acne_report_${active.session_id.slice(0, 8)}_${exportPreset}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
       }
       dispatch({ type: 'EXPORT_COMPLETE' })
       toast(`${exportPreset.charAt(0).toUpperCase() + exportPreset.slice(1)} report downloaded.`, { type: 'success' })
@@ -476,10 +484,10 @@ export function ClinicalWorkspace() {
     }
   }
 
-  const resetMainViewer = () => setMainViewer({ scale: 1, x: 0, y: 0 })
-  const resetCompareViewer = () => setCompareViewer({ scale: 1, x: 0, y: 0 })
-  const handleLesionHover = (key: string | null) => dispatch({ type: 'SET_ACTIVE_LESION', key })
-  const handleNoteDraftChange = (draft: string) => dispatch({ type: 'SET_NOTE_DRAFT', draft })
+  const resetMainViewer = useCallback(() => setMainViewer({ scale: 1, x: 0, y: 0 }), [])
+  const resetCompareViewer = useCallback(() => setCompareViewer({ scale: 1, x: 0, y: 0 }), [])
+  const handleLesionHover = useCallback((key: string | null) => dispatch({ type: 'SET_ACTIVE_LESION', key }), [])
+  const handleNoteDraftChange = useCallback((draft: string) => dispatch({ type: 'SET_NOTE_DRAFT', draft }), [])
 
   const toggleFullscreen = async () => {
     if (!workspaceRef.current) return
@@ -491,6 +499,36 @@ export function ClinicalWorkspace() {
       setIsFullscreen(false)
     }
   }
+
+  // Stable callback refs for async handlers — avoids dependency chains
+  const handleSelectHistoryRef = useRef(handleSelectHistory)
+  handleSelectHistoryRef.current = handleSelectHistory
+  const handlePurgeRef = useRef(handlePurge)
+  handlePurgeRef.current = handlePurge
+  const pinBaselineRef = useRef(pinBaseline)
+  pinBaselineRef.current = pinBaseline
+  const handleStartRef = useRef(handleStart)
+  handleStartRef.current = handleStart
+  const handleExportRef = useRef(handleExport)
+  handleExportRef.current = handleExport
+  const saveNotesRef = useRef(saveNotes)
+  saveNotesRef.current = saveNotes
+  const clearBaselineRef = useRef(clearBaseline)
+  clearBaselineRef.current = clearBaseline
+  const toggleFullscreenRef = useRef(toggleFullscreen)
+  toggleFullscreenRef.current = toggleFullscreen
+
+  const toggleDetectionOverlay = useCallback(() => setShowDetectionOverlay((v: boolean) => !v), [setShowDetectionOverlay])
+  const toggleCompareOverlay = useCallback(() => setShowCompareOverlay((v: boolean) => !v), [setShowCompareOverlay])
+  const handleSelectHistoryStable = useCallback((item: SessionSummary) => void handleSelectHistoryRef.current(item), [])
+  const handlePurgeStable = useCallback((item: SessionSummary) => void handlePurgeRef.current(item), [])
+  const handlePinBaselineStable = useCallback((item: SessionSummary) => void pinBaselineRef.current(item), [])
+  const handleLoadMoreStable = useCallback(() => void loadMoreHistory(), [loadMoreHistory])
+  const handleStartStable = useCallback(() => void handleStartRef.current(), [])
+  const handleExportStable = useCallback(() => void handleExportRef.current(), [])
+  const handleSaveNotesStable = useCallback(() => void saveNotesRef.current(), [])
+  const handleClearBaselineStable = useCallback(() => void clearBaselineRef.current(), [])
+  const handleToggleFullscreenStable = useCallback(() => void toggleFullscreenRef.current(), [])
 
   const handleProfileChange = (nextProfileId: string) => {
     setActiveProfileId(nextProfileId)
@@ -561,14 +599,14 @@ export function ClinicalWorkspace() {
             profiles={profiles}
             history={history}
             baselineSession={baselineSession}
-            onSelectHistory={(item) => void handleSelectHistory(item)}
-            onPurge={(item) => void handlePurge(item)}
-            onPinBaseline={(item) => void pinBaseline(item)}
+            onSelectHistory={handleSelectHistoryStable}
+            onPurge={handlePurgeStable}
+            onPinBaseline={handlePinBaselineStable}
             leftRailWidth={leftRailWidth}
             onLeftRailWidthChange={setLeftRailWidth}
             hasMore={Boolean(historyCursor)}
             isLoadingMore={isLoadingMore}
-            onLoadMore={() => void loadMoreHistory()}
+            onLoadMore={handleLoadMoreStable}
           />
 
           <main className="holographic-panel rounded-[2rem] p-8">
@@ -610,7 +648,7 @@ export function ClinicalWorkspace() {
                 privacy={privacy}
                 selectedFile={selectedFile}
                 onFileChange={handleFileChange}
-                onStart={() => void handleStart()}
+                onStart={handleStartStable}
               />
             ) : (
               <AnimatePresence mode="wait">
@@ -637,12 +675,12 @@ export function ClinicalWorkspace() {
                     displaySeverity={displaySeverity}
                     severityTone={severityTone}
                     showDetectionOverlay={showDetectionOverlay}
-                    onToggleOverlay={() => setShowDetectionOverlay((v) => !v)}
+                    onToggleOverlay={toggleDetectionOverlay}
                     mainViewer={mainViewer}
                     onMainViewerChange={setMainViewer}
                     onResetMainViewer={resetMainViewer}
                     isFullscreen={isFullscreen}
-                    onToggleFullscreen={() => void toggleFullscreen()}
+                    onToggleFullscreen={handleToggleFullscreenStable}
                     lesionOverlayItems={lesionOverlayItems}
                     activeLesionKey={activeLesionKey}
                     onLesionHover={handleLesionHover}
@@ -665,7 +703,7 @@ export function ClinicalWorkspace() {
                     activeImage={activeImage}
                     previousImage={previousImage}
                     showCompareOverlay={showCompareOverlay}
-                    onToggleCompareOverlay={() => setShowCompareOverlay((v) => !v)}
+                    onToggleCompareOverlay={toggleCompareOverlay}
                     compareViewer={compareViewer}
                     onCompareViewerChange={setCompareViewer}
                     onResetCompareViewer={resetCompareViewer}
@@ -688,7 +726,7 @@ export function ClinicalWorkspace() {
                     isPinnedBaselineCompare={isPinnedBaselineCompare}
                     isViewingPinnedBaseline={isViewingPinnedBaseline}
                     regionDeltaCards={regionDeltaCards}
-                    onClearBaseline={() => void clearBaseline()}
+                    onClearBaseline={handleClearBaselineStable}
                   />
 
                   <PrivacyExportPanel
@@ -697,7 +735,7 @@ export function ClinicalWorkspace() {
                     sessionId={active.session_id}
                     exportPreset={exportPreset}
                     onExportPresetChange={setExportPreset}
-                    onExport={() => void handleExport()}
+                    onExport={handleExportStable}
                     onNewCase={resetCaseWorkspace}
                     isExporting={isExporting}
                   />
@@ -721,7 +759,7 @@ export function ClinicalWorkspace() {
                 <SessionNotesPanel
                   noteDraft={noteDraft}
                   onDraftChange={handleNoteDraftChange}
-                  onSave={() => void saveNotes()}
+                  onSave={handleSaveNotesStable}
                   isSaving={isSavingNotes}
                 />
               </motion.div>
@@ -766,7 +804,7 @@ export function ClinicalWorkspace() {
 
 // ---------- Private sub-components ----------
 
-function WorkspaceHeader({
+const WorkspaceHeader = memo(function WorkspaceHeader({
   activeProfileId,
   activeProfileSummary,
   retentionHours,
@@ -806,7 +844,7 @@ function WorkspaceHeader({
       </div>
     </div>
   )
-}
+})
 
 function ProfileGuardBanner({
   profileGuard,

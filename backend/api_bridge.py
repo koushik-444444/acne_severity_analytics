@@ -17,6 +17,7 @@ import numpy as np
 from dotenv import load_dotenv
 from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import FileResponse, Response, StreamingResponse
 from pydantic import BaseModel, Field
 from reportlab.lib import colors as rl_colors
@@ -596,6 +597,7 @@ class BridgeStore:
     def __init__(self, db_path: Path):
         self.lock = threading.Lock()
         self.conn = sqlite3.connect(str(db_path), check_same_thread=False)
+        self.conn.execute('PRAGMA journal_mode=WAL')
         self.conn.row_factory = sqlite3.Row
         self._init_db()
 
@@ -649,6 +651,9 @@ class BridgeStore:
                 )
                 '''
             )
+            self.conn.execute('CREATE INDEX IF NOT EXISTS idx_sessions_timestamp ON sessions (timestamp)')
+            self.conn.execute('CREATE INDEX IF NOT EXISTS idx_sessions_profile_id ON sessions (profile_id)')
+            self.conn.execute('CREATE INDEX IF NOT EXISTS idx_statuses_updated_at ON statuses (updated_at)')
             self.conn.commit()
 
     def close(self) -> None:
@@ -759,17 +764,18 @@ class BridgeStore:
         current = self.get_session_row(session_id)
         if not current:
             return None
-        row = self.conn.execute(
-            '''
-            SELECT * FROM sessions
-            WHERE timestamp < ?
-              AND session_id != ?
-              AND results_json IS NOT NULL
-            ORDER BY timestamp DESC
-            LIMIT 1
-            ''',
-            (current['timestamp'], session_id),
-        ).fetchone()
+        with self.lock:
+            row = self.conn.execute(
+                '''
+                SELECT * FROM sessions
+                WHERE timestamp < ?
+                  AND session_id != ?
+                  AND results_json IS NOT NULL
+                ORDER BY timestamp DESC
+                LIMIT 1
+                ''',
+                (current['timestamp'], session_id),
+            ).fetchone()
         if not row:
             return None
         return row_to_session(row, self.get_status(row['session_id']))
@@ -891,12 +897,13 @@ class BridgeStore:
 
     def cleanup_expired(self) -> Dict[str, int]:
         now = utcnow()
-        rows = self.conn.execute(
-            '''
-            SELECT session_id, timestamp, retention_hours, diagnostic_image_path, original_image_path
-            FROM sessions
-            '''
-        ).fetchall()
+        with self.lock:
+            rows = self.conn.execute(
+                '''
+                SELECT session_id, timestamp, retention_hours, diagnostic_image_path, original_image_path
+                FROM sessions
+                '''
+            ).fetchall()
         purged_sessions = 0
         live_paths: Set[str] = set()
         for row in rows:
@@ -1490,6 +1497,7 @@ app.add_middleware(
     allow_methods=['*'],
     allow_headers=['*'],
 )
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 
 @app.middleware('http')
@@ -1758,7 +1766,8 @@ async def report(session_id: str, previous_session_id: Optional[str] = None) -> 
     else:
         previous = require_session(previous_session_id) if previous_session_id else get_store().previous_session(session['session_id'])
     compare_data = annotate_compare_payload(compare_payload(previous, session), bool(previous_session_id))
-    pdf_path = write_pdf_report(session, compare_data, 'clinical')
+    loop = asyncio.get_event_loop()
+    pdf_path = await loop.run_in_executor(None, write_pdf_report, session, compare_data, 'clinical')
     return {
         'session_id': session['session_id'],
         'report': {
@@ -1781,7 +1790,8 @@ async def export(session_id: str, request: ExportRequest) -> Dict[str, Any]:
     else:
         previous = require_session(request.previous_session_id) if request.previous_session_id else get_store().previous_session(session['session_id'])
     compare_data = annotate_compare_payload(compare_payload(previous, session), bool(request.previous_session_id))
-    pdf_path = write_pdf_report(session, compare_data, request.preset)
+    loop = asyncio.get_event_loop()
+    pdf_path = await loop.run_in_executor(None, write_pdf_report, session, compare_data, request.preset)
     payload: Dict[str, Any] = {
         'session_id': session['session_id'],
         'pdf_path': str(pdf_path),

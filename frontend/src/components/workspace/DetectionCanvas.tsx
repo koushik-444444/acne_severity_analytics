@@ -79,7 +79,7 @@ export function DetectionCanvas({
         src={activeImage}
         alt="Acne detection visual"
         state={mainViewer}
-        onChange={(next) => onMainViewerChange(next)}
+        onChange={onMainViewerChange}
         heightClass="h-[520px]"
         lesions={showDetectionOverlay ? lesionOverlayItems : []}
         activeLesionKey={activeLesionKey}
