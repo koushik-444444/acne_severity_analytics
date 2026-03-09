@@ -113,3 +113,95 @@ export function removeStorageItem(key: string) {
     // ignore storage removal failures
   }
 }
+
+// ---------------------------------------------------------------------------
+// Acne type label and colour utilities
+// ---------------------------------------------------------------------------
+
+/**
+ * Canonical display labels for acne types returned by the detection models.
+ * Keys are lowercase to allow case-insensitive lookup.
+ */
+const ACNE_TYPE_LABELS: Record<string, string> = {
+  blackhead: 'Blackhead',
+  blackheads: 'Blackhead',
+  whitehead: 'Whitehead',
+  whiteheads: 'Whitehead',
+  papule: 'Papule',
+  papules: 'Papule',
+  pustule: 'Pustule',
+  pustules: 'Pustule',
+  nodule: 'Nodule',
+  nodules: 'Nodule',
+  cyst: 'Cyst',
+  cystic: 'Cyst',
+  comedone: 'Comedone',
+  'dark spot': 'Dark Spot',
+  'dark_spot': 'Dark Spot',
+  acne: 'Acne',
+}
+
+/**
+ * Tailwind colour classes keyed by canonical label.
+ * Each entry provides text, bg, and border classes for a
+ * consistent colour-coded badge.
+ */
+const ACNE_TYPE_COLORS: Record<string, string> = {
+  Blackhead: 'text-zinc-300 bg-zinc-500/20 border-zinc-500/30',
+  Whitehead: 'text-slate-200 bg-slate-400/20 border-slate-400/30',
+  Comedone: 'text-zinc-300 bg-zinc-500/20 border-zinc-500/30',
+  Papule: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+  Pustule: 'text-orange-300 bg-orange-500/20 border-orange-500/30',
+  Nodule: 'text-red-300 bg-red-500/20 border-red-500/30',
+  Cyst: 'text-rose-300 bg-rose-500/20 border-rose-500/30',
+  'Dark Spot': 'text-purple-300 bg-purple-500/20 border-purple-500/30',
+  Acne: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+}
+
+const DEFAULT_ACNE_COLOR = 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30'
+
+/**
+ * Convert a raw model class_name into a human-readable label.
+ *
+ * Returns `'Acne'` for generic / unrecognised labels.
+ */
+export function getAcneTypeLabel(className?: string): string {
+  if (!className) return 'Acne'
+  return ACNE_TYPE_LABELS[className.toLowerCase().trim()] ?? 'Acne'
+}
+
+/**
+ * Return Tailwind utility classes for an acne-type badge.
+ *
+ * Accepts either the raw model class_name or a canonical label.
+ */
+export function getAcneTypeColor(className?: string): string {
+  const label = getAcneTypeLabel(className)
+  return ACNE_TYPE_COLORS[label] ?? DEFAULT_ACNE_COLOR
+}
+
+/**
+ * GAGS severity grade as a short label.
+ */
+const SEVERITY_GRADE_LABELS: Record<number, string> = {
+  1: 'Grade 1 — Comedone',
+  2: 'Grade 2 — Papule',
+  3: 'Grade 3 — Pustule',
+  4: 'Grade 4 — Nodule/Cyst',
+}
+
+export function getSeverityGradeLabel(grade?: number): string {
+  if (grade == null) return 'Grade 2 — Papule'
+  return SEVERITY_GRADE_LABELS[grade] ?? `Grade ${grade}`
+}
+
+/**
+ * Return true when the class label carries real type information
+ * (i.e. it is NOT a generic catch-all like "acne").
+ */
+const GENERIC_LABELS = new Set(['acne', 'acne_detected', 'lesion', ''])
+
+export function isTypedAcneLabel(className?: string): boolean {
+  if (!className) return false
+  return !GENERIC_LABELS.has(className.toLowerCase().trim())
+}

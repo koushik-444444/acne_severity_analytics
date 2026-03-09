@@ -33,6 +33,7 @@ export type ConsensusSummary = {
   unassigned_count: number
   summary: string
   lesions?: ConsensusLesion[]
+  type_counts?: Record<string, number>
 }
 
 export type SessionStage =
@@ -78,7 +79,7 @@ export type SessionSummary = {
 }
 
 export type SessionDetail = SessionSummary & {
-  results: {
+  results: ({
     clinical_analysis?: ClinicalAnalysis
     consensus_summary?: ConsensusSummary
     lesions?: Record<string, ConsensusLesion[]>
@@ -87,9 +88,9 @@ export type SessionDetail = SessionSummary & {
       streams: Record<string, number>
       strongest_stream: string | null
       stream_total: number
+      stream_classes?: Record<string, Record<string, number>>
     }
-    [key: string]: unknown
-  } | null
+  } & Record<string, unknown>) | null
   diagnostic_image_path?: string | null
   original_image_path?: string | null
   diagnostic_image?: string | null
@@ -127,13 +128,18 @@ export type AnalyzeResponse = {
   gags_score: number | null
   lesion_count: number | null
   symmetry_delta: number | null
-  results: {
+  results: ({
     clinical_analysis?: ClinicalAnalysis
     consensus_summary?: ConsensusSummary
     lesions?: Record<string, ConsensusLesion[]>
     cloud_results?: Record<string, unknown>
-    [key: string]: unknown
-  }
+    source_stream_provenance?: {
+      streams: Record<string, number>
+      strongest_stream: string | null
+      stream_total: number
+      stream_classes?: Record<string, Record<string, number>>
+    }
+  } & Record<string, unknown>)
   compare: ComparePayload
   diagnostic_image: string | null
   original_image: string | null

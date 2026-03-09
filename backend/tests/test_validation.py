@@ -8,6 +8,7 @@ from api_bridge import (
     validate_upload,
     consensus_summary,
     compare_payload,
+    summarize_stream_provenance,
 )
 from fastapi import HTTPException
 
@@ -128,16 +129,18 @@ def test_consensus_summary_empty():
     assert result['verified_lesions'] == 0
     assert result['average_confidence'] == 0.0
     assert result['summary'] == 'No verified lesions detected'
+    assert result['lesions'] == []
+    assert result['type_counts'] == {}
 
 
 def test_consensus_summary_with_lesions():
     assignments = {
         'nose': [
-            {'confidence': 0.8, 'bbox': [0, 0, 10, 10]},
-            {'confidence': 0.6, 'bbox': [5, 5, 15, 15]},
+            {'confidence': 0.8, 'bbox': [0, 0, 10, 10], 'class_name': 'pustule'},
+            {'confidence': 0.6, 'bbox': [5, 5, 15, 15], 'class_name': 'acne'},
         ],
         'left_cheek': [
-            {'confidence': 0.9, 'bbox': [20, 20, 30, 30]},
+            {'confidence': 0.9, 'bbox': [20, 20, 30, 30], 'class_name': 'pustule'},
         ],
         'unassigned': [
             {'confidence': 0.3, 'bbox': [50, 50, 60, 60]},
@@ -149,6 +152,10 @@ def test_consensus_summary_with_lesions():
     assert len(result['top_regions']) == 2
     assert result['top_regions'][0]['region'] == 'nose'
     assert result['top_regions'][0]['count'] == 2
+    # New: lesions flat list and type_counts
+    assert len(result['lesions']) == 3
+    assert all('region' in l for l in result['lesions'])
+    assert result['type_counts'] == {'pustule': 2, 'acne': 1}
 
 
 def test_consensus_summary_excludes_unassigned_from_count():
@@ -157,6 +164,7 @@ def test_consensus_summary_excludes_unassigned_from_count():
     }
     result = consensus_summary(assignments)
     assert result['verified_lesions'] == 0
+    assert result['lesions'] == []
 
 
 # --- compare_payload ---
@@ -209,3 +217,41 @@ def test_compare_payload_computes_deltas():
     assert result['lesion_delta'] == -3
     assert result['gags_delta'] == -5
     assert result['regions']['nose']['count_delta'] == -1
+
+
+# --- summarize_stream_provenance ---
+
+def test_stream_provenance_empty():
+    result = summarize_stream_provenance({})
+    assert result['stream_total'] == 0
+    assert result['stream_classes'] == {}
+
+
+def test_stream_provenance_with_typed_classes():
+    cloud_results = {
+        'preds_a_640': [
+            {'class': 'Acne', 'confidence': 0.8},
+            {'class': 'Acne', 'confidence': 0.7},
+        ],
+        'preds_b': [
+            {'class': 'pustule', 'confidence': 0.9},
+            {'class': 'nodule', 'confidence': 0.85},
+            {'class': 'pustule', 'confidence': 0.6},
+        ],
+    }
+    result = summarize_stream_provenance(cloud_results)
+    assert result['streams']['model_a_640'] == 2
+    assert result['streams']['model_b_native'] == 3
+    assert result['stream_total'] == 5
+    assert result['stream_classes']['model_a_640'] == {'Acne': 2}
+    assert result['stream_classes']['model_b_native'] == {'pustule': 2, 'nodule': 1}
+
+
+def test_stream_provenance_strongest_stream():
+    cloud_results = {
+        'preds_a_640': [{'class': 'Acne'}] * 10,
+        'preds_a_1280': [{'class': 'Acne'}] * 5,
+        'preds_b': [{'class': 'pustule'}] * 3,
+    }
+    result = summarize_stream_provenance(cloud_results)
+    assert result['strongest_stream'] == 'model_a_640'

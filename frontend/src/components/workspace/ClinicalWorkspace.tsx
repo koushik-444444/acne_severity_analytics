@@ -8,11 +8,15 @@ import {
   describeDelta,
   formatDate,
   formatSignedDelta,
+  getAcneTypeColor,
+  getAcneTypeLabel,
   getConfidenceTextTone,
   getClinicalDeltaLabel,
   getDeltaTone,
   getProfileStorageKey,
+  getSeverityGradeLabel,
   getSeverityTone,
+  isTypedAcneLabel,
   readStorageItem,
   removeStorageItem,
   writeStorageItem,
@@ -62,6 +66,7 @@ export function ClinicalWorkspace() {
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [lesionRegionFilter, setLesionRegionFilter] = useState<string>('all')
   const [lesionConfidenceFilter, setLesionConfidenceFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all')
+  const [lesionTypeFilter, setLesionTypeFilter] = useState<string>('all')
   const [showOnboarding, setShowOnboarding] = useState(false)
   const workspaceRef = useRef<HTMLDivElement | null>(null)
 
@@ -184,9 +189,11 @@ export function ClinicalWorkspace() {
       || (lesionConfidenceFilter === 'high' && lesion.confidence >= 0.7)
       || (lesionConfidenceFilter === 'medium' && lesion.confidence >= 0.4 && lesion.confidence < 0.7)
       || (lesionConfidenceFilter === 'low' && lesion.confidence < 0.4)
-    return regionPass && confidencePass
+    const typePass = lesionTypeFilter === 'all' || (lesion.class_name ?? 'acne') === lesionTypeFilter
+    return regionPass && confidencePass && typePass
   })
   const lesionRegions = Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.region))).sort()
+  const lesionTypes = Array.from(new Set(lesionOverlayItems.map((lesion) => lesion.class_name ?? 'acne'))).sort()
   const activeProfileSummary = profiles.find((profile) => profile.profile_id === activeProfileId) ?? null
   const activeSessionProfileId = active?.profile_id
     ?? history.find((item) => item.session_id === active?.session_id)?.profile_id
@@ -797,20 +804,26 @@ export function ClinicalWorkspace() {
                       <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">HOW GAGS WAS CALCULATED</div>
                       <div className="space-y-3 text-sm text-zinc-400">
                         <div className="rounded-xl border border-white/5 bg-white/3 px-4 py-3">
-                          Total score is built from region-level lesion burden mapped onto anatomical zones and summed into a clinical severity band.
+                          Regional GAGS = region weight x highest severity grade in that zone. Typed detections now drive real grades (1-4) instead of a flat default.
                         </div>
                         <div className="grid grid-cols-1 gap-2">
-                          <div className="flex items-center justify-between rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs uppercase tracking-[0.2em] text-zinc-500">
+                          <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs uppercase tracking-[0.2em] text-zinc-500">
                             <span>Region</span>
                             <span>Lesions</span>
-                            <span>Regional GAGS</span>
+                            <span>Max Grade</span>
+                            <span>GAGS</span>
                           </div>
                           {regionRows.map(([region, data]) => {
                             const regionData = data as RegionStats
+                            const regionLesions = consensusLesions.filter((l) => l.region === region)
+                            const maxGrade = regionLesions.length > 0
+                              ? Math.max(...regionLesions.map((l) => l.severity_grade ?? 2))
+                              : 0
                             return (
-                              <div key={`gags-${region}`} className="grid grid-cols-[1fr_auto_auto] items-center gap-3 rounded-xl border border-white/5 bg-white/3 px-3 py-3 text-sm">
+                              <div key={`gags-${region}`} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-xl border border-white/5 bg-white/3 px-3 py-3 text-sm">
                                 <span className="text-zinc-300">{region.replaceAll('_', ' ')}</span>
                                 <span className="text-zinc-500">{regionData.count}</span>
+                                <span className="text-zinc-400">{maxGrade > 0 ? maxGrade : '-'}</span>
                                 <span className="font-semibold text-cyan-300">{regionData.gags_score ?? 0}</span>
                               </div>
                             )
@@ -827,6 +840,20 @@ export function ClinicalWorkspace() {
                         <div>Average confidence: {active.results?.consensus_summary?.average_confidence ?? 0}</div>
                         <div>Top regions: {(active.results?.consensus_summary?.top_regions ?? []).map((item) => item.region).join(', ') || 'n/a'}</div>
                       </div>
+                      {active.results?.consensus_summary?.type_counts && Object.keys(active.results.consensus_summary.type_counts).length > 0 && (
+                        <div className="mt-4">
+                          <div className="mb-2 text-[10px] uppercase tracking-[0.15em] text-zinc-500">Type distribution</div>
+                          <div className="flex flex-wrap gap-2">
+                            {Object.entries(active.results.consensus_summary.type_counts)
+                              .sort(([, a], [, b]) => b - a)
+                              .map(([cls, n]) => (
+                                <span key={cls} className={`rounded-full border px-2.5 py-1 text-xs font-medium ${getAcneTypeColor(cls)}`}>
+                                  {getAcneTypeLabel(cls)} {n}
+                                </span>
+                              ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
 
                     <div className="holographic-panel rounded-[1.75rem] p-6">
@@ -847,15 +874,29 @@ export function ClinicalWorkspace() {
                     <div className="holographic-panel rounded-[1.75rem] p-6">
                       <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">SOURCE STREAM DEBUGGER</div>
                       <div className="space-y-3 text-sm text-zinc-400">
-                        <div>Strongest stream: {String((active.results?.source_stream_provenance as { strongest_stream?: string } | undefined)?.strongest_stream ?? 'n/a')}</div>
-                        <div>Total source proposals: {String((active.results?.source_stream_provenance as { stream_total?: number } | undefined)?.stream_total ?? 0)}</div>
+                        <div>Strongest stream: {String(active.results?.source_stream_provenance?.strongest_stream ?? 'n/a')}</div>
+                        <div>Total source proposals: {String(active.results?.source_stream_provenance?.stream_total ?? 0)}</div>
                         <div className="grid grid-cols-1 gap-2">
-                          {Object.entries(((active.results?.source_stream_provenance as { streams?: Record<string, number> } | undefined)?.streams ?? {})).map(([name, count]) => (
-                            <div key={name} className="flex items-center justify-between rounded-xl border border-white/5 bg-white/3 px-3 py-2">
-                              <span>{name}</span>
-                              <span className="font-medium text-white">{count}</span>
-                            </div>
-                          ))}
+                          {Object.entries(active.results?.source_stream_provenance?.streams ?? {}).map(([name, count]) => {
+                            const classDist = active.results?.source_stream_provenance?.stream_classes?.[name]
+                            return (
+                              <div key={name} className="rounded-xl border border-white/5 bg-white/3 px-3 py-2">
+                                <div className="flex items-center justify-between">
+                                  <span>{name}</span>
+                                  <span className="font-medium text-white">{count}</span>
+                                </div>
+                                {classDist && Object.keys(classDist).length > 0 && (
+                                  <div className="mt-1.5 flex flex-wrap gap-1">
+                                    {Object.entries(classDist).sort(([, a], [, b]) => (b as number) - (a as number)).map(([cls, n]) => (
+                                      <span key={cls} className={`rounded-full border px-1.5 py-0.5 text-[8px] ${getAcneTypeColor(cls)}`}>
+                                        {getAcneTypeLabel(cls)} {n}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
                     </div>
@@ -1123,7 +1164,7 @@ export function ClinicalWorkspace() {
                 {consensusLesions.length > 0 && (
                   <div className="holographic-panel rounded-[1.75rem] p-6">
                     <div className="terminal-text mb-4 text-[10px] text-cyan-400/80">CONSENSUS LESION TABLE</div>
-                    <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-2">
+                    <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
                       <select
                         value={lesionRegionFilter}
                         onChange={(e) => setLesionRegionFilter(e.target.value)}
@@ -1146,6 +1187,17 @@ export function ClinicalWorkspace() {
                         <option value="medium">Medium confidence</option>
                         <option value="low">Low / review</option>
                       </select>
+                      <select
+                        value={lesionTypeFilter}
+                        onChange={(e) => setLesionTypeFilter(e.target.value)}
+                        aria-label="Filter by acne type"
+                        className="rounded-xl border border-white/10 bg-black/40 px-3 py-2 text-sm text-white"
+                      >
+                        <option value="all">All acne types</option>
+                        {lesionTypes.map((t) => (
+                          <option key={t} value={t}>{getAcneTypeLabel(t)}</option>
+                        ))}
+                      </select>
                     </div>
                     <div className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
                       {filteredLesionOverlayItems.slice(0, 12).map((lesion) => (
@@ -1155,11 +1207,12 @@ export function ClinicalWorkspace() {
                           onMouseLeave={() => handleLesionHover(null)}
                           className={`rounded-xl border bg-white/3 p-4 text-left text-sm transition-all ${activeLesionKey === lesion.key ? 'border-cyan-400/40 bg-cyan-400/8 shadow-[0_0_25px_rgba(0,242,255,0.12)]' : 'border-white/5'}`}
                         >
-                          <div className="mb-2 flex items-center justify-between">
+                          <div className="mb-2 flex items-center justify-between gap-2">
                             <span className="font-medium text-white">{lesion.region}</span>
+                            <span className={`rounded-full border px-2 py-0.5 text-[9px] font-medium ${getAcneTypeColor(lesion.class_name)}`}>{getAcneTypeLabel(lesion.class_name)}</span>
                             <span className={`terminal-text text-[8px] ${getConfidenceTextTone(lesion.confidence)}`}>{lesion.confidence_level}</span>
                           </div>
-                          <div className="text-zinc-400">confidence {lesion.confidence}</div>
+                          <div className="text-zinc-400">confidence {lesion.confidence} · {getSeverityGradeLabel(lesion.severity_grade)}</div>
                           <div className="text-zinc-500">votes {lesion.votes} · reliability {lesion.reliability_score}</div>
                         </button>
                       ))}

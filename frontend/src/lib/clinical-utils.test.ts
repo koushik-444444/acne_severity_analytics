@@ -5,12 +5,16 @@ import {
   describeDelta,
   formatDate,
   formatSignedDelta,
+  getAcneTypeColor,
+  getAcneTypeLabel,
   getConfidenceTextTone,
   getClinicalDeltaLabel,
   getClinicalDeltaStatus,
   getDeltaTone,
   getProfileStorageKey,
+  getSeverityGradeLabel,
   getSeverityTone,
+  isTypedAcneLabel,
 } from './clinical-utils'
 
 // --- formatDate ---
@@ -198,5 +202,105 @@ describe('getConfidenceTextTone', () => {
 
   it('returns amber at exactly 0.4', () => {
     expect(getConfidenceTextTone(0.4)).toBe('text-amber-300')
+  })
+})
+
+// --- getAcneTypeLabel ---
+
+describe('getAcneTypeLabel', () => {
+  it('returns canonical label for known type', () => {
+    expect(getAcneTypeLabel('pustule')).toBe('Pustule')
+    expect(getAcneTypeLabel('Pustules')).toBe('Pustule')
+  })
+
+  it('normalises plural and case variants', () => {
+    expect(getAcneTypeLabel('blackheads')).toBe('Blackhead')
+    expect(getAcneTypeLabel('Nodules')).toBe('Nodule')
+    expect(getAcneTypeLabel('papules')).toBe('Papule')
+    expect(getAcneTypeLabel('whiteheads')).toBe('Whitehead')
+  })
+
+  it('returns Acne for generic labels', () => {
+    expect(getAcneTypeLabel('acne')).toBe('Acne')
+    expect(getAcneTypeLabel('Acne')).toBe('Acne')
+  })
+
+  it('returns Acne for undefined/empty input', () => {
+    expect(getAcneTypeLabel(undefined)).toBe('Acne')
+    expect(getAcneTypeLabel('')).toBe('Acne')
+  })
+
+  it('handles dark spot', () => {
+    expect(getAcneTypeLabel('dark spot')).toBe('Dark Spot')
+    expect(getAcneTypeLabel('dark_spot')).toBe('Dark Spot')
+  })
+
+  it('returns Acne for unknown labels', () => {
+    expect(getAcneTypeLabel('some_unknown_class')).toBe('Acne')
+  })
+})
+
+// --- getAcneTypeColor ---
+
+describe('getAcneTypeColor', () => {
+  it('returns unique color for each type', () => {
+    const pustuleColor = getAcneTypeColor('pustule')
+    const blackheadColor = getAcneTypeColor('blackhead')
+    const cystColor = getAcneTypeColor('cyst')
+    expect(pustuleColor).toContain('orange')
+    expect(blackheadColor).toContain('zinc')
+    expect(cystColor).toContain('rose')
+  })
+
+  it('returns default cyan for generic acne', () => {
+    expect(getAcneTypeColor('acne')).toContain('cyan')
+    expect(getAcneTypeColor(undefined)).toContain('cyan')
+  })
+
+  it('returns classes with bg, text, and border', () => {
+    const color = getAcneTypeColor('nodule')
+    expect(color).toContain('text-')
+    expect(color).toContain('bg-')
+    expect(color).toContain('border-')
+  })
+})
+
+// --- getSeverityGradeLabel ---
+
+describe('getSeverityGradeLabel', () => {
+  it('returns correct label for each grade', () => {
+    expect(getSeverityGradeLabel(1)).toContain('Comedone')
+    expect(getSeverityGradeLabel(2)).toContain('Papule')
+    expect(getSeverityGradeLabel(3)).toContain('Pustule')
+    expect(getSeverityGradeLabel(4)).toContain('Nodule/Cyst')
+  })
+
+  it('returns default grade 2 for undefined', () => {
+    expect(getSeverityGradeLabel(undefined)).toContain('Papule')
+  })
+
+  it('handles unknown grade', () => {
+    expect(getSeverityGradeLabel(99)).toBe('Grade 99')
+  })
+})
+
+// --- isTypedAcneLabel ---
+
+describe('isTypedAcneLabel', () => {
+  it('returns false for generic labels', () => {
+    expect(isTypedAcneLabel('acne')).toBe(false)
+    expect(isTypedAcneLabel('Acne')).toBe(false)
+    expect(isTypedAcneLabel('acne_detected')).toBe(false)
+    expect(isTypedAcneLabel('lesion')).toBe(false)
+    expect(isTypedAcneLabel('')).toBe(false)
+    expect(isTypedAcneLabel(undefined)).toBe(false)
+  })
+
+  it('returns true for typed labels', () => {
+    expect(isTypedAcneLabel('pustule')).toBe(true)
+    expect(isTypedAcneLabel('Blackheads')).toBe(true)
+    expect(isTypedAcneLabel('nodule')).toBe(true)
+    expect(isTypedAcneLabel('cyst')).toBe(true)
+    expect(isTypedAcneLabel('dark spot')).toBe(true)
   })
 })

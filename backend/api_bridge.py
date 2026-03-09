@@ -414,6 +414,21 @@ def consensus_summary(assignments: Dict[str, List[Dict[str, Any]]]) -> Dict[str,
     summary = 'No verified lesions detected'
     if total:
         summary = f"{total} verified lesions concentrated in {', '.join(name for name, _ in top_regions)}"
+
+    # Build flat lesion list with region tag for the frontend
+    lesions: List[Dict[str, Any]] = []
+    for region, items in assignments.items():
+        if region == 'unassigned':
+            continue
+        for item in items:
+            lesions.append({**item, 'region': region})
+
+    # Acne type distribution across all verified lesions
+    type_counts: Dict[str, int] = {}
+    for lesion in lesions:
+        cls = lesion.get('class_name', 'acne')
+        type_counts[cls] = type_counts.get(cls, 0) + 1
+
     return {
         'verified_lesions': total,
         'average_confidence': round(sum(confidence_values) / len(confidence_values), 3)
@@ -423,6 +438,8 @@ def consensus_summary(assignments: Dict[str, List[Dict[str, Any]]]) -> Dict[str,
         'region_counts': region_counts,
         'unassigned_count': len(assignments.get('unassigned', [])),
         'summary': summary,
+        'lesions': lesions,
+        'type_counts': type_counts,
     }
 
 
@@ -910,16 +927,28 @@ def require_session(session_id: str) -> Dict[str, Any]:
 
 
 def summarize_stream_provenance(cloud_results: Dict[str, Any]) -> Dict[str, Any]:
-    streams = {
-        'model_a_640': len(cloud_results.get('preds_a_640', [])),
-        'model_a_1280': len(cloud_results.get('preds_a_1280', [])),
-        'model_b_native': len(cloud_results.get('preds_b', [])),
+    stream_keys = {
+        'model_a_640': 'preds_a_640',
+        'model_a_1280': 'preds_a_1280',
+        'model_b_native': 'preds_b',
     }
+    streams: Dict[str, int] = {}
+    stream_classes: Dict[str, Dict[str, int]] = {}
+    for display_name, data_key in stream_keys.items():
+        preds = cloud_results.get(data_key, [])
+        streams[display_name] = len(preds)
+        class_dist: Dict[str, int] = {}
+        for p in preds:
+            cls = str(p.get('class', 'acne'))
+            class_dist[cls] = class_dist.get(cls, 0) + 1
+        if class_dist:
+            stream_classes[display_name] = class_dist
     strongest_stream = max(streams, key=lambda key: streams[key]) if streams else None
     return {
         'streams': streams,
         'strongest_stream': strongest_stream,
         'stream_total': sum(streams.values()),
+        'stream_classes': stream_classes,
     }
 
 
