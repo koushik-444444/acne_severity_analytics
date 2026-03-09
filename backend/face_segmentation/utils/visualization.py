@@ -158,8 +158,12 @@ def draw_region_masks(
     # Draw color-coded lesions
     if lesions:
         for region_name, detections in lesions.items():
+            if not isinstance(detections, list):
+                continue
             color = REGION_COLORS.get(region_name, (128, 128, 128))
             for det in detections:
+                if not isinstance(det, dict) or 'bbox' not in det:
+                    continue
                 x1, y1, x2, y2 = det["bbox"]
                 # Ensemble Confidence Visuals
                 conf_level = det.get("confidence_level", "Unknown")
@@ -209,6 +213,8 @@ def draw_lesion_boxes(
                 continue
 
             for det in detections:
+                if not isinstance(det, dict) or 'bbox' not in det:
+                    continue
                 x1, y1, x2, y2 = det['bbox']
                 conf_level = det.get('confidence_level', 'Unknown')
                 thickness = 2

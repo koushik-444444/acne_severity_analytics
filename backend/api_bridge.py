@@ -2015,9 +2015,16 @@ async def analyze(
 
         store.set_status(session_id, 'rendering', 'Rendering diagnostic overlay', 82)
         ensure_runtime_imports()
+        
+        # Filter assignments to ensure only list-of-dicts are passed to visualization
+        clean_assignments = {
+            k: v for k, v in assignments.items() 
+            if isinstance(v, list) and not k.startswith('_')
+        }
+        
         overlay = draw_lesion_boxes(
             image,
-            lesions=assignments,
+            lesions=clean_assignments,
             clinical_report=clinical_report,
         )
         diagnostic_jpeg = image_to_jpeg_bytes(overlay)
@@ -2110,5 +2117,11 @@ async def analyze(
         store.set_status(session_id, 'failed', 'Analysis failed', 100, {'failed': True})
         raise
     except Exception as exc:
+        with open("error_debug.log", "a") as f:
+            import traceback
+            f.write(f"\n--- Error at {utcnow_iso()} ---\n")
+            f.write(f"Exc type: {type(exc)}\n")
+            f.write(f"Exc msg: {str(exc)}\n")
+            traceback.print_exc(file=f)
         store.set_status(session_id, 'failed', str(exc), 100, {'failed': True})
         raise HTTPException(status_code=500, detail='Analysis failed') from exc
