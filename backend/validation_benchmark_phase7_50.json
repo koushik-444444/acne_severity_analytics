@@ -1,0 +1,1880 @@
+{
+  "config": {
+    "image_dir": "E:\\data_generation\\dataset\\original\\images\\val",
+    "label_dir": "E:\\data_generation\\dataset\\original\\labels\\val",
+    "iou_threshold": 0.35,
+    "sag_z_threshold": 0.5,
+    "nms_iou_threshold": 0.3,
+    "limit": 50,
+    "images_processed": 50,
+    "model_a_id": "runner-e0dmy/acne-ijcab/2",
+    "model_b_id": "acne-project-2auvb/acne-detection-v2/1"
+  },
+  "aggregate": {
+    "precision": 0.2334,
+    "recall": 0.5249,
+    "f1_score": 0.3231,
+    "mean_iou": 0.7084,
+    "tp": 95,
+    "fp": 312,
+    "fn": 86
+  },
+  "timing": {
+    "segmentation_ms_mean": 460.8,
+    "cloud_ms_mean": 6321.7,
+    "mapping_ms_mean": 29.6,
+    "total_ms_mean": 6813.2
+  },
+  "per_image": [
+    {
+      "image": "00a6e318-fe21-4e01-b02f-f7d55d7c0096_jpg.rf.87df103fa136805a019918b755ef28c0.jpg",
+      "gt_count": 3,
+      "pred_count": 14,
+      "tp": 1,
+      "fp": 13,
+      "fn": 2,
+      "mean_iou": 0.5556,
+      "timing": {
+        "segmentation_ms": 893.8,
+        "cloud_ms": 6052.0,
+        "mapping_ms": 37.1,
+        "total_ms": 6984.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 14
+        },
+        "post_nms": 14,
+        "post_gating": 14,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 14,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2789.3,
+        "model_b_ms": 2307.9,
+        "total_wall_ms": 6051.9
+      }
+    },
+    {
+      "image": "01e0130f-2574-4895-97e6-772dd76d5a1c_jpg.rf.ceed42a8c85d78fca44239d9e66cf86b.jpg",
+      "gt_count": 5,
+      "pred_count": 14,
+      "tp": 0,
+      "fp": 14,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 438.9,
+        "cloud_ms": 6077.3,
+        "mapping_ms": 37.7,
+        "total_ms": 6555.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 15
+        },
+        "post_nms": 14,
+        "post_gating": 14,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 14,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3191.4,
+        "model_b_ms": 3371.0,
+        "total_wall_ms": 6077.2
+      }
+    },
+    {
+      "image": "01F3MMV6NBB013AEV2SH04SRQ9_jpeg_jpg.rf.550a15abf28e7de917e8292bdaf033c9.jpg",
+      "gt_count": 2,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 1,
+      "mean_iou": 0.5262,
+      "timing": {
+        "segmentation_ms": 450.1,
+        "cloud_ms": 6111.7,
+        "mapping_ms": 43.9,
+        "total_ms": 6606.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 2
+        },
+        "post_nms": 4,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2459.0,
+        "model_b_ms": 2443.7,
+        "total_wall_ms": 6111.6
+      }
+    },
+    {
+      "image": "01F3MMVH87B4G7M1NH7963VX3M_jpeg_jpg.rf.1cb4dbf91d6f761a4d56c9f79641f289.jpg",
+      "gt_count": 5,
+      "pred_count": 8,
+      "tp": 3,
+      "fp": 5,
+      "fn": 2,
+      "mean_iou": 0.8704,
+      "timing": {
+        "segmentation_ms": 454.2,
+        "cloud_ms": 5984.5,
+        "mapping_ms": 30.2,
+        "total_ms": 6469.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 11
+        },
+        "post_nms": 10,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2692.8,
+        "model_b_ms": 1250.7,
+        "total_wall_ms": 5984.4
+      }
+    },
+    {
+      "image": "01F3MMVJ16XHRQ3TM1JQANVQXV_jpeg_jpg.rf.990dfd4c9c07040ff522389ca9ec1c58.jpg",
+      "gt_count": 12,
+      "pred_count": 13,
+      "tp": 11,
+      "fp": 2,
+      "fn": 1,
+      "mean_iou": 0.8064,
+      "timing": {
+        "segmentation_ms": 443.0,
+        "cloud_ms": 4846.0,
+        "mapping_ms": 25.9,
+        "total_ms": 5316.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 13
+        },
+        "post_nms": 14,
+        "post_gating": 13,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 13,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1810.4,
+        "model_b_ms": 1939.5,
+        "total_wall_ms": 4845.9
+      }
+    },
+    {
+      "image": "01F3MMVJ16XHRQ3TM1JQANVQXV_jpeg_jpg.rf.9bd233dce8af4e8588df4a55f2b5b302.jpg",
+      "gt_count": 2,
+      "pred_count": 5,
+      "tp": 0,
+      "fp": 5,
+      "fn": 2,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 466.7,
+        "cloud_ms": 5081.3,
+        "mapping_ms": 30.6,
+        "total_ms": 5579.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 5
+        },
+        "post_nms": 5,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2432.9,
+        "model_b_ms": 2156.7,
+        "total_wall_ms": 5081.1
+      }
+    },
+    {
+      "image": "01F3MMVXXRHA3S1EBPKVXEFEZZ_jpeg_jpg.rf.256f6431b7fe79f81d2b197a8f621e3e.jpg",
+      "gt_count": 1,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 470.3,
+        "cloud_ms": 4655.4,
+        "mapping_ms": 32.8,
+        "total_ms": 5159.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 4,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 3
+        },
+        "post_nms": 4,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1727.7,
+        "model_b_ms": 1734.2,
+        "total_wall_ms": 4655.3
+      }
+    },
+    {
+      "image": "01F3MMWA0ZXZAHHVH6VFY7VSEH_jpeg_jpg.rf.0b93a5372c9b883b0d003aca82304ae2.jpg",
+      "gt_count": 2,
+      "pred_count": 8,
+      "tp": 2,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.8307,
+      "timing": {
+        "segmentation_ms": 453.7,
+        "cloud_ms": 6160.5,
+        "mapping_ms": 40.5,
+        "total_ms": 6655.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 8
+        },
+        "post_nms": 9,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2342.9,
+        "model_b_ms": 2619.1,
+        "total_wall_ms": 6160.4
+      }
+    },
+    {
+      "image": "01F3MMWA0ZXZAHHVH6VFY7VSEH_jpeg_jpg.rf.51fef54dacaeb616e59b2634928584ba.jpg",
+      "gt_count": 2,
+      "pred_count": 9,
+      "tp": 2,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.8646,
+      "timing": {
+        "segmentation_ms": 456.9,
+        "cloud_ms": 5635.3,
+        "mapping_ms": 36.9,
+        "total_ms": 6130.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 8
+        },
+        "post_nms": 11,
+        "post_gating": 9,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2518.2,
+        "model_b_ms": 1806.4,
+        "total_wall_ms": 5635.2
+      }
+    },
+    {
+      "image": "01F3MMWASQXMT2JDT81P87MS6M_jpeg.rf.0e3541e67905faec0745cb0a46317e5c.jpg",
+      "gt_count": 4,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 4,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 445.7,
+        "cloud_ms": 5243.6,
+        "mapping_ms": 37.2,
+        "total_ms": 5727.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 7
+        },
+        "post_nms": 12,
+        "post_gating": 8,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1743.3,
+        "model_b_ms": 2363.1,
+        "total_wall_ms": 5243.5
+      }
+    },
+    {
+      "image": "01F3MMWE5K79PAZ2BXYDN3NG2F_jpeg.rf.b92e7a32947784d14a3a5bf87b38aec0.jpg",
+      "gt_count": 2,
+      "pred_count": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 0,
+      "mean_iou": 0.7578,
+      "timing": {
+        "segmentation_ms": 441.5,
+        "cloud_ms": 5802.3,
+        "mapping_ms": 42.3,
+        "total_ms": 6287.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 3,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 2
+        },
+        "post_nms": 2,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1569.9,
+        "model_b_ms": 1616.9,
+        "total_wall_ms": 5802.1
+      }
+    },
+    {
+      "image": "01F3MMWHQX27K1VQ2DNNKGJZRV_jpeg_jpg.rf.c2620cf53b67f50c6ff9827c36942936.jpg",
+      "gt_count": 1,
+      "pred_count": 26,
+      "tp": 1,
+      "fp": 25,
+      "fn": 0,
+      "mean_iou": 0.8776,
+      "timing": {
+        "segmentation_ms": 450.9,
+        "cloud_ms": 20860.8,
+        "mapping_ms": 38.0,
+        "total_ms": 21350.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 30,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 28
+        },
+        "post_nms": 30,
+        "post_gating": 26,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 26,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 17582.4,
+        "model_b_ms": 3775.0,
+        "total_wall_ms": 20860.7
+      }
+    },
+    {
+      "image": "01F3MMWJDWYGQBZM3PTZYMYZDH_jpeg.rf.d81207788ac679b0081a455d135ab08b.jpg",
+      "gt_count": 5,
+      "pred_count": 3,
+      "tp": 3,
+      "fp": 0,
+      "fn": 2,
+      "mean_iou": 0.7166,
+      "timing": {
+        "segmentation_ms": 476.2,
+        "cloud_ms": 5120.1,
+        "mapping_ms": 22.6,
+        "total_ms": 5619.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 4
+        },
+        "post_nms": 6,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1678.5,
+        "model_b_ms": 2416.3,
+        "total_wall_ms": 5120.0
+      }
+    },
+    {
+      "image": "01F3MMWJDWYGQBZM3PTZYMYZDH_jpeg_jpg.rf.a0f49c1c797632582fb6438f9d85c455.jpg",
+      "gt_count": 5,
+      "pred_count": 5,
+      "tp": 3,
+      "fp": 2,
+      "fn": 2,
+      "mean_iou": 0.8917,
+      "timing": {
+        "segmentation_ms": 462.5,
+        "cloud_ms": 5939.9,
+        "mapping_ms": 19.7,
+        "total_ms": 6423.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 8,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 5,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1604.8,
+        "model_b_ms": 2823.9,
+        "total_wall_ms": 5939.8
+      }
+    },
+    {
+      "image": "01F3MMWNXPEZ1XR663SPGRBJBB_jpeg.rf.212a25318330afe999db7161343b4838.jpg",
+      "gt_count": 5,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 437.7,
+        "cloud_ms": 7110.0,
+        "mapping_ms": 5.2,
+        "total_ms": 7553.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 28,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 19
+        },
+        "post_nms": 23,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3191.2,
+        "model_b_ms": 1201.4,
+        "total_wall_ms": 7109.9
+      }
+    },
+    {
+      "image": "01F3MMWQ8CPEGRTX4RR44TCJH8_jpeg_jpg.rf.cf87620dbc9b7f5e0598fda75e7f6834.jpg",
+      "gt_count": 4,
+      "pred_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 3,
+      "mean_iou": 0.4131,
+      "timing": {
+        "segmentation_ms": 460.4,
+        "cloud_ms": 5565.7,
+        "mapping_ms": 37.4,
+        "total_ms": 6064.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 15,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 8
+        },
+        "post_nms": 11,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2143.0,
+        "model_b_ms": 1905.3,
+        "total_wall_ms": 5565.5
+      }
+    },
+    {
+      "image": "01F3MMWRMC4TXQKFQWF8PSB3WS_jpeg_jpg.rf.196363d4740267ecddf87bd6f2b65cde.jpg",
+      "gt_count": 4,
+      "pred_count": 5,
+      "tp": 1,
+      "fp": 4,
+      "fn": 3,
+      "mean_iou": 0.4082,
+      "timing": {
+        "segmentation_ms": 436.9,
+        "cloud_ms": 6788.0,
+        "mapping_ms": 29.1,
+        "total_ms": 7255.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 8,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 6
+        },
+        "post_nms": 5,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3660.5,
+        "model_b_ms": 3036.0,
+        "total_wall_ms": 6787.8
+      }
+    },
+    {
+      "image": "01F3MMWRMC4TXQKFQWF8PSB3WS_jpeg_jpg.rf.7a4e7abece793e8c941b3efbb73bd14e.jpg",
+      "gt_count": 4,
+      "pred_count": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 3,
+      "mean_iou": 0.5309,
+      "timing": {
+        "segmentation_ms": 486.4,
+        "cloud_ms": 6244.2,
+        "mapping_ms": 32.8,
+        "total_ms": 6764.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 1,
+          "model_b": 6
+        },
+        "post_nms": 4,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 4,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2771.9,
+        "model_b_ms": 1958.4,
+        "total_wall_ms": 6244.1
+      }
+    },
+    {
+      "image": "01F3MMWSAGG0C6JYE1NYSM6GM4_jpeg.rf.82cdd59d23ebc3a4873551ea4c7d8d38.jpg",
+      "gt_count": 4,
+      "pred_count": 7,
+      "tp": 4,
+      "fp": 3,
+      "fn": 0,
+      "mean_iou": 0.509,
+      "timing": {
+        "segmentation_ms": 316.5,
+        "cloud_ms": 6193.3,
+        "mapping_ms": 38.3,
+        "total_ms": 6549.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 7,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2845.9,
+        "model_b_ms": 2909.3,
+        "total_wall_ms": 6193.1
+      }
+    },
+    {
+      "image": "01F3MMWTMD0T886A949RXRZTYG_jpeg.rf.366c42ff5261208270f2c7a5b156a448.jpg",
+      "gt_count": 1,
+      "pred_count": 9,
+      "tp": 0,
+      "fp": 9,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 547.4,
+        "cloud_ms": 4849.3,
+        "mapping_ms": 33.7,
+        "total_ms": 5431.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 18,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 7,
+          "model_b": 11
+        },
+        "post_nms": 14,
+        "post_gating": 9,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 1,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1905.2,
+        "model_b_ms": 2045.1,
+        "total_wall_ms": 4849.2
+      }
+    },
+    {
+      "image": "01F3MMWVX2Z9ZE1Z0Y3R4JA8B5_jpeg_jpg.rf.9b57103a7c0720f05ead8e94e00c17fc.jpg",
+      "gt_count": 2,
+      "pred_count": 16,
+      "tp": 1,
+      "fp": 15,
+      "fn": 1,
+      "mean_iou": 0.6207,
+      "timing": {
+        "segmentation_ms": 521.8,
+        "cloud_ms": 5476.2,
+        "mapping_ms": 29.6,
+        "total_ms": 6028.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 20,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 16
+        },
+        "post_nms": 16,
+        "post_gating": 16,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 16,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2514.0,
+        "model_b_ms": 2682.0,
+        "total_wall_ms": 5476.0
+      }
+    },
+    {
+      "image": "01F3MMWYSD0H8X9217EFP9VCYN_jpeg_jpg.rf.13f581b018c319091df74a5564508160.jpg",
+      "gt_count": 1,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.5235,
+      "timing": {
+        "segmentation_ms": 455.4,
+        "cloud_ms": 5425.4,
+        "mapping_ms": 21.3,
+        "total_ms": 5903.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 2,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 2,
+          "model_b": 0
+        },
+        "post_nms": 2,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1697.9,
+        "model_b_ms": 1488.8,
+        "total_wall_ms": 5425.3
+      }
+    },
+    {
+      "image": "01F3MMX2RXFSJV79X3QMF6XXW8_jpeg_jpg.rf.1cdad5d6ddcaf53764aabd3a3d125d48.jpg",
+      "gt_count": 2,
+      "pred_count": 6,
+      "tp": 2,
+      "fp": 4,
+      "fn": 0,
+      "mean_iou": 0.6806,
+      "timing": {
+        "segmentation_ms": 436.7,
+        "cloud_ms": 6499.4,
+        "mapping_ms": 29.7,
+        "total_ms": 6966.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 7
+        },
+        "post_nms": 10,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2507.6,
+        "model_b_ms": 1415.7,
+        "total_wall_ms": 6499.4
+      }
+    },
+    {
+      "image": "01F3MMX2RXFSJV79X3QMF6XXW8_jpeg_jpg.rf.8e4e9e13c1a2269aaa65c60e8e997521.jpg",
+      "gt_count": 2,
+      "pred_count": 6,
+      "tp": 2,
+      "fp": 4,
+      "fn": 0,
+      "mean_iou": 0.6454,
+      "timing": {
+        "segmentation_ms": 434.7,
+        "cloud_ms": 17547.4,
+        "mapping_ms": 35.5,
+        "total_ms": 18019.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 8
+        },
+        "post_nms": 10,
+        "post_gating": 6,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 5,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 12785.6,
+        "model_b_ms": 14582.1,
+        "total_wall_ms": 17547.3
+      }
+    },
+    {
+      "image": "01F3MMX3DB7W0CEV30K2NZZR8Q_jpeg_jpg.rf.d638d78ec4e42e9da850978e27790312.jpg",
+      "gt_count": 2,
+      "pred_count": 8,
+      "tp": 2,
+      "fp": 6,
+      "fn": 0,
+      "mean_iou": 0.6931,
+      "timing": {
+        "segmentation_ms": 515.1,
+        "cloud_ms": 5999.4,
+        "mapping_ms": 36.9,
+        "total_ms": 6552.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 12,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 6
+        },
+        "post_nms": 10,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 5
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1945.8,
+        "model_b_ms": 2157.9,
+        "total_wall_ms": 5999.2
+      }
+    },
+    {
+      "image": "01F3MMX425PSHQZGCBHMQPVEYW_jpeg_jpg.rf.e9e30c2683a79a6f45f6d557b4a0258e.jpg",
+      "gt_count": 3,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 428.9,
+        "cloud_ms": 5765.8,
+        "mapping_ms": 20.2,
+        "total_ms": 6215.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 1
+        },
+        "post_nms": 6,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2781.7,
+        "model_b_ms": 2567.4,
+        "total_wall_ms": 5765.7
+      }
+    },
+    {
+      "image": "01F3MMX85MKKVDR2PMR3S2F4B6_jpeg_jpg.rf.513b09799f5dae2cfe42322f2c474b0c.jpg",
+      "gt_count": 9,
+      "pred_count": 11,
+      "tp": 6,
+      "fp": 5,
+      "fn": 3,
+      "mean_iou": 0.7402,
+      "timing": {
+        "segmentation_ms": 431.8,
+        "cloud_ms": 5789.9,
+        "mapping_ms": 30.0,
+        "total_ms": 6252.6
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 10
+        },
+        "post_nms": 12,
+        "post_gating": 11,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2726.4,
+        "model_b_ms": 2765.5,
+        "total_wall_ms": 5789.8
+      }
+    },
+    {
+      "image": "01F3MMXD1283Z6TWREGFWXYSQM_jpeg_jpg.rf.0824ae3f0263773d2a69f6838ca8b58a.jpg",
+      "gt_count": 1,
+      "pred_count": 4,
+      "tp": 1,
+      "fp": 3,
+      "fn": 0,
+      "mean_iou": 0.855,
+      "timing": {
+        "segmentation_ms": 439.7,
+        "cloud_ms": 6072.2,
+        "mapping_ms": 30.2,
+        "total_ms": 6543.0
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 3
+        },
+        "post_nms": 6,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2376.8,
+        "model_b_ms": 2328.9,
+        "total_wall_ms": 6072.1
+      }
+    },
+    {
+      "image": "01F3MMXD1283Z6TWREGFWXYSQM_jpeg_jpg.rf.37a1a695c5443599869954323cc98227.jpg",
+      "gt_count": 1,
+      "pred_count": 2,
+      "tp": 1,
+      "fp": 1,
+      "fn": 0,
+      "mean_iou": 0.8283,
+      "timing": {
+        "segmentation_ms": 430.4,
+        "cloud_ms": 5040.9,
+        "mapping_ms": 39.6,
+        "total_ms": 5512.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 1
+        },
+        "post_nms": 3,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2105.2,
+        "model_b_ms": 1942.4,
+        "total_wall_ms": 5040.8
+      }
+    },
+    {
+      "image": "01F3MMXJ24BWB58NHE1QVGMZJ3_jpeg_jpg.rf.a6d653ad9a9a23febf22a4547668adb5.jpg",
+      "gt_count": 1,
+      "pred_count": 8,
+      "tp": 0,
+      "fp": 8,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 429.8,
+        "cloud_ms": 4659.5,
+        "mapping_ms": 17.5,
+        "total_ms": 5107.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 17
+        },
+        "post_nms": 17,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 811.8,
+        "model_b_ms": 1771.1,
+        "total_wall_ms": 4659.4
+      }
+    },
+    {
+      "image": "01F3MMXJ24BWB58NHE1QVGMZJ3_jpeg_jpg.rf.fba047b93d93e41ade83344711a205d9.jpg",
+      "gt_count": 1,
+      "pred_count": 1,
+      "tp": 0,
+      "fp": 1,
+      "fn": 1,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 514.7,
+        "cloud_ms": 5609.7,
+        "mapping_ms": 5.8,
+        "total_ms": 6130.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 16,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 11
+        },
+        "post_nms": 16,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2134.3,
+        "model_b_ms": 2050.1,
+        "total_wall_ms": 5609.6
+      }
+    },
+    {
+      "image": "01F3MMXPCMJG0YNSRQB08N2W6Y_jpeg_jpg.rf.452acb4f17392af02cead55432ba9164.jpg",
+      "gt_count": 5,
+      "pred_count": 7,
+      "tp": 0,
+      "fp": 7,
+      "fn": 5,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 511.0,
+        "cloud_ms": 4901.6,
+        "mapping_ms": 8.0,
+        "total_ms": 5421.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 28,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 10,
+          "model_b": 18
+        },
+        "post_nms": 24,
+        "post_gating": 7,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 6,
+          "proximity": 1,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1616.0,
+        "model_b_ms": 1877.8,
+        "total_wall_ms": 4901.4
+      }
+    },
+    {
+      "image": "01F3MMXPCMJG0YNSRQB08N2W6Y_jpeg_jpg.rf.c91e424bfd4ff09cc4037b0b61603b1f.jpg",
+      "gt_count": 12,
+      "pred_count": 16,
+      "tp": 10,
+      "fp": 6,
+      "fn": 2,
+      "mean_iou": 0.6874,
+      "timing": {
+        "segmentation_ms": 448.4,
+        "cloud_ms": 5372.1,
+        "mapping_ms": 35.9,
+        "total_ms": 5857.8
+      },
+      "pipeline_metrics": {
+        "raw_detections": 25,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 10,
+          "model_b": 15
+        },
+        "post_nms": 19,
+        "post_gating": 16,
+        "proximity_propagated": 2,
+        "type_coverage": {
+          "direct": 14,
+          "proximity": 2,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1906.1,
+        "model_b_ms": 2011.1,
+        "total_wall_ms": 5372.0
+      }
+    },
+    {
+      "image": "01F3MMXYDGEXQKQJRTNM7HN4H2_jpeg_jpg.rf.e24b5fc7829d084ef8e94d9874620052.jpg",
+      "gt_count": 3,
+      "pred_count": 3,
+      "tp": 2,
+      "fp": 1,
+      "fn": 1,
+      "mean_iou": 0.6427,
+      "timing": {
+        "segmentation_ms": 429.3,
+        "cloud_ms": 6796.9,
+        "mapping_ms": 32.2,
+        "total_ms": 7259.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 7,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 2
+        },
+        "post_nms": 6,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2514.9,
+        "model_b_ms": 2446.5,
+        "total_wall_ms": 6796.8
+      }
+    },
+    {
+      "image": "01F3MMY1W7BKARQ7SMST6FA3WF_jpeg_jpg.rf.df411474ad8fed0e9fca57b0637d4a38.jpg",
+      "gt_count": 7,
+      "pred_count": 14,
+      "tp": 6,
+      "fp": 8,
+      "fn": 1,
+      "mean_iou": 0.734,
+      "timing": {
+        "segmentation_ms": 356.7,
+        "cloud_ms": 6121.0,
+        "mapping_ms": 44.1,
+        "total_ms": 6522.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 24,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 14,
+          "model_b": 10
+        },
+        "post_nms": 19,
+        "post_gating": 14,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 9,
+          "proximity": 0,
+          "none": 5
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2919.3,
+        "model_b_ms": 2369.6,
+        "total_wall_ms": 6120.9
+      }
+    },
+    {
+      "image": "01F3MMY37WC5S8V9A3VD4X56PT_jpeg.rf.3c0f6a366a679844e65de3aa9a74892f.jpg",
+      "gt_count": 8,
+      "pred_count": 12,
+      "tp": 4,
+      "fp": 8,
+      "fn": 4,
+      "mean_iou": 0.5214,
+      "timing": {
+        "segmentation_ms": 435.0,
+        "cloud_ms": 6508.3,
+        "mapping_ms": 25.8,
+        "total_ms": 6970.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 20,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 10,
+          "model_b": 10
+        },
+        "post_nms": 14,
+        "post_gating": 12,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 10,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3168.1,
+        "model_b_ms": 2711.9,
+        "total_wall_ms": 6508.2
+      }
+    },
+    {
+      "image": "01F3MMY4J53Z59TW33Y4D840DM_jpeg_jpg.rf.a0be5cb98c2221918bb33755bf4d8253.jpg",
+      "gt_count": 1,
+      "pred_count": 8,
+      "tp": 1,
+      "fp": 7,
+      "fn": 0,
+      "mean_iou": 0.8767,
+      "timing": {
+        "segmentation_ms": 519.7,
+        "cloud_ms": 6716.8,
+        "mapping_ms": 37.8,
+        "total_ms": 7275.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 12,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 8
+        },
+        "post_nms": 10,
+        "post_gating": 8,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 8,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2583.5,
+        "model_b_ms": 3318.8,
+        "total_wall_ms": 6716.5
+      }
+    },
+    {
+      "image": "01F3MMY5FZF8N8BX849Y22JCQW_jpeg_jpg.rf.2442f48e1987bbc15b85e3091cfbaef7.jpg",
+      "gt_count": 2,
+      "pred_count": 4,
+      "tp": 2,
+      "fp": 2,
+      "fn": 0,
+      "mean_iou": 0.9423,
+      "timing": {
+        "segmentation_ms": 450.9,
+        "cloud_ms": 6258.0,
+        "mapping_ms": 27.7,
+        "total_ms": 6737.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 8,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 4,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2670.4,
+        "model_b_ms": 1513.5,
+        "total_wall_ms": 6257.9
+      }
+    },
+    {
+      "image": "01F3MMY6511W62QXS9V7R450H7_jpeg_jpg.rf.b5862c005ad80c135a331619101b9aa0.jpg",
+      "gt_count": 3,
+      "pred_count": 15,
+      "tp": 2,
+      "fp": 13,
+      "fn": 1,
+      "mean_iou": 0.7992,
+      "timing": {
+        "segmentation_ms": 438.8,
+        "cloud_ms": 5471.3,
+        "mapping_ms": 38.3,
+        "total_ms": 5949.3
+      },
+      "pipeline_metrics": {
+        "raw_detections": 19,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 4,
+          "model_b": 15
+        },
+        "post_nms": 15,
+        "post_gating": 15,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 15,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2250.3,
+        "model_b_ms": 1937.0,
+        "total_wall_ms": 5471.2
+      }
+    },
+    {
+      "image": "01F3MMY86R7W5CGSXKR551GQVK_jpeg.rf.4308c77848b1dc48c491e8036dc22a0c.jpg",
+      "gt_count": 5,
+      "pred_count": 2,
+      "tp": 2,
+      "fp": 0,
+      "fn": 3,
+      "mean_iou": 0.5102,
+      "timing": {
+        "segmentation_ms": 445.3,
+        "cloud_ms": 5240.3,
+        "mapping_ms": 35.3,
+        "total_ms": 5721.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 17,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 14,
+          "model_b": 3
+        },
+        "post_nms": 15,
+        "post_gating": 2,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1875.2,
+        "model_b_ms": 2283.7,
+        "total_wall_ms": 5240.2
+      }
+    },
+    {
+      "image": "01F3MMYACD6GHPPGMBJ8SE65WG_jpeg_jpg.rf.0654c17d9a24d7afc9cc868151d5ca6f.jpg",
+      "gt_count": 2,
+      "pred_count": 22,
+      "tp": 2,
+      "fp": 20,
+      "fn": 0,
+      "mean_iou": 0.8824,
+      "timing": {
+        "segmentation_ms": 482.0,
+        "cloud_ms": 5716.6,
+        "mapping_ms": 31.4,
+        "total_ms": 6231.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 25,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 20
+        },
+        "post_nms": 23,
+        "post_gating": 22,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 20,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2267.3,
+        "model_b_ms": 2725.7,
+        "total_wall_ms": 5716.4
+      }
+    },
+    {
+      "image": "01F3MMYBPQHZ5K2Q3NJR5DWQ3H_jpeg.rf.20f85bee453a4d1b5416c5f3386ec44b.jpg",
+      "gt_count": 4,
+      "pred_count": 9,
+      "tp": 3,
+      "fp": 6,
+      "fn": 1,
+      "mean_iou": 0.5535,
+      "timing": {
+        "segmentation_ms": 439.9,
+        "cloud_ms": 6173.3,
+        "mapping_ms": 35.2,
+        "total_ms": 6649.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 13,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 6,
+          "model_b": 7
+        },
+        "post_nms": 10,
+        "post_gating": 9,
+        "proximity_propagated": 1,
+        "type_coverage": {
+          "direct": 7,
+          "proximity": 1,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3202.4,
+        "model_b_ms": 2963.7,
+        "total_wall_ms": 6173.1
+      }
+    },
+    {
+      "image": "01F3MMYHWYZV3YVFBXQGTF43D6_jpeg_jpg.rf.d11578aee2a7de3f6f919e15e83b7a34.jpg",
+      "gt_count": 12,
+      "pred_count": 1,
+      "tp": 1,
+      "fp": 0,
+      "fn": 11,
+      "mean_iou": 0.9215,
+      "timing": {
+        "segmentation_ms": 426.0,
+        "cloud_ms": 5065.4,
+        "mapping_ms": 20.9,
+        "total_ms": 5513.2
+      },
+      "pipeline_metrics": {
+        "raw_detections": 29,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 13,
+          "model_b": 16
+        },
+        "post_nms": 16,
+        "post_gating": 1,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 1,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2129.3,
+        "model_b_ms": 1912.0,
+        "total_wall_ms": 5065.2
+      }
+    },
+    {
+      "image": "01F3MMYK6VE9FG2WN2PKGRW6ZR_jpeg.rf.28d921e9437fde19c4e1f26815349809.jpg",
+      "gt_count": 2,
+      "pred_count": 3,
+      "tp": 1,
+      "fp": 2,
+      "fn": 1,
+      "mean_iou": 0.5553,
+      "timing": {
+        "segmentation_ms": 436.8,
+        "cloud_ms": 5879.0,
+        "mapping_ms": 23.7,
+        "total_ms": 6340.4
+      },
+      "pipeline_metrics": {
+        "raw_detections": 6,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 3,
+          "model_b": 3
+        },
+        "post_nms": 3,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 2,
+          "proximity": 0,
+          "none": 1
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 3031.5,
+        "model_b_ms": 1947.9,
+        "total_wall_ms": 5878.8
+      }
+    },
+    {
+      "image": "01F3MMYK6VE9FG2WN2PKGRW6ZR_jpeg_jpg.rf.3eb57ccdee5b6760a18685d3d9a46b0f.jpg",
+      "gt_count": 2,
+      "pred_count": 5,
+      "tp": 2,
+      "fp": 3,
+      "fn": 0,
+      "mean_iou": 0.5722,
+      "timing": {
+        "segmentation_ms": 431.3,
+        "cloud_ms": 5478.6,
+        "mapping_ms": 25.6,
+        "total_ms": 5936.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 10,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 5,
+          "model_b": 5
+        },
+        "post_nms": 8,
+        "post_gating": 5,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 2
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 2093.3,
+        "model_b_ms": 2257.7,
+        "total_wall_ms": 5478.5
+      }
+    },
+    {
+      "image": "01F3MMYNE0NXTGFZ8T0PGRQPGY_jpeg_jpg.rf.444838803a885b54b60459a27d0534bc.jpg",
+      "gt_count": 1,
+      "pred_count": 22,
+      "tp": 1,
+      "fp": 21,
+      "fn": 0,
+      "mean_iou": 0.8082,
+      "timing": {
+        "segmentation_ms": 441.1,
+        "cloud_ms": 6689.7,
+        "mapping_ms": 30.7,
+        "total_ms": 7162.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 31,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 9,
+          "model_b": 22
+        },
+        "post_nms": 25,
+        "post_gating": 22,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 22,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1958.9,
+        "model_b_ms": 3249.2,
+        "total_wall_ms": 6689.6
+      }
+    },
+    {
+      "image": "01F3MMZ6PBPZ02R00D2GS0XSDQ_jpeg_jpg.rf.034a330571691bf39ffc11fd6dd7ea4c.jpg",
+      "gt_count": 4,
+      "pred_count": 3,
+      "tp": 2,
+      "fp": 1,
+      "fn": 2,
+      "mean_iou": 0.7594,
+      "timing": {
+        "segmentation_ms": 511.0,
+        "cloud_ms": 6209.0,
+        "mapping_ms": 25.0,
+        "total_ms": 6745.9
+      },
+      "pipeline_metrics": {
+        "raw_detections": 8,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 8
+        },
+        "post_nms": 7,
+        "post_gating": 3,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 3,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1724.4,
+        "model_b_ms": 2738.5,
+        "total_wall_ms": 6208.8
+      }
+    },
+    {
+      "image": "043c0d25-8c12-4b47-a8cc-b4e8c54ead43_jpg.rf.d10b598c088c7e04d17d8a85fe4261a4.jpg",
+      "gt_count": 4,
+      "pred_count": 33,
+      "tp": 2,
+      "fp": 31,
+      "fn": 2,
+      "mean_iou": 0.5119,
+      "timing": {
+        "segmentation_ms": 447.0,
+        "cloud_ms": 5731.3,
+        "mapping_ms": 29.0,
+        "total_ms": 6208.5
+      },
+      "pipeline_metrics": {
+        "raw_detections": 35,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 35
+        },
+        "post_nms": 33,
+        "post_gating": 33,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 33,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1850.8,
+        "model_b_ms": 2274.5,
+        "total_wall_ms": 5731.2
+      }
+    },
+    {
+      "image": "05ae6d60-df34-4286-8c95-e213785dc9d2_jpg.rf.02acdf772156680d3326576c60f526f7.jpg",
+      "gt_count": 3,
+      "pred_count": 12,
+      "tp": 0,
+      "fp": 12,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 441.5,
+        "cloud_ms": 6211.4,
+        "mapping_ms": 25.1,
+        "total_ms": 6679.1
+      },
+      "pipeline_metrics": {
+        "raw_detections": 14,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 14
+        },
+        "post_nms": 13,
+        "post_gating": 12,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 12,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1663.7,
+        "model_b_ms": 3059.5,
+        "total_wall_ms": 6211.3
+      }
+    },
+    {
+      "image": "07AcnePittedScars_jpg.rf.9365e160efd8a08f4fd1408a385d9680.jpg",
+      "gt_count": 3,
+      "pred_count": 0,
+      "tp": 0,
+      "fp": 0,
+      "fn": 3,
+      "mean_iou": 0.0,
+      "timing": {
+        "segmentation_ms": 420.0,
+        "cloud_ms": 5339.5,
+        "mapping_ms": 1.2,
+        "total_ms": 5761.7
+      },
+      "pipeline_metrics": {
+        "raw_detections": 1,
+        "raw_by_stream": {
+          "model_a_640": 0,
+          "model_a_1280": 0,
+          "model_b": 1
+        },
+        "post_nms": 1,
+        "post_gating": 0,
+        "proximity_propagated": 0,
+        "type_coverage": {
+          "direct": 0,
+          "proximity": 0,
+          "none": 0
+        }
+      },
+      "cloud_timing": {
+        "model_a_640_ms": null,
+        "model_a_1280_ms": 1043.2,
+        "model_b_ms": 2421.1,
+        "total_wall_ms": 5339.4
+      }
+    }
+  ]
+}

@@ -10,12 +10,23 @@ LesionMapper.SEVERITY_MAP.
 After NMS and statistical gating, a proximity-propagation pass assigns
 typed labels to remaining generic ("Acne") detections when a nearby
 Model B typed detection exists within ``PROXIMITY_THRESHOLD``.
+
+Configurable thresholds (via environment variables):
+- ``SAG_Z_THRESHOLD``: Z-score threshold for redness outlier gating
+  (default 0.5).  Lower values keep more detections.
+- ``NMS_IOU_THRESHOLD``: IoU threshold for NMS overlap suppression
+  (default 0.30).  Lower values suppress more aggressively.
 """
+import os
 import cv2
 import math
 import numpy as np
 from typing import Dict, List, Tuple, Optional
 from .mapping import LesionMapper
+
+# Configurable thresholds with defaults
+SAG_Z_THRESHOLD = float(os.environ.get('SAG_Z_THRESHOLD', '0.5'))
+NMS_IOU_THRESHOLD = float(os.environ.get('NMS_IOU_THRESHOLD', '0.30'))
 
 # Generic labels that indicate the model does NOT distinguish types.
 # These are treated as "untyped" and get the default severity grade.
@@ -141,7 +152,7 @@ class EnsembleLesionMapper(LesionMapper):
             curr_box = all_raw_boxes[i]
             is_redundant = False
             for k_idx in keep_indices:
-                if self._calculate_iou(curr_box, all_raw_boxes[k_idx]) > 0.35:
+                if self._calculate_iou(curr_box, all_raw_boxes[k_idx]) > NMS_IOU_THRESHOLD:
                     is_redundant = True
                     # If the suppressed detection has a typed label and the
                     # kept one does not, promote the typed label.
@@ -178,7 +189,12 @@ class EnsembleLesionMapper(LesionMapper):
                 continue  # Reject lines (hair/wrinkles)
 
             # C. Statistical Anomaly Detection (SAG)
-            if image is not None:
+            #    Typed detections (e.g. "pustule", "papule") from Model B
+            #    have already been classified by a specialised model —
+            #    skip redness gating for these to avoid rejecting valid
+            #    non-inflammatory lesion types (comedones, whiteheads).
+            class_name = best_class_for_kept.get(idx, all_raw_classes[idx])
+            if image is not None and not _is_typed_label(class_name):
                 patch = image[max(0, y1):min(H, y2), max(0, x1):min(W, x2)]
                 if patch.size > 0:
                     pr = patch[:, :, 2].astype(float)
@@ -189,12 +205,11 @@ class EnsembleLesionMapper(LesionMapper):
                     # Using a Z-Score approach (Sigma gating)
                     z_score = (p_redness - skin_baseline_redness) / (skin_std_dev + 1e-6)
 
-                    if z_score < 1.5:  # Must be > 1.5 Sigma outlier in redness
+                    if z_score < SAG_Z_THRESHOLD:
                         continue
 
             # Resolve class label: prefer the best (most specific) label
             # found during NMS overlap resolution.
-            class_name = best_class_for_kept.get(idx, all_raw_classes[idx])
             severity_grade = self._get_severity_grade(class_name)
             type_source = 'direct' if _is_typed_label(class_name) else 'none'
 

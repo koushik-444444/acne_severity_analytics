@@ -3,6 +3,7 @@ V7 Clinical Validation Engine - True Accuracy Auditor (SAG Optimized)
 Calculates Precision, Recall, and mAP@50 using Statistical Adaptive Gating.
 
 Phase 5: Added timing instrumentation, per-image stats, JSON output.
+Phase 7: Configurable SAG_Z_THRESHOLD, NMS_IOU_THRESHOLD, match IoU.
 """
 import os
 import sys
@@ -13,10 +14,6 @@ import argparse
 import numpy as np
 from tqdm import tqdm
 from dotenv import load_dotenv
-
-from face_segmentation.pipeline import FaceSegmentationPipeline
-from face_segmentation.ensemble_mapper import EnsembleLesionMapper
-from cloud_inference import CloudInferenceEngine
 
 load_dotenv()
 
@@ -31,7 +28,8 @@ MODEL_B_ID = os.getenv("MODEL_B_ID", "acne-project-2auvb/acne-detection-v2/1")
 from utils import calculate_iou
 
 
-def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=None):
+def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=None,
+             sag_z=None, nms_iou=None):
     """Run validation benchmark on labeled images.
 
     Args:
@@ -40,11 +38,32 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
         iou_threshold: Minimum IoU for a true positive match.
         limit: Maximum images to process.
         output_json: Optional path to save detailed results as JSON.
+        sag_z: Override SAG_Z_THRESHOLD for this run.
+        nms_iou: Override NMS_IOU_THRESHOLD for this run.
 
     Returns:
         Dict with aggregate and per-image statistics.
     """
+    # Apply threshold overrides via env vars before importing the mapper
+    if sag_z is not None:
+        os.environ['SAG_Z_THRESHOLD'] = str(sag_z)
+    if nms_iou is not None:
+        os.environ['NMS_IOU_THRESHOLD'] = str(nms_iou)
+
+    # Import pipeline modules after setting env vars so they pick up overrides.
+    # Use importlib to force re-read of env vars even if already imported.
+    import importlib
+    import face_segmentation.ensemble_mapper as em_mod
+    importlib.reload(em_mod)
+    from face_segmentation.pipeline import FaceSegmentationPipeline
+    from face_segmentation.ensemble_mapper import EnsembleLesionMapper
+    from cloud_inference import CloudInferenceEngine
+
+    effective_sag_z = float(os.environ.get('SAG_Z_THRESHOLD', '0.5'))
+    effective_nms_iou = float(os.environ.get('NMS_IOU_THRESHOLD', '0.30'))
+
     print(f"[Validator] Initializing Clinical Pipeline (SAG-Enabled)...")
+    print(f"[Validator] SAG_Z_THRESHOLD={effective_sag_z}, NMS_IOU_THRESHOLD={effective_nms_iou}, match_iou={iou_threshold}")
     pipeline = FaceSegmentationPipeline(smooth_edges=True)
     cloud_engine = CloudInferenceEngine(api_key=ROBOFLOW_API_KEY)
     
@@ -188,6 +207,8 @@ def validate(image_dir, label_dir, iou_threshold=0.45, limit=20, output_json=Non
             'image_dir': image_dir,
             'label_dir': label_dir,
             'iou_threshold': iou_threshold,
+            'sag_z_threshold': effective_sag_z,
+            'nms_iou_threshold': effective_nms_iou,
             'limit': limit,
             'images_processed': len(per_image),
             'model_a_id': MODEL_A_ID,
@@ -219,7 +240,15 @@ if __name__ == "__main__":
     parser.add_argument("--images", required=True)
     parser.add_argument("--labels", required=True)
     parser.add_argument("--limit", type=int, default=20)
+    parser.add_argument("--match-iou", type=float, default=0.45,
+                        help="IoU threshold for TP matching (default 0.45)")
+    parser.add_argument("--sag-z", type=float, default=None,
+                        help="Override SAG_Z_THRESHOLD (default from env or 0.5)")
+    parser.add_argument("--nms-iou", type=float, default=None,
+                        help="Override NMS_IOU_THRESHOLD (default from env or 0.30)")
     parser.add_argument("--output", type=str, default=None,
                         help="Path to save JSON results file")
     args = parser.parse_args()
-    validate(args.images, args.labels, limit=args.limit, output_json=args.output)
+    validate(args.images, args.labels, iou_threshold=args.match_iou,
+             limit=args.limit, output_json=args.output,
+             sag_z=args.sag_z, nms_iou=args.nms_iou)

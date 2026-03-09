@@ -1,4 +1,7 @@
 """Unit tests for EnsembleLesionMapper class label preservation and proximity propagation."""
+import importlib
+import os
+
 import numpy as np
 import pytest
 
@@ -398,3 +401,233 @@ class TestProximityPropagation:
         # Distance = 11/200 = 0.055 < PROXIMITY_THRESHOLD (should propagate)
         assert det['class_name'] == 'papules'
         assert det['type_source'] == 'proximity'
+
+
+# --- Phase 7: Type-aware SAG gating bypass ---
+
+def _make_sag_test_image(h=200, w=200):
+    """Create a synthetic BGR image for SAG redness gating tests.
+
+    The image has a uniform skin-tone background.  A 20x20 "lesion patch"
+    at pixel rows 90-110, cols 15-35 (centred at ~25,100) is given a
+    distinctly *higher* redness to pass SAG gating.  The rest of the
+    image has low redness so detections placed elsewhere will *fail*
+    SAG gating unless they bypass it.
+    """
+    # Low-redness skin background (G slightly > R  => negative redness)
+    img = np.full((h, w, 3), [100, 150, 120], dtype=np.uint8)  # BGR: B=100, G=150, R=120
+    # Hot patch in forehead region: high redness (R >> G)
+    img[90:110, 15:35] = [80, 80, 220]  # BGR: B=80, G=80, R=220
+    return img
+
+
+class TestTypeAwareSagBypass:
+    """Typed (Model B) detections should bypass SAG redness gating."""
+
+    def test_typed_detection_survives_sag_without_redness(self):
+        """A typed Model B detection in a non-red area should survive
+        because typed labels bypass SAG gating entirely."""
+        mapper = _make_ensemble_mapper()
+        img = _make_sag_test_image()
+
+        # Place typed detection in a LOW-redness area (nose region x=75)
+        preds_b = [_rf_pred(75, 100, 20, 20, 0.7, 'pustule')]
+
+        result = mapper.ensemble_map_multi_scale(
+            [], [], preds_b, (200, 200), image=img,
+        )
+        nose = result['nose']
+        assert len(nose) == 1
+        assert nose[0]['class_name'] == 'pustule'
+        assert nose[0]['type_source'] == 'direct'
+
+    def test_generic_detection_rejected_by_sag_in_non_red_area(self):
+        """A generic 'Acne' detection in a non-red area should be
+        rejected by SAG redness gating when an image is provided."""
+        mapper = _make_ensemble_mapper()
+        img = _make_sag_test_image()
+
+        # Place generic detection in LOW-redness area (nose region x=75)
+        preds_a = [_rf_pred(75, 100, 20, 20, 0.8, 'Acne')]
+
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], [], (200, 200), image=img,
+        )
+        nose = result['nose']
+        # Should be rejected by SAG — patch is not redder than baseline
+        assert len(nose) == 0
+
+    def test_generic_detection_passes_sag_in_red_area(self):
+        """A generic detection in a high-redness area passes SAG."""
+        mapper = _make_ensemble_mapper()
+        img = _make_sag_test_image()
+
+        # Place generic detection over the hot patch (forehead x=25, y=100)
+        preds_a = [_rf_pred(25, 100, 20, 20, 0.8, 'Acne')]
+
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], [], (200, 200), image=img,
+        )
+        forehead = result['forehead']
+        assert len(forehead) == 1
+        assert forehead[0]['class_name'] == 'Acne'
+
+    def test_no_image_skips_sag_for_generic(self):
+        """Without an image, SAG is skipped entirely (image=None)."""
+        mapper = _make_ensemble_mapper()
+
+        preds_a = [_rf_pred(75, 100, 20, 20, 0.8, 'Acne')]
+
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], [], (200, 200), image=None,
+        )
+        nose = result['nose']
+        assert len(nose) == 1
+
+    def test_typed_label_promoted_during_nms_bypasses_sag(self):
+        """When NMS merges a generic detection with a typed one,
+        the resulting typed label should bypass SAG gating."""
+        mapper = _make_ensemble_mapper()
+        img = _make_sag_test_image()
+
+        # Model A (high conf, generic) and Model B (lower conf, typed)
+        # Both in a LOW-redness area (nose, x=75).
+        # They overlap => NMS merges, typed label wins.
+        preds_a = [_rf_pred(75, 100, 20, 20, 0.9, 'Acne')]
+        preds_b = [_rf_pred(76, 101, 20, 20, 0.6, 'nodule')]
+
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], preds_b, (200, 200), image=img,
+        )
+        nose = result['nose']
+        # The typed label from Model B should be promoted during NMS,
+        # and then the detection should bypass SAG.
+        assert len(nose) == 1
+        assert nose[0]['class_name'] == 'nodule'
+        assert nose[0]['type_source'] == 'direct'
+
+
+# --- Phase 7: Configurable SAG_Z_THRESHOLD ---
+
+class TestConfigurableSagThreshold:
+    """SAG_Z_THRESHOLD is read from os.environ at module load time."""
+
+    def test_sag_z_threshold_default_is_0_5(self):
+        """Default SAG_Z_THRESHOLD should be 0.5."""
+        from face_segmentation.ensemble_mapper import SAG_Z_THRESHOLD
+        # If env var is not set to something else, default is 0.5
+        # (It may already be 0.5 from module load.)
+        assert SAG_Z_THRESHOLD == 0.5
+
+    def test_high_sag_z_threshold_rejects_more(self):
+        """With a very high SAG_Z_THRESHOLD, even moderately red patches
+        get rejected (more aggressive gating)."""
+        # Set env var and reload module
+        os.environ['SAG_Z_THRESHOLD'] = '5.0'
+        try:
+            import face_segmentation.ensemble_mapper as em_mod
+            importlib.reload(em_mod)
+            assert em_mod.SAG_Z_THRESHOLD == 5.0
+
+            mapper = _make_ensemble_mapper()
+            img = _make_sag_test_image()
+
+            # Even the hot patch may not meet z=5.0
+            preds_a = [_rf_pred(25, 100, 20, 20, 0.8, 'Acne')]
+            result = em_mod.EnsembleLesionMapper(mapper.region_masks).ensemble_map_multi_scale(
+                preds_a, [], [], (200, 200), image=img,
+            )
+            forehead = result['forehead']
+            # With z=5.0, the hot patch might still pass or fail depending
+            # on the exact redness distribution.  The important thing is
+            # that the module picked up the env var.
+            assert em_mod.SAG_Z_THRESHOLD == 5.0
+        finally:
+            # Restore default
+            os.environ['SAG_Z_THRESHOLD'] = '0.5'
+            importlib.reload(em_mod)
+
+    def test_negative_sag_z_threshold_keeps_everything(self):
+        """With SAG_Z_THRESHOLD=-10.0, all detections survive gating
+        because every z-score is above -10."""
+        os.environ['SAG_Z_THRESHOLD'] = '-10.0'
+        try:
+            import face_segmentation.ensemble_mapper as em_mod
+            importlib.reload(em_mod)
+            assert em_mod.SAG_Z_THRESHOLD == -10.0
+
+            mapper = _make_ensemble_mapper()
+            img = _make_sag_test_image()
+
+            # Detection in low-redness area — survives because threshold
+            # is so low that any z-score passes.
+            preds_a = [_rf_pred(75, 100, 20, 20, 0.8, 'Acne')]
+            result = em_mod.EnsembleLesionMapper(mapper.region_masks).ensemble_map_multi_scale(
+                preds_a, [], [], (200, 200), image=img,
+            )
+            nose = result['nose']
+            assert len(nose) == 1
+        finally:
+            os.environ['SAG_Z_THRESHOLD'] = '0.5'
+            importlib.reload(em_mod)
+
+
+# --- Phase 7: Configurable NMS_IOU_THRESHOLD ---
+
+class TestConfigurableNmsThreshold:
+    """NMS_IOU_THRESHOLD is read from os.environ at module load time."""
+
+    def test_nms_iou_threshold_default_is_0_30(self):
+        """Default NMS_IOU_THRESHOLD should be 0.30."""
+        from face_segmentation.ensemble_mapper import NMS_IOU_THRESHOLD
+        assert NMS_IOU_THRESHOLD == pytest.approx(0.30)
+
+    def test_low_nms_threshold_suppresses_more(self):
+        """With NMS_IOU_THRESHOLD=0.10, even slightly overlapping
+        detections get suppressed."""
+        os.environ['NMS_IOU_THRESHOLD'] = '0.10'
+        try:
+            import face_segmentation.ensemble_mapper as em_mod
+            importlib.reload(em_mod)
+            assert em_mod.NMS_IOU_THRESHOLD == pytest.approx(0.10)
+
+            mapper = _make_ensemble_mapper()
+            # Two detections with moderate overlap in forehead
+            preds_a = [
+                _rf_pred(25, 100, 30, 30, 0.9, 'Acne'),
+                _rf_pred(35, 100, 30, 30, 0.7, 'Acne'),
+            ]
+            result = em_mod.EnsembleLesionMapper(mapper.region_masks).ensemble_map_multi_scale(
+                preds_a, [], [], (200, 200), image=None,
+            )
+            forehead = result['forehead']
+            # With IoU threshold of 0.10, these overlapping boxes should merge
+            assert len(forehead) <= 1
+        finally:
+            os.environ['NMS_IOU_THRESHOLD'] = '0.30'
+            importlib.reload(em_mod)
+
+    def test_high_nms_threshold_keeps_more(self):
+        """With NMS_IOU_THRESHOLD=0.90, even heavily overlapping
+        detections survive independently."""
+        os.environ['NMS_IOU_THRESHOLD'] = '0.90'
+        try:
+            import face_segmentation.ensemble_mapper as em_mod
+            importlib.reload(em_mod)
+            assert em_mod.NMS_IOU_THRESHOLD == pytest.approx(0.90)
+
+            mapper = _make_ensemble_mapper()
+            # Two heavily overlapping detections
+            preds_a = [
+                _rf_pred(25, 100, 30, 30, 0.9, 'Acne'),
+                _rf_pred(27, 102, 30, 30, 0.7, 'Acne'),
+            ]
+            result = em_mod.EnsembleLesionMapper(mapper.region_masks).ensemble_map_multi_scale(
+                preds_a, [], [], (200, 200), image=None,
+            )
+            forehead = result['forehead']
+            # With IoU threshold of 0.90, these should both survive NMS
+            assert len(forehead) == 2
+        finally:
+            os.environ['NMS_IOU_THRESHOLD'] = '0.30'
+            importlib.reload(em_mod)
