@@ -41,7 +41,7 @@ export function LesionTable({
 
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
-      <div className="terminal-text mb-4 text-[10px] text-cyan-400/80">CONSENSUS LESION TABLE</div>
+      <h3 className="terminal-text mb-4 text-[10px] text-cyan-400/80">CONSENSUS LESION TABLE</h3>
       <div className="mb-4 grid grid-cols-1 gap-3 md:grid-cols-3">
         <select
           value={lesionRegionFilter}
@@ -86,6 +86,9 @@ export function LesionTable({
             transition={{ delay: idx * 0.03, duration: 0.25 }}
             onMouseEnter={() => onLesionHover(lesion.key)}
             onMouseLeave={() => onLesionHover(null)}
+            onFocus={() => onLesionHover(lesion.key)}
+            onBlur={() => onLesionHover(null)}
+            aria-current={activeLesionKey === lesion.key ? 'true' : undefined}
             className={`rounded-xl border bg-white/3 p-4 text-left text-sm transition-all ${activeLesionKey === lesion.key ? 'border-cyan-400/40 bg-cyan-400/8 shadow-[0_0_25px_rgba(0,242,255,0.12)]' : 'border-white/5'}`}
           >
             <div className="mb-2 flex items-center justify-between gap-2">
@@ -98,6 +101,11 @@ export function LesionTable({
           </motion.button>
         ))}
       </div>
+      {filteredLesions.length > 12 && (
+        <p className="mt-3 text-center text-xs text-zinc-500">
+          Showing 12 of {filteredLesions.length} lesions
+        </p>
+      )}
     </div>
   )
 }

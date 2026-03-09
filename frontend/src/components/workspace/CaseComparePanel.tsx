@@ -32,8 +32,8 @@ export function CaseComparePanel({
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
       <div className="mb-4 flex items-center gap-2">
-        <Sparkles className="h-4 w-4 text-cyan-400" />
-        <div className="terminal-text text-[10px] text-cyan-400/80">CASE COMPARE</div>
+        <Sparkles aria-hidden="true" className="h-4 w-4 text-cyan-400" />
+        <h3 className="terminal-text text-[10px] text-cyan-400/80">CASE COMPARE</h3>
       </div>
       {compare ? (
         <>
@@ -51,7 +51,7 @@ export function CaseComparePanel({
                 </div>
               </div>
               {baselineSession ? (
-                <button onClick={onClearBaseline} className="rounded-full border border-cyan-400/30 px-3 py-1 text-[10px] text-cyan-100 hover:bg-cyan-400/10">
+                <button type="button" onClick={onClearBaseline} className="rounded-full border border-cyan-400/30 px-3 py-1 text-[10px] text-cyan-100 hover:bg-cyan-400/10">
                   Clear baseline
                 </button>
               ) : null}
@@ -76,7 +76,7 @@ export function CaseComparePanel({
               <div className="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-zinc-200">
                 <div className="terminal-text text-[8px] text-zinc-500">SEVERITY BAND</div>
                 <div className="mt-2 text-sm font-semibold text-white">
-                  {compare.severity_change.from} {'->'} {compare.severity_change.to}
+                  {compare.severity_change.from} <span aria-label="to">{'\u2192'}</span> {compare.severity_change.to}
                 </div>
               </div>
             </div>

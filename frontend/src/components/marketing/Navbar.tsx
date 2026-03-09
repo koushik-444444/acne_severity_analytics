@@ -26,6 +26,7 @@ export function Navbar() {
 
   return (
     <nav
+      aria-label="Main navigation"
       className={cn(
         'fixed left-0 right-0 top-0 z-50 px-8 py-6 transition-all duration-500',
         isScrolled ? 'border-b border-cyan-400/10 bg-black/80 py-4 backdrop-blur-2xl' : 'bg-transparent',
@@ -35,9 +36,9 @@ export function Navbar() {
         <div className="flex items-center gap-3">
           <div className="relative">
             <div className="flex h-10 w-10 rotate-45 items-center justify-center bg-cyan-400">
-              <Activity className="h-6 w-6 -rotate-45 text-black" />
+              <Activity aria-hidden="true" className="h-6 w-6 -rotate-45 text-black" />
             </div>
-            <div className="absolute -inset-1 rotate-45 animate-pulse border border-cyan-400/30" />
+            <div aria-hidden="true" className="absolute -inset-1 rotate-45 animate-pulse border border-cyan-400/30" />
           </div>
           <span className="terminal-text text-xl font-bold tracking-widest">
             ClearSkin<span className="text-cyan-400">AI</span>
@@ -65,6 +66,8 @@ export function Navbar() {
           type="button"
           onClick={() => setMobileOpen((v) => !v)}
           aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileOpen}
+          aria-controls="mobile-menu"
           className="inline-flex items-center justify-center rounded-lg border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white md:hidden"
         >
           {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -81,7 +84,7 @@ export function Navbar() {
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="overflow-hidden md:hidden"
           >
-            <div className="flex flex-col gap-4 pb-6 pt-4">
+            <div id="mobile-menu" className="flex flex-col gap-4 pb-6 pt-4">
               {NAV_LINKS.map((item) => (
                 <a
                   key={item.label}

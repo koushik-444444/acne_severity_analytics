@@ -138,30 +138,34 @@ function SingleCompare({
     <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
       <div className="rounded-[1.75rem] border border-white/5 bg-black/30 p-4">
         <div className="mb-3 flex items-center justify-between">
-          <div className="terminal-text text-[10px] text-cyan-400/80">VISUAL COMPARE · CURRENT</div>
+          <h3 className="terminal-text text-[10px] text-cyan-400/80">VISUAL COMPARE · CURRENT</h3>
           <div className="flex items-center gap-2">
             <button
+              type="button"
+              aria-pressed={showCompareOverlay}
               onClick={onToggleCompareOverlay}
               className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
             >
               {showCompareOverlay ? 'Detection pair' : 'Original pair'}
             </button>
-            <button aria-label="Zoom in compare" onClick={() => onCompareViewerChange((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+            <button type="button" aria-label="Zoom in compare" onClick={() => onCompareViewerChange((state) => ({ ...state, scale: clamp(state.scale + 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
               <Search className="h-4 w-4" />
             </button>
-            <button aria-label="Zoom out compare" onClick={() => onCompareViewerChange((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+            <button type="button" aria-label="Zoom out compare" onClick={() => onCompareViewerChange((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
               <SearchX className="h-4 w-4" />
             </button>
-            <button onClick={onResetCompareViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+            <button type="button" aria-label="Reset compare viewer" onClick={onResetCompareViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
               Reset
             </button>
             <button
+              type="button"
               onClick={() => onSetCompareViewerMode('split')}
               className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
             >
               Split view
             </button>
             <button
+              type="button"
               onClick={() => onSetCompareFullscreen(true)}
               className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
             >
@@ -181,7 +185,7 @@ function SingleCompare({
         />
       </div>
       <div className="rounded-[1.75rem] border border-white/5 bg-black/30 p-4">
-        <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">VISUAL COMPARE · PRIOR</div>
+        <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">VISUAL COMPARE · PRIOR</h3>
         {previousImage ? (
           <AdvancedImageViewer
             src={previousImage}
@@ -220,18 +224,20 @@ function SplitCompare({
   return (
     <div className="rounded-[1.75rem] border border-white/5 bg-black/30 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <div className="terminal-text text-[10px] text-cyan-400/80">SPLIT COMPARE VIEWER</div>
+        <h3 className="terminal-text text-[10px] text-cyan-400/80">SPLIT COMPARE VIEWER</h3>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => onSetCompareViewerMode('single')}
             className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
           >
             Side by side
           </button>
-          <button onClick={onResetCompareViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+          <button type="button" aria-label="Reset split compare viewer" onClick={onResetCompareViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
             Reset
           </button>
           <button
+            type="button"
             onClick={() => onSetCompareFullscreen(true)}
             className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
           >
@@ -273,9 +279,10 @@ function FullscreenCompare({
   return (
     <div className="rounded-[1.75rem] border border-cyan-400/15 bg-black/40 p-4 shadow-[0_0_40px_rgba(0,242,255,0.08)]">
       <div className="mb-3 flex items-center justify-between">
-        <div className="terminal-text text-[10px] text-cyan-400/80">FULLSCREEN COMPARE WORKSPACE</div>
+        <h3 className="terminal-text text-[10px] text-cyan-400/80">FULLSCREEN COMPARE WORKSPACE</h3>
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => onSetCompareFullscreen(false)}
             className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
           >

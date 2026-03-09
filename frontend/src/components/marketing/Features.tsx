@@ -3,22 +3,22 @@ import { motion } from 'framer-motion'
 
 const FEATURES = [
   {
-    icon: <Brain className="h-6 w-6 text-cyan-400" />,
+    icon: <Brain aria-hidden="true" className="h-6 w-6 text-cyan-400" />,
     title: 'NEURAL_SEGMENTATION',
     description: 'Deep-layer facial region mapping via BiSeNet consensus architecture.',
   },
   {
-    icon: <Target className="h-6 w-6 text-cyan-400" />,
+    icon: <Target aria-hidden="true" className="h-6 w-6 text-cyan-400" />,
     title: 'LESION_PRECISION',
     description: 'Multi-scale WBF fusion for sub-pixel detection of inflammatory triggers.',
   },
   {
-    icon: <Activity className="h-6 w-6 text-cyan-400" />,
+    icon: <Activity aria-hidden="true" className="h-6 w-6 text-cyan-400" />,
     title: 'GAGS_ANALYTICS',
     description: 'Automated Global Acne Grading System compliance for clinical validation.',
   },
   {
-    icon: <Sparkles className="h-6 w-6 text-cyan-400" />,
+    icon: <Sparkles aria-hidden="true" className="h-6 w-6 text-cyan-400" />,
     title: 'EDGE_INFERENCE',
     description: 'Privacy-first workflows with retained archive intelligence and case comparison.',
   },
@@ -26,8 +26,9 @@ const FEATURES = [
 
 export function Features() {
   return (
-    <section className="relative bg-black py-40">
+    <section aria-label="Features" className="relative bg-black py-40">
       <div className="mx-auto max-w-7xl px-8">
+        <h2 className="sr-only">Features</h2>
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           {FEATURES.map((feature, idx) => (
             <motion.div

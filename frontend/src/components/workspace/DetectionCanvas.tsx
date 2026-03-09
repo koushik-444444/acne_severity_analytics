@@ -41,9 +41,10 @@ export function DetectionCanvas({
   return (
     <div className="rounded-[1.75rem] border border-white/5 bg-black/30 p-4">
       <div className="mb-4 flex items-center justify-between">
-        <div className="terminal-text text-[10px] text-cyan-400/80">ACNE DETECTION CANVAS</div>
+        <h3 className="terminal-text text-[10px] text-cyan-400/80">ACNE DETECTION CANVAS</h3>
         <div className="flex flex-wrap items-center gap-2">
           <button
+            aria-pressed={showDetectionOverlay}
             onClick={onToggleOverlay}
             className="inline-flex items-center gap-2 rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
           >
@@ -56,7 +57,7 @@ export function DetectionCanvas({
           <button aria-label="Zoom out" onClick={() => onMainViewerChange((state) => ({ ...state, scale: clamp(state.scale - 0.25, 1, 4) }))} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
             <SearchX className="h-4 w-4" />
           </button>
-          <button onClick={onResetMainViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
+          <button aria-label="Reset viewer zoom and position" onClick={onResetMainViewer} className="rounded-full border border-white/10 px-3 py-1 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">
             Reset
           </button>
           <button aria-label={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'} onClick={onToggleFullscreen} className="rounded-full border border-white/10 p-2 text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white">

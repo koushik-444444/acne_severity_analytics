@@ -23,7 +23,7 @@ export function ClinicalGradePanel({
   return (
     <div className="space-y-6">
       <div className="holographic-panel rounded-[1.75rem] p-6">
-        <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">CLINICAL GRADE</div>
+        <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">CLINICAL GRADE</h3>
         <div className="space-y-3 text-sm text-zinc-300">
           <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/3 px-4 py-3">
             <span className="text-zinc-500">GAGS total</span>
@@ -56,34 +56,38 @@ function GagsBreakdownPanel({
 }) {
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
-      <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">HOW GAGS WAS CALCULATED</div>
+      <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">HOW GAGS WAS CALCULATED</h3>
       <div className="space-y-3 text-sm text-zinc-400">
         <div className="rounded-xl border border-white/5 bg-white/3 px-4 py-3">
           Regional GAGS = region weight x highest severity grade in that zone. Typed detections now drive real grades (1-4) instead of a flat default.
         </div>
-        <div className="grid grid-cols-1 gap-2">
-          <div className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-xl border border-white/5 bg-black/20 px-3 py-2 text-xs uppercase tracking-[0.2em] text-zinc-500">
-            <span>Region</span>
-            <span>Lesions</span>
-            <span>Max Grade</span>
-            <span>GAGS</span>
-          </div>
-          {regionRows.map(([region, data]) => {
-            const regionData = data as RegionStats
-            const regionLesions = consensusLesions.filter((l) => l.region === region)
-            const maxGrade = regionLesions.length > 0
-              ? Math.max(...regionLesions.map((l) => l.severity_grade ?? 2))
-              : 0
-            return (
-              <div key={`gags-${region}`} className="grid grid-cols-[1fr_auto_auto_auto] items-center gap-3 rounded-xl border border-white/5 bg-white/3 px-3 py-3 text-sm">
-                <span className="text-zinc-300">{region.replaceAll('_', ' ')}</span>
-                <span className="text-zinc-500">{regionData.count}</span>
-                <span className="text-zinc-400">{maxGrade > 0 ? maxGrade : '-'}</span>
-                <span className="font-semibold text-cyan-300">{regionData.gags_score ?? 0}</span>
-              </div>
-            )
-          })}
-        </div>
+        <table className="w-full text-sm text-zinc-400">
+          <thead>
+            <tr className="rounded-xl border border-white/5 bg-black/20 text-xs uppercase tracking-[0.2em] text-zinc-500">
+              <th scope="col" className="px-3 py-2 text-left font-normal">Region</th>
+              <th scope="col" className="px-3 py-2 text-right font-normal">Lesions</th>
+              <th scope="col" className="px-3 py-2 text-right font-normal">Max Grade</th>
+              <th scope="col" className="px-3 py-2 text-right font-normal">GAGS</th>
+            </tr>
+          </thead>
+          <tbody>
+            {regionRows.map(([region, data]) => {
+              const regionData = data as RegionStats
+              const regionLesions = consensusLesions.filter((l) => l.region === region)
+              const maxGrade = regionLesions.length > 0
+                ? Math.max(...regionLesions.map((l) => l.severity_grade ?? 2))
+                : 0
+              return (
+                <tr key={`gags-${region}`} className="border-b border-white/5">
+                  <td className="px-3 py-3 text-zinc-300">{region.replaceAll('_', ' ')}</td>
+                  <td className="px-3 py-3 text-right text-zinc-500">{regionData.count}</td>
+                  <td className="px-3 py-3 text-right text-zinc-400">{maxGrade > 0 ? maxGrade : '-'}</td>
+                  <td className="px-3 py-3 text-right font-semibold text-cyan-300">{regionData.gags_score ?? 0}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
       </div>
     </div>
   )
@@ -92,7 +96,7 @@ function GagsBreakdownPanel({
 function ConsensusInspectorPanel({ active }: { active: AnalyzeResponse }) {
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
-      <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">CONSENSUS INSPECTOR</div>
+      <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">CONSENSUS INSPECTOR</h3>
       <p className="mb-4 text-sm text-zinc-500">{active.results?.consensus_summary?.summary ?? 'No consensus data available'}</p>
       <div className="space-y-2 text-sm text-zinc-300">
         <div>Verified lesions: {active.results?.consensus_summary?.verified_lesions ?? 0}</div>
@@ -120,7 +124,7 @@ function ConsensusInspectorPanel({ active }: { active: AnalyzeResponse }) {
 function SeverityExplainerPanel({ active }: { active: AnalyzeResponse }) {
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
-      <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">WHY THIS SEVERITY?</div>
+      <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">WHY THIS SEVERITY?</h3>
       <div className="space-y-3">
         {Object.entries(active.results?.clinical_analysis?.regions ?? {}).map(([region, data]) => {
           const regionData = data as RegionStats
@@ -139,7 +143,7 @@ function SeverityExplainerPanel({ active }: { active: AnalyzeResponse }) {
 function SourceStreamDebuggerPanel({ active }: { active: AnalyzeResponse }) {
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
-      <div className="terminal-text mb-3 text-[10px] text-cyan-400/80">SOURCE STREAM DEBUGGER</div>
+      <h3 className="terminal-text mb-3 text-[10px] text-cyan-400/80">SOURCE STREAM DEBUGGER</h3>
       <div className="space-y-3 text-sm text-zinc-400">
         <div>Strongest stream: {String(active.results?.source_stream_provenance?.strongest_stream ?? 'n/a')}</div>
         <div>Total source proposals: {String(active.results?.source_stream_provenance?.stream_total ?? 0)}</div>

@@ -36,17 +36,17 @@ export function SessionArchiveRail({
   onLoadMore?: () => void
 }) {
   return (
-    <aside className="holographic-panel relative rounded-[2rem] p-6">
+    <aside aria-label="Session archive" className="holographic-panel relative rounded-[2rem] p-6">
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <div className="terminal-text text-[10px] text-cyan-400/80">SESSION ARCHIVE</div>
+          <h3 className="terminal-text text-[10px] text-cyan-400/80">SESSION ARCHIVE</h3>
           <div className="text-sm text-zinc-500">Longitudinal timeline</div>
         </div>
-        <Activity className="h-4 w-4 text-cyan-400" />
+        <Activity aria-hidden="true" className="h-4 w-4 text-cyan-400" />
       </div>
 
       <div className="mb-4 space-y-2">
-        <div className="terminal-text text-[9px] text-zinc-500">PATIENT / PROFILE</div>
+        <h4 className="terminal-text text-[9px] text-zinc-500">PATIENT / PROFILE</h4>
         <select
           value={activeProfileId}
           onChange={(e) => onProfileChange(e.target.value)}
@@ -88,7 +88,7 @@ export function SessionArchiveRail({
             onClick={onLoadMore}
             className="flex w-full items-center justify-center gap-2 rounded-xl border border-white/10 py-2 text-xs text-zinc-400 transition-colors hover:border-cyan-400/20 hover:text-white"
           >
-            <Loader2 className="h-3 w-3" />
+            <Loader2 aria-hidden="true" className="h-3 w-3" />
             Load older sessions
           </button>
         )}
@@ -109,7 +109,7 @@ export function SessionArchiveRail({
 function EmptyHistoryState() {
   return (
     <div className="flex flex-col items-center gap-3 py-12 text-center">
-      <Activity className="h-8 w-8 text-zinc-700" />
+      <Activity aria-hidden="true" className="h-8 w-8 text-zinc-700" />
       <div className="terminal-text text-[10px] text-zinc-600">NO SESSIONS YET</div>
       <p className="max-w-[200px] text-xs text-zinc-600">
         Run your first analysis to see session history here.
@@ -132,9 +132,12 @@ const SessionCard = memo(function SessionCard({
   onPinBaseline: (item: SessionSummary) => void
 }) {
   return (
-    <button
+    <div
+      role="group"
+      tabIndex={0}
       onClick={() => onSelect(item)}
-      className="w-full rounded-2xl border border-white/5 bg-white/3 p-4 text-left transition-all hover:border-cyan-400/25 hover:bg-cyan-400/5"
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(item) } }}
+      className="w-full cursor-pointer rounded-2xl border border-white/5 bg-white/3 p-4 text-left transition-all hover:border-cyan-400/25 hover:bg-cyan-400/5 focus:outline-none focus:ring-2 focus:ring-cyan-400/40"
     >
       <div className="mb-2 flex items-start justify-between gap-3">
         <span className="terminal-text text-[9px] text-cyan-400/80">{item.severity ?? 'Unknown'}</span>
@@ -162,6 +165,7 @@ const SessionCard = memo(function SessionCard({
       </div>
       <div className="mt-2 flex items-center justify-between">
         <button
+          type="button"
           onClick={(event) => {
             event.stopPropagation()
             onPinBaseline(item)
@@ -171,6 +175,6 @@ const SessionCard = memo(function SessionCard({
           {isBaseline ? 'Baseline pinned' : 'Pin baseline'}
         </button>
       </div>
-    </button>
+    </div>
   )
 })

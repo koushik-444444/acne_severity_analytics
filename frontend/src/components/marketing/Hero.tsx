@@ -6,11 +6,11 @@ import { MetadataLabel } from './MetadataLabel'
 export function Hero() {
   return (
     <section className="medical-grid relative flex min-h-screen flex-col items-center justify-center overflow-hidden pt-20">
-      <h2 className="editorial-title pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 -rotate-12 select-none text-[25vw]">
+      <div aria-hidden="true" className="editorial-title pointer-events-none absolute left-0 top-1/2 -translate-y-1/2 -rotate-12 select-none text-[25vw]">
         Archival_07
-      </h2>
+      </div>
 
-      <div className="pointer-events-none absolute inset-0 opacity-40">
+      <div aria-hidden="true" className="pointer-events-none absolute inset-0 opacity-40">
         <MetadataLabel className="absolute left-12 top-32">LN_LOAD: 0.992ms</MetadataLabel>
         <MetadataLabel className="absolute left-8 top-1/2 origin-left -rotate-90">SEQ_BUFFER_ACTIVE</MetadataLabel>
         <MetadataLabel className="absolute bottom-12 right-12">REF_SYNC: UTC_STABLE</MetadataLabel>
@@ -26,7 +26,7 @@ export function Hero() {
             className="relative z-30 lg:col-span-5"
           >
             <div className="mb-12 inline-flex items-center gap-4 rounded-full border border-cyan-400/10 bg-cyan-400/2 px-4 py-2">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_10px_#00f2ff]" />
+              <span aria-hidden="true" className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-400 shadow-[0_0_10px_#00f2ff]" />
               <span className="font-mono text-[9px] font-bold uppercase tracking-[0.3em] text-cyan-400/60">
                 Neural Protocol Established
               </span>
@@ -43,10 +43,10 @@ export function Hero() {
             </p>
 
             <div className="flex flex-wrap gap-8">
-              <a href="#workspace" className="btn-precision terminal-text px-12 py-6 text-[10px] font-bold text-cyan-400">
+              <a href="#workspace" aria-label="Go to diagnostic workspace" className="btn-precision terminal-text px-12 py-6 text-[10px] font-bold text-cyan-400">
                 INIT_DIAGNOSTIC
               </a>
-              <a href="#features" className="terminal-text border border-white/5 bg-white/2 px-12 py-6 text-[10px] font-bold text-white/40 transition-all hover:border-white/20 hover:text-white">
+              <a href="#features" aria-label="View features and research" className="terminal-text border border-white/5 bg-white/2 px-12 py-6 text-[10px] font-bold text-white/40 transition-all hover:border-white/20 hover:text-white">
                 WHITE_PAPER
               </a>
             </div>
@@ -68,8 +68,8 @@ export function Hero() {
                 </div>
               </div>
 
-              <div className="absolute right-1/4 top-1/4 h-px w-32 rotate-45 bg-cyan-400/20" />
-              <div className="absolute right-[35%] top-[20%]">
+              <div aria-hidden="true" className="absolute right-1/4 top-1/4 h-px w-32 rotate-45 bg-cyan-400/20" />
+              <div aria-hidden="true" className="absolute right-[35%] top-[20%]">
                 <MetadataLabel>ROBOT_ID: CS_001</MetadataLabel>
               </div>
             </div>

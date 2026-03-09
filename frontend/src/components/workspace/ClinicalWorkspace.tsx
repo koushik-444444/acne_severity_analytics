@@ -612,8 +612,8 @@ export function ClinicalWorkspace() {
           <main className="holographic-panel rounded-[2rem] p-8">
             <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <div className="terminal-text text-[10px] text-cyan-400/80">LIVE DIAGNOSTIC CANVAS</div>
-                <div className="text-sm text-zinc-500">
+                <h3 className="terminal-text text-[10px] text-cyan-400/80">LIVE DIAGNOSTIC CANVAS</h3>
+                <div className="text-sm text-zinc-500" aria-live="polite">
                   {status ? `${status.stage} · ${status.detail}` : 'Awaiting upload'}
                 </div>
               </div>
@@ -661,7 +661,7 @@ export function ClinicalWorkspace() {
                   transition={{ duration: 0.35, ease: 'easeOut' }}
                   className="space-y-8"
                 >
-                <div className="grid grid-cols-2 gap-4 xl:grid-cols-4">
+                <div role="group" aria-label="Analysis summary metrics" className="grid grid-cols-2 gap-4 xl:grid-cols-4">
                   <MetricCard label="SEVERITY" value={displaySeverity} accent tone={severityTone} />
                   <MetricCard label="GAGS SCORE" value={String(displayGags)} accent />
                   <MetricCard label="LESIONS" value={String(displayLesions)} />
@@ -836,7 +836,7 @@ const WorkspaceHeader = memo(function WorkspaceHeader({
       </div>
 
       <div className="holographic-panel flex items-center gap-4 rounded-2xl px-6 py-4">
-        <Shield className="h-5 w-5 text-cyan-400" />
+        <Shield aria-hidden="true" className="h-5 w-5 text-cyan-400" />
         <div>
           <div className="terminal-text text-[9px] text-cyan-400/80">RETENTION WINDOW</div>
           <div className="text-sm text-zinc-300">{retentionHours} hours</div>
@@ -874,12 +874,14 @@ function ProfileGuardBanner({
       </div>
       <div className="flex flex-wrap gap-3">
         <button
+          type="button"
           onClick={onReturnToProfile}
           className="rounded-full border border-amber-200/30 px-4 py-2 text-[11px] font-medium text-amber-50 hover:bg-amber-200/10"
         >
           Return to {profileGuard.sessionProfileId}
         </button>
         <button
+          type="button"
           onClick={onResetCase}
           className="rounded-full bg-amber-300 px-4 py-2 text-[11px] font-semibold text-black"
         >

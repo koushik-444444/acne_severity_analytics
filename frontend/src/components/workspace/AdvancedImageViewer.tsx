@@ -69,10 +69,11 @@ export function AdvancedImageViewer({
       <div className="pointer-events-none absolute left-4 top-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-400 backdrop-blur">
         zoom {state.scale.toFixed(2)}x
       </div>
-      <div className="pointer-events-none absolute left-4 bottom-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-400 backdrop-blur">
+      <div aria-hidden="true" className="pointer-events-none absolute left-4 bottom-4 z-10 rounded-full border border-white/10 bg-black/50 px-3 py-1 text-[10px] uppercase tracking-[0.25em] text-zinc-400 backdrop-blur">
         {cursor ? `x ${cursor.x.toFixed(0)} · y ${cursor.y.toFixed(0)}` : 'x -- · y --'}
       </div>
       <div
+        aria-hidden="true"
         className="absolute bottom-4 right-4 z-10 h-24 w-24 overflow-hidden rounded-lg border border-white/10 bg-black/60 backdrop-blur"
         onMouseDown={() => {
           minimapDragRef.current = true
@@ -84,7 +85,7 @@ export function AdvancedImageViewer({
       >
         {src ? (
           <>
-            <img src={src} alt="navigator" className="h-full w-full object-cover opacity-60" />
+            <img src={src} alt="" className="h-full w-full object-cover opacity-60" />
             <div
               className="absolute border border-cyan-300/80 bg-cyan-400/10"
               style={{
@@ -100,10 +101,19 @@ export function AdvancedImageViewer({
       </div>
       {src ? (
         <div
-          role="presentation"
+          role="application"
+          aria-label="Image viewer — drag to pan, double-click to reset"
+          tabIndex={0}
           onMouseDown={startDrag}
           onDoubleClick={() => onChange({ scale: 1, x: 0, y: 0 })}
-          className="flex h-full w-full cursor-grab items-center justify-center active:cursor-grabbing"
+          onKeyDown={(e) => {
+            const step = 20
+            if (e.key === 'ArrowLeft') { e.preventDefault(); onChange({ ...state, x: state.x + step }) }
+            else if (e.key === 'ArrowRight') { e.preventDefault(); onChange({ ...state, x: state.x - step }) }
+            else if (e.key === 'ArrowUp') { e.preventDefault(); onChange({ ...state, y: state.y + step }) }
+            else if (e.key === 'ArrowDown') { e.preventDefault(); onChange({ ...state, y: state.y - step }) }
+          }}
+          className="flex h-full w-full cursor-grab items-center justify-center focus:outline-none focus:ring-2 focus:ring-inset focus:ring-cyan-400/40 active:cursor-grabbing"
           onMouseMove={(event) => {
             onMove(event)
             const rect = event.currentTarget.getBoundingClientRect()
@@ -145,6 +155,8 @@ export function AdvancedImageViewer({
                       aria-label={`${lesion.region} lesion, confidence ${lesion.confidence.toFixed(2)}`}
                       onMouseEnter={() => onLesionHover?.(lesion.key)}
                       onMouseLeave={() => onLesionHover?.(null)}
+                      onFocus={() => onLesionHover?.(lesion.key)}
+                      onBlur={() => onLesionHover?.(null)}
                       className={`pointer-events-auto absolute border transition-all ${tone} ${isActive ? 'scale-[1.02] bg-cyan-400/10' : 'bg-transparent'}`}
                       style={{
                         left: `${pctLeft}%`,

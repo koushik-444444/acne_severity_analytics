@@ -24,8 +24,8 @@ export function PrivacyExportPanel({
   return (
     <div className="holographic-panel rounded-[1.75rem] p-6">
       <div className="mb-4 flex items-center gap-2">
-        <Shield className="h-4 w-4 text-cyan-400" />
-        <div className="terminal-text text-[10px] text-cyan-400/80">PRIVACY + EXPORT</div>
+        <Shield aria-hidden="true" className="h-4 w-4 text-cyan-400" />
+        <h3 className="terminal-text text-[10px] text-cyan-400/80">PRIVACY + EXPORT</h3>
       </div>
       <div className="space-y-3 text-sm text-zinc-400">
         <div>Privacy mode: {privacyMode ? 'enabled' : 'disabled'}</div>
@@ -33,7 +33,7 @@ export function PrivacyExportPanel({
         <div>Current session: {sessionId}</div>
       </div>
       <div className="mt-4 space-y-2">
-        <div className="terminal-text text-[9px] text-zinc-500">EXPORT PRESET</div>
+        <h4 className="terminal-text text-[9px] text-zinc-500">EXPORT PRESET</h4>
         <select
           value={exportPreset}
           onChange={(e) => onExportPresetChange(e.target.value as ExportPreset)}
@@ -47,6 +47,7 @@ export function PrivacyExportPanel({
       </div>
       <div className="mt-6 flex flex-wrap gap-3">
         <button
+          type="button"
           onClick={onExport}
           disabled={isExporting}
           className="terminal-text rounded-full border border-white/10 px-4 py-2 text-[10px] text-white transition-colors hover:border-cyan-400/20 hover:text-cyan-400 disabled:cursor-not-allowed disabled:opacity-50"
@@ -54,6 +55,7 @@ export function PrivacyExportPanel({
           {isExporting ? 'EXPORTING...' : `EXPORT ${exportPreset.toUpperCase()}`}
         </button>
         <button
+          type="button"
           onClick={onNewCase}
           className="terminal-text rounded-full bg-cyan-400 px-4 py-2 text-[10px] text-black"
         >
