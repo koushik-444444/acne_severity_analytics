@@ -218,17 +218,17 @@ class EnsembleLesionMapper(LesionMapper):
             severity_grade = self._get_severity_grade(class_name)
             type_source = 'direct' if _is_typed_label(class_name) else 'none'
 
-                ensemble_assignments[assigned_region].append({
-                    'bbox': [int(x1), int(y1), int(x2), int(y2)],
-                    'center': [int(cx), int(cy)],
-                    'confidence': float(s),
-                    'reliability_score': round(float(s), 3),
-                    'class_name': class_name,
-                    'severity_grade': severity_grade,
-                    'type_source': type_source,
-                    'confidence_level': 'Statistically Verified',
-                    'votes': 1,
-                })
+            ensemble_assignments[assigned_region].append({
+                'bbox': [int(x1), int(y1), int(x2), int(y2)],
+                'center': [int(cx), int(cy)],
+                'confidence': float(s),
+                'reliability_score': round(float(s), 3),
+                'class_name': class_name,
+                'severity_grade': severity_grade,
+                'type_source': type_source,
+                'confidence_level': 'Statistically Verified',
+                'votes': 1,
+            })
 
         # 5. Proximity-based type propagation
         # For any surviving detection still carrying a generic label,
