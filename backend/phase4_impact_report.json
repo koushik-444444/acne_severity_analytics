@@ -1,0 +1,132 @@
+{
+  "generated_at": "2026-03-09T13:43:00.880413",
+  "description": "Phase 4 impact analysis \u2014 quantifying three pipeline optimizations",
+  "benchmark_source": "validation_benchmark_50.json",
+  "baseline_source": "metrics_baseline.json",
+  "images_analyzed": 50,
+  "validation_accuracy": {
+    "precision": 0.1957,
+    "recall": 0.0497,
+    "f1_score": 0.0793,
+    "mean_iou": 0.6869,
+    "tp": 9,
+    "fp": 37,
+    "fn": 172
+  },
+  "optimizations": {
+    "opt1_model_b_413_fix": {
+      "description": "Model B 413 error elimination via MAX_MODEL_B_DIM=1280 + JPEG_QUALITY=85",
+      "post_phase4": {
+        "total_images": 50,
+        "model_b_failures": 0,
+        "model_b_successes": 50,
+        "success_rate": "100.0%",
+        "images_with_detections": 49,
+        "total_detections": 478,
+        "mean_latency_ms": 1875.3
+      },
+      "pre_phase4_reference": {
+        "model_b_api_calls": 14,
+        "total_api_calls": 41,
+        "note": "Pre-Phase 4 had frequent 413 errors on high-res images; exact failure count not tracked in api_usage_log (only successes logged)"
+      },
+      "impact": "0 Model B failures across 50 images \u2014 413 errors fully eliminated"
+    },
+    "opt2_dual_scale_a_removal": {
+      "description": "Redundant 640px Model A pass removed (ENABLE_DUAL_SCALE_A=false)",
+      "post_phase4": {
+        "model_a_640_calls": 0,
+        "model_a_640_detections": 0,
+        "model_a_1280_calls": 50,
+        "model_a_1280_detections": 240,
+        "model_a_1280_mean_latency_ms": 2113.7,
+        "confirmation": "model_a_640 fully disabled \u2014 0 calls, 0 detections"
+      },
+      "pre_phase4_reference": {
+        "model_a_640_detections_per_session": [
+          76,
+          74
+        ],
+        "model_a_1280_detections_per_session": [
+          28,
+          24
+        ],
+        "total_model_a_api_calls": 27,
+        "note": "Pre-Phase 4 made ~2 Model A calls per image (640+1280). 640px produced avg 75 dets/session vs 1280px avg 26"
+      },
+      "impact": {
+        "api_calls_saved_per_image": 1,
+        "api_calls_saved_50_images": 50,
+        "estimated_latency_savings_ms": 2114.0,
+        "note": "Savings realized as reduced API cost (1 fewer call per image). Wall-clock savings depend on parallelism \u2014 since Model A 640 ran in parallel with Model A 1280 + Model B, actual time savings are modest but API cost is halved for Model A."
+      }
+    },
+    "opt3_proximity_propagation": {
+      "description": "Spatial proximity type propagation \u2014 Model A lesions inherit acne-type labels from nearby Model B detections",
+      "post_phase4": {
+        "total_lesions_post_gating": 46,
+        "proximity_propagated_total": 4,
+        "images_with_propagation": 4,
+        "images_total": 50,
+        "propagation_rate": "8.0%",
+        "type_coverage": {
+          "direct_from_model_b": 32,
+          "via_proximity": 4,
+          "untyped": 10,
+          "total": 46
+        },
+        "type_coverage_percentages": {
+          "direct": "69.6%",
+          "proximity": "8.7%",
+          "untyped": "21.7%"
+        }
+      },
+      "impact": {
+        "lesions_gained_type_labels": 4,
+        "coverage_improvement": "4 lesions that would have been untyped now have acne-type labels for accurate GAGS scoring",
+        "note": "Low propagation count expected: most validation images are AI-generated and MediaPipe cannot detect faces, limiting region-based gating to parsing-only fallback. Real clinical photos would show higher propagation rates."
+      }
+    }
+  },
+  "pipeline_efficiency": {
+    "detection_funnel": {
+      "raw_detections": 718,
+      "post_nms": 591,
+      "nms_reduction": 127,
+      "nms_reduction_pct": "17.7%",
+      "post_gating": 46,
+      "gating_reduction": 545,
+      "gating_reduction_pct": "92.2%",
+      "overall_reduction": "93.6%"
+    },
+    "timing_ms": {
+      "segmentation_mean": 306.2,
+      "cloud_mean": 5339.1,
+      "mapping_mean": 24.1,
+      "total_mean": 5687.8,
+      "cloud_wall_mean": 5339.0
+    },
+    "api_calls_per_image": {
+      "model_a_1280": 1,
+      "model_b": 1,
+      "total": 2,
+      "pre_phase4_total": 3,
+      "savings": "33% fewer API calls per image (3 to 2)"
+    },
+    "streams_active": [
+      "model_a_1280",
+      "model_b"
+    ],
+    "streams_disabled": [
+      "model_a_640"
+    ]
+  },
+  "summary": {
+    "model_b_413_errors": "0 failures across 50 images (eliminated)",
+    "api_calls_saved": "50 calls saved (1 per image x 50 images)",
+    "api_cost_reduction": "33% fewer Model A calls (dual-scale to single-scale)",
+    "type_propagation": "4 lesions gained acne-type labels via proximity",
+    "type_coverage": "69.6% direct + 8.7% proximity = 78.3% typed (21.7% untyped)",
+    "detection_funnel": "718 raw to 591 post-NMS to 46 post-gating (93.6% overall reduction)"
+  }
+}

@@ -172,3 +172,44 @@ export type HistoryPage = {
   items: SessionSummary[]
   next_cursor?: string | null
 }
+
+export type LatencyStats = {
+  count: number
+  mean_ms: number
+  min_ms: number
+  max_ms: number
+  p50_ms: number
+  p95_ms: number
+}
+
+export type MetricsResponse = {
+  api_usage: {
+    total_calls: number
+    calls_by_model: Record<string, number>
+    calls_by_status: Record<string, number>
+    latency_stats: LatencyStats | null
+    error_rate: number
+    recent_errors: Array<{ timestamp: string; model: string; error: string | null }>
+  }
+  session_stats: {
+    total_sessions: number
+    sessions_with_results: number
+    detection_counts: { mean: number | null; min: number | null; max: number | null }
+    gags_scores: { mean: number | null; min: number | null; max: number | null }
+  }
+  timing: {
+    local_pipeline: Record<string, number | null>
+    cloud_inference: Record<string, number | null>
+    sample_count: number
+  }
+  pipeline_metrics: {
+    sample_count: number
+    total_raw_detections: number
+    total_post_nms: number
+    total_post_gating: number
+    total_proximity_propagated: number
+    nms_reduction_pct: number | null
+    gating_reduction_pct: number | null
+    type_coverage_aggregate: Record<string, number>
+  } | null
+}

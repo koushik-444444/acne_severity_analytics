@@ -1,0 +1,239 @@
+{
+  "generated_at": "2026-03-09T13:07:52.445960",
+  "description": "Pre-Phase 5 metrics baseline mined from existing data",
+  "sessions": {
+    "session_count": 3,
+    "sessions": [
+      {
+        "session_id": "b1b67892-2037-4ad5-acd0-96bbf3c8ddbe",
+        "timestamp": "2026-03-06T18:56:05.176579",
+        "severity": "Mild",
+        "gags_score": 18,
+        "lesion_count": 73,
+        "symmetry_delta": 43.6,
+        "schema_version": "v1",
+        "schema_keys": [
+          "total_face_pixels",
+          "regions",
+          "timing_ms",
+          "clinical_analysis",
+          "lesions"
+        ],
+        "timing_ms": {
+          "bisenet": 1039.1681999899447,
+          "landmarks": 80.95219999086112,
+          "geometry": 36.46109998226166,
+          "combine": 101.76819993648678,
+          "total": 1258.3496998995543
+        },
+        "total_lesions": 73,
+        "clinical_gags": null,
+        "clinical_severity": null
+      },
+      {
+        "session_id": "308ed4e94cbc496abc1f428f35121470",
+        "timestamp": "2026-03-06T16:41:07.366573+00:00",
+        "severity": "Mild",
+        "gags_score": 8,
+        "lesion_count": 2,
+        "symmetry_delta": 5.6,
+        "schema_version": "v2",
+        "schema_keys": [
+          "total_face_pixels",
+          "regions",
+          "timing_ms",
+          "timestamp",
+          "session_id",
+          "privacy_mode",
+          "retention_hours",
+          "clinical_analysis",
+          "lesions",
+          "consensus_summary",
+          "cloud_results",
+          "source_stream_provenance"
+        ],
+        "timing_ms": {
+          "bisenet": 1747.0377000281587,
+          "landmarks": 207.1089999517426,
+          "geometry": 100.78589990735054,
+          "combine": 236.50619992986321,
+          "total": 2291.438799817115
+        },
+        "total_lesions": 2,
+        "clinical_gags": null,
+        "clinical_severity": null,
+        "cloud_detections": {
+          "preds_a_640": 76,
+          "preds_a_1280": 28,
+          "preds_b": 13
+        },
+        "model_b_class_distribution": {
+          "pustules": 7,
+          "blackheads": 1,
+          "papules": 3,
+          "nodules": 2
+        },
+        "consensus_summary": {
+          "verified_lesions": 2,
+          "average_confidence": 0.323,
+          "top_regions": [
+            {
+              "region": "left_cheek",
+              "count": 1
+            },
+            {
+              "region": "right_cheek",
+              "count": 1
+            }
+          ],
+          "region_counts": {
+            "left_cheek": 1,
+            "right_cheek": 1
+          },
+          "unassigned_count": 0,
+          "summary": "2 verified lesions concentrated in left_cheek, right_cheek"
+        },
+        "source_stream_provenance": {
+          "streams": {
+            "model_a_640": 76,
+            "model_a_1280": 28,
+            "model_b_native": 13
+          },
+          "strongest_stream": "model_a_640",
+          "stream_total": 117
+        }
+      },
+      {
+        "session_id": "62b99b67dfc0421ea50f424fa9f45038",
+        "timestamp": "2026-03-06T16:54:58.923441+00:00",
+        "severity": "None",
+        "gags_score": 0,
+        "lesion_count": 0,
+        "symmetry_delta": 0.0,
+        "schema_version": "v2",
+        "schema_keys": [
+          "total_face_pixels",
+          "regions",
+          "timing_ms",
+          "timestamp",
+          "session_id",
+          "privacy_mode",
+          "retention_hours",
+          "clinical_analysis",
+          "lesions",
+          "consensus_summary",
+          "cloud_results",
+          "source_stream_provenance"
+        ],
+        "timing_ms": {
+          "bisenet": 1181.698999949731,
+          "landmarks": 147.18189998529851,
+          "geometry": 76.32330001797527,
+          "combine": 121.31820002105087,
+          "total": 1526.5223999740556
+        },
+        "total_lesions": 0,
+        "clinical_gags": null,
+        "clinical_severity": null,
+        "cloud_detections": {
+          "preds_a_640": 74,
+          "preds_a_1280": 24,
+          "preds_b": 0
+        },
+        "model_b_class_distribution": {},
+        "consensus_summary": {
+          "verified_lesions": 0,
+          "average_confidence": 0.0,
+          "top_regions": [],
+          "region_counts": {},
+          "unassigned_count": 0,
+          "summary": "No verified lesions detected"
+        },
+        "source_stream_provenance": {
+          "streams": {
+            "model_a_640": 74,
+            "model_a_1280": 24,
+            "model_b_native": 0
+          },
+          "strongest_stream": "model_a_640",
+          "stream_total": 98
+        }
+      }
+    ],
+    "timing_averages": {
+      "bisenet": {
+        "mean_ms": 1322.63,
+        "min_ms": 1039.17,
+        "max_ms": 1747.04,
+        "count": 3
+      },
+      "combine": {
+        "mean_ms": 153.2,
+        "min_ms": 101.77,
+        "max_ms": 236.51,
+        "count": 3
+      },
+      "geometry": {
+        "mean_ms": 71.19,
+        "min_ms": 36.46,
+        "max_ms": 100.79,
+        "count": 3
+      },
+      "landmarks": {
+        "mean_ms": 145.08,
+        "min_ms": 80.95,
+        "max_ms": 207.11,
+        "count": 3
+      },
+      "total": {
+        "mean_ms": 1692.1,
+        "min_ms": 1258.35,
+        "max_ms": 2291.44,
+        "count": 3
+      }
+    },
+    "detection_stats": {
+      "lesion_counts": [
+        73,
+        2,
+        0
+      ],
+      "mean_lesions": 25.0,
+      "gags_scores": [],
+      "mean_gags": null
+    },
+    "cloud_stats": {
+      "model_a_detections": {
+        "mean": 50.5,
+        "values": [
+          76,
+          28,
+          74,
+          24
+        ]
+      },
+      "model_b_detections": {
+        "mean": 6.5,
+        "values": [
+          13,
+          0
+        ]
+      }
+    }
+  },
+  "api_usage": {
+    "total_calls": 41,
+    "entries_in_history": 41,
+    "model_breakdown": {
+      "acne-project-2auvb/acne-detection-v2/1": 14,
+      "runner-e0dmy/acne-ijcab/2": 27
+    },
+    "status_breakdown": {
+      "success": 41
+    },
+    "time_range": {
+      "first": "2026-03-06T08:36:16.288793",
+      "last": "2026-03-06T22:24:58.774178"
+    }
+  }
+}

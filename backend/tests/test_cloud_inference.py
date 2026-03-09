@@ -93,9 +93,9 @@ class TestFetchMultiScaleConsensus:
         """Call fetch_multi_scale_consensus with _fetch_single_scale mocked."""
         dummy_image = np.zeros((100, 100, 3), dtype=np.uint8)
 
-        # Mock _fetch_single_scale to return a recognisable list
+        # Mock _fetch_single_scale to return a recognisable tuple
         def side_effect(image, model_id, target_dim):
-            return [{'model': model_id, 'dim': target_dim}]
+            return [{'model': model_id, 'dim': target_dim}], 100.0, 5000
 
         with patch.object(engine, '_fetch_single_scale', side_effect=side_effect) as mock_fetch:
             result = engine.fetch_multi_scale_consensus(dummy_image, model_a, model_b)
@@ -145,7 +145,7 @@ class TestFetchMultiScaleConsensus:
             call_count[0] += 1
             if target_dim == 640:
                 raise RuntimeError('Simulated 413 error')
-            return [{'model': model_id, 'dim': target_dim}]
+            return [{'model': model_id, 'dim': target_dim}], 100.0, 5000
 
         with patch.object(engine, '_fetch_single_scale', side_effect=side_effect):
             result = engine.fetch_multi_scale_consensus(dummy_image, MODEL_A, MODEL_B)
@@ -157,17 +157,41 @@ class TestFetchMultiScaleConsensus:
         assert len(result['preds_b']) == 1
 
     def test_all_keys_always_present(self):
-        """Return dict always has preds_a_640, preds_a_1280, preds_b keys."""
+        """Return dict always has preds_a_640, preds_a_1280, preds_b, _timing, _file_sizes."""
         for dual in ('true', 'false'):
             engine = _make_engine(ENABLE_DUAL_SCALE_A=dual)
             dummy_image = np.zeros((100, 100, 3), dtype=np.uint8)
 
-            with patch.object(engine, '_fetch_single_scale', return_value=[]):
+            with patch.object(engine, '_fetch_single_scale', return_value=([], 0.0, 0)):
                 result = engine.fetch_multi_scale_consensus(dummy_image, MODEL_A, MODEL_B)
 
             assert 'preds_a_640' in result
             assert 'preds_a_1280' in result
             assert 'preds_b' in result
+            assert '_timing' in result
+            assert '_file_sizes' in result
+            assert 'total_wall_ms' in result['_timing']
+
+    def test_timing_captures_per_task_latency(self):
+        """Timing dict reports per-task latency from _fetch_single_scale."""
+        engine = _make_engine(ENABLE_DUAL_SCALE_A='true')
+        result, _ = self._run_consensus(engine)
+
+        timing = result['_timing']
+        assert timing['model_a_640_ms'] == 100.0
+        assert timing['model_a_1280_ms'] == 100.0
+        assert timing['model_b_ms'] == 100.0
+        assert timing['total_wall_ms'] > 0
+
+    def test_file_sizes_captures_upload_bytes(self):
+        """File sizes dict reports JPEG bytes from _fetch_single_scale."""
+        engine = _make_engine(ENABLE_DUAL_SCALE_A='false')
+        result, _ = self._run_consensus(engine)
+
+        sizes = result['_file_sizes']
+        assert sizes['model_a_640_bytes'] is None  # dual-scale disabled
+        assert sizes['model_a_1280_bytes'] == 5000
+        assert sizes['model_b_bytes'] == 5000
 
 
 # ---------------------------------------------------------------------------
@@ -198,17 +222,20 @@ class TestFetchSingleScale:
         large_image = np.zeros((1000, 1000, 3), dtype=np.uint8)
 
         from cloud_inference import SCALED_CONFIDENCE
-        result = engine._fetch_single_scale(large_image, MODEL_A, 640)
+        preds, elapsed_ms, upload_bytes = engine._fetch_single_scale(large_image, MODEL_A, 640)
 
         # Should have predictions with re-scaled coords
-        assert len(result) == 1
+        assert len(preds) == 1
         # Coords should be scaled back: 50 / (640/1000) = 78.125
         scale = 640 / 1000
-        assert abs(result[0]['x'] - 50 / scale) < 0.1
+        assert abs(preds[0]['x'] - 50 / scale) < 0.1
         # Model was called with scaled confidence
         mock_model.predict.assert_called_once()
         call_args = mock_model.predict.call_args
         assert call_args[1]['confidence'] == SCALED_CONFIDENCE
+        # Timing should be a positive number
+        assert elapsed_ms >= 0
+        assert isinstance(upload_bytes, int)
 
     @patch('cloud_inference.log_api_call')
     @patch('cloud_inference.os.remove')
@@ -218,14 +245,16 @@ class TestFetchSingleScale:
         small_image = np.zeros((500, 500, 3), dtype=np.uint8)
 
         from cloud_inference import NATIVE_CONFIDENCE
-        result = engine._fetch_single_scale(small_image, MODEL_A, 1280)
+        preds, elapsed_ms, upload_bytes = engine._fetch_single_scale(small_image, MODEL_A, 1280)
 
-        assert len(result) == 1
+        assert len(preds) == 1
         # Coords should NOT be re-scaled
-        assert result[0]['x'] == 50
+        assert preds[0]['x'] == 50
         # Model was called with native confidence
         call_args = mock_model.predict.call_args
         assert call_args[1]['confidence'] == NATIVE_CONFIDENCE
+        assert elapsed_ms >= 0
+        assert isinstance(upload_bytes, int)
 
     @patch('cloud_inference.log_api_call')
     @patch('cloud_inference.os.remove')

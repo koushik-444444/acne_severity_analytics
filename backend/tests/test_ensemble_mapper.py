@@ -116,8 +116,14 @@ class TestEnsembleClassLabels:
         result = mapper.ensemble_map_multi_scale(
             [], [], [], (200, 200), image=None,
         )
-        total = sum(len(items) for items in result.values())
+        total = sum(
+            len(items) for k, items in result.items()
+            if k != '_pipeline_metrics' and isinstance(items, list)
+        )
         assert total == 0
+        # Pipeline metrics should still be present
+        assert '_pipeline_metrics' in result
+        assert result['_pipeline_metrics']['raw_detections'] == 0
 
     def test_missing_class_key_defaults_to_acne(self):
         """Prediction without a 'class' key should default to 'acne'."""
@@ -183,11 +189,70 @@ class TestTypeSourceField:
             preds_a, [], preds_b, (200, 200), image=None,
         )
         for region, dets in result.items():
+            if region == '_pipeline_metrics':
+                continue
             for det in dets:
                 assert 'type_source' in det, f'Missing type_source in {region}'
 
 
-# --- Proximity propagation ---
+# --- Pipeline Metrics ---
+
+class TestPipelineMetrics:
+    def test_pipeline_metrics_present(self):
+        """ensemble_map_multi_scale always includes _pipeline_metrics."""
+        mapper = _make_ensemble_mapper()
+        preds_a = [_rf_pred(25, 100, 20, 20, 0.8, 'Acne')]
+        preds_b = [_rf_pred(75, 100, 20, 20, 0.7, 'pustule')]
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], preds_b, (200, 200), image=None,
+        )
+        assert '_pipeline_metrics' in result
+        pm = result['_pipeline_metrics']
+        assert 'raw_detections' in pm
+        assert 'raw_by_stream' in pm
+        assert 'post_nms' in pm
+        assert 'post_gating' in pm
+        assert 'proximity_propagated' in pm
+        assert 'type_coverage' in pm
+
+    def test_raw_counts_correct(self):
+        """raw_detections equals sum of all input predictions."""
+        mapper = _make_ensemble_mapper()
+        preds_a_640 = [_rf_pred(25, 100, 20, 20, 0.7, 'Acne')]
+        preds_a_1280 = [
+            _rf_pred(25, 100, 20, 20, 0.8, 'Acne'),
+            _rf_pred(75, 100, 20, 20, 0.6, 'Acne'),
+        ]
+        preds_b = [_rf_pred(75, 100, 20, 20, 0.9, 'pustule')]
+        result = mapper.ensemble_map_multi_scale(
+            preds_a_640, preds_a_1280, preds_b, (200, 200), image=None,
+        )
+        pm = result['_pipeline_metrics']
+        assert pm['raw_detections'] == 4
+        assert pm['raw_by_stream']['model_a_640'] == 1
+        assert pm['raw_by_stream']['model_a_1280'] == 2
+        assert pm['raw_by_stream']['model_b'] == 1
+
+    def test_post_gating_less_than_or_equal_post_nms(self):
+        """Post-gating count should never exceed post-NMS count."""
+        mapper = _make_ensemble_mapper()
+        preds_a = [_rf_pred(25, 100, 20, 20, 0.8, 'Acne')]
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], [], (200, 200), image=None,
+        )
+        pm = result['_pipeline_metrics']
+        assert pm['post_gating'] <= pm['post_nms']
+
+    def test_type_coverage_sums_to_post_gating(self):
+        """type_coverage values should sum to post_gating count."""
+        mapper = _make_ensemble_mapper()
+        preds_a = [_rf_pred(25, 100, 20, 20, 0.8, 'Acne')]
+        preds_b = [_rf_pred(75, 100, 20, 20, 0.7, 'pustule')]
+        result = mapper.ensemble_map_multi_scale(
+            preds_a, [], preds_b, (200, 200), image=None,
+        )
+        pm = result['_pipeline_metrics']
+        assert sum(pm['type_coverage'].values()) == pm['post_gating']
 
 class TestProximityPropagation:
     def test_nearby_generic_gets_typed_label(self):

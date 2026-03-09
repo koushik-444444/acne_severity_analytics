@@ -3,6 +3,7 @@ import type {
   AnalyzeResponse,
   ComparePayload,
   HistoryPage,
+  MetricsResponse,
   PrivacyConfig,
   ProfileSummary,
   SessionDetail,
@@ -133,4 +134,6 @@ export const api = {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ note }),
     }),
+
+  getMetrics: () => request<MetricsResponse>('/metrics'),
 }

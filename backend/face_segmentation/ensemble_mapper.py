@@ -100,7 +100,23 @@ class EnsembleLesionMapper(LesionMapper):
         all_raw_scores = s_a1 + s_a2 + s_b
         all_raw_classes = c_a1 + c_a2 + c_b
 
+        # Track pipeline metrics at each stage
+        raw_count = len(all_raw_scores)
+        raw_by_stream = {
+            'model_a_640': len(b_a1),
+            'model_a_1280': len(b_a2),
+            'model_b': len(b_b),
+        }
+
         if not all_raw_scores:
+            ensemble_assignments['_pipeline_metrics'] = {
+                'raw_detections': 0,
+                'raw_by_stream': raw_by_stream,
+                'post_nms': 0,
+                'post_gating': 0,
+                'proximity_propagated': 0,
+                'type_coverage': {'direct': 0, 'proximity': 0, 'none': 0},
+            }
             return ensemble_assignments
 
         # Build typed-source list from raw Model B predictions for
@@ -138,6 +154,7 @@ class EnsembleLesionMapper(LesionMapper):
                 best_class_for_kept[i] = all_raw_classes[i]
 
         # 4. Statistical Gating Loop
+        post_nms_count = len(keep_indices)
         for idx in keep_indices:
             b = all_raw_boxes[idx]
             s = all_raw_scores[idx]
@@ -202,6 +219,31 @@ class EnsembleLesionMapper(LesionMapper):
             self._propagate_types_by_proximity(
                 ensemble_assignments, typed_sources, H, W,
             )
+
+        # 6. Compute pipeline metrics
+        type_coverage = {'direct': 0, 'proximity': 0, 'none': 0}
+        post_gating_count = 0
+        for rname, dets in ensemble_assignments.items():
+            if rname in ('unassigned', '_pipeline_metrics'):
+                continue
+            for det in dets:
+                post_gating_count += 1
+                ts = det.get('type_source', 'none')
+                if ts in type_coverage:
+                    type_coverage[ts] += 1
+                else:
+                    type_coverage[ts] = 1
+
+        proximity_propagated = type_coverage.get('proximity', 0)
+
+        ensemble_assignments['_pipeline_metrics'] = {
+            'raw_detections': raw_count,
+            'raw_by_stream': raw_by_stream,
+            'post_nms': post_nms_count,
+            'post_gating': post_gating_count,
+            'proximity_propagated': proximity_propagated,
+            'type_coverage': type_coverage,
+        }
 
         return ensemble_assignments
 

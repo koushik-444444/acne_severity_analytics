@@ -24,6 +24,7 @@ from reportlab.pdfgen import canvas
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from slowapi.util import get_remote_address
+from usage_tracker import get_usage_summary
 
 logger = logging.getLogger(__name__)
 
@@ -399,14 +400,20 @@ def decode_image(payload: bytes) -> np.ndarray:
 
 
 def consensus_summary(assignments: Dict[str, List[Dict[str, Any]]]) -> Dict[str, Any]:
+    # Filter out internal metadata keys (e.g. _pipeline_metrics) that are
+    # not region->lesion-list mappings.
+    region_assignments = {
+        k: v for k, v in assignments.items()
+        if not k.startswith('_') and isinstance(v, list)
+    }
     region_counts = {
         region: len(items)
-        for region, items in assignments.items()
+        for region, items in region_assignments.items()
         if region != 'unassigned' and items
     }
     confidence_values = [
         item.get('confidence', 0.0)
-        for items in assignments.values()
+        for items in region_assignments.values()
         for item in items
     ]
     total = sum(region_counts.values())
@@ -417,7 +424,7 @@ def consensus_summary(assignments: Dict[str, List[Dict[str, Any]]]) -> Dict[str,
 
     # Build flat lesion list with region tag for the frontend
     lesions: List[Dict[str, Any]] = []
-    for region, items in assignments.items():
+    for region, items in region_assignments.items():
         if region == 'unassigned':
             continue
         for item in items:
@@ -436,7 +443,7 @@ def consensus_summary(assignments: Dict[str, List[Dict[str, Any]]]) -> Dict[str,
         else 0.0,
         'top_regions': [{'region': name, 'count': count} for name, count in top_regions],
         'region_counts': region_counts,
-        'unassigned_count': len(assignments.get('unassigned', [])),
+        'unassigned_count': len(region_assignments.get('unassigned', [])),
         'summary': summary,
         'lesions': lesions,
         'type_counts': type_counts,
@@ -832,6 +839,39 @@ class BridgeStore:
         ]
         next_cursor = page_rows[-1]['timestamp'] if has_next else None
         return items, next_cursor
+
+    def list_sessions(self, limit: int = 1000) -> List[Dict[str, Any]]:
+        """Return lightweight session dicts with parsed results for metrics.
+
+        Unlike ``history()`` this includes ``results_json`` (parsed) but
+        skips image data-URI generation for performance.
+
+        Args:
+            limit: Maximum number of sessions to return.
+
+        Returns:
+            List of dicts with session_id, timestamp, and parsed results.
+        """
+        with self.lock:
+            rows = self.conn.execute(
+                'SELECT session_id, timestamp, results_json '
+                'FROM sessions ORDER BY timestamp DESC LIMIT ?',
+                (limit,),
+            ).fetchall()
+        items: List[Dict[str, Any]] = []
+        for row in rows:
+            results = None
+            if row['results_json']:
+                try:
+                    results = json.loads(row['results_json'])
+                except (json.JSONDecodeError, TypeError):
+                    pass
+            items.append({
+                'session_id': row['session_id'],
+                'timestamp': row['timestamp'],
+                'results': results,
+            })
+        return items
 
     def purge(self, session_id: str) -> bool:
         row = self.get_session_row(session_id)
@@ -1550,6 +1590,114 @@ async def export(session_id: str, request: ExportRequest) -> Dict[str, Any]:
     return payload
 
 
+@app.get('/metrics')
+async def metrics() -> Dict[str, Any]:
+    """Aggregated system metrics: API usage, pipeline timing, detection stats.
+
+    Returns:
+        Dict with api_usage, session_stats, and timing_averages.
+    """
+    store = get_store()
+
+    # --- API usage from usage_tracker ---
+    api_usage = get_usage_summary()
+
+    # --- Session statistics from sessions.db ---
+    sessions = store.list_sessions(limit=1000)
+    session_count = len(sessions)
+    timing_samples = []
+    cloud_timing_samples = []
+    pipeline_metrics_samples = []
+    detection_counts = []
+    gags_scores = []
+
+    for sess in sessions:
+        results = sess.get('results')
+        if not results:
+            continue
+        # Local pipeline timing
+        timing_ms = results.get('timing_ms', {})
+        if timing_ms:
+            timing_samples.append(timing_ms)
+        # Cloud timing (Phase 5 instrumented)
+        cloud_timing = results.get('cloud_timing', {})
+        if cloud_timing:
+            cloud_timing_samples.append(cloud_timing)
+        # Pipeline metrics (Phase 5 instrumented)
+        pm = results.get('pipeline_metrics', {})
+        if pm:
+            pipeline_metrics_samples.append(pm)
+        # Clinical analysis
+        ca = results.get('clinical_analysis', {})
+        total_lesions = ca.get('total_lesions')
+        if total_lesions is not None:
+            detection_counts.append(total_lesions)
+        gags = ca.get('gags_score')
+        if gags is not None:
+            gags_scores.append(gags)
+
+    # Compute timing averages
+    def _avg_timing(samples: list, keys: list) -> Dict[str, Optional[float]]:
+        result = {}
+        for k in keys:
+            vals = [s[k] for s in samples if k in s and s[k] is not None]
+            result[f'{k}_mean'] = round(sum(vals) / len(vals), 1) if vals else None
+        return result
+
+    local_timing_avg = _avg_timing(timing_samples, [
+        'bisenet', 'landmarks', 'geometry', 'combine', 'total',
+    ])
+    cloud_timing_avg = _avg_timing(cloud_timing_samples, [
+        'model_a_1280_ms', 'model_b_ms', 'total_wall_ms',
+    ])
+
+    # Aggregate pipeline metrics
+    agg_pipeline = None
+    if pipeline_metrics_samples:
+        total_raw = sum(pm.get('raw_detections', 0) for pm in pipeline_metrics_samples)
+        total_nms = sum(pm.get('post_nms', 0) for pm in pipeline_metrics_samples)
+        total_gated = sum(pm.get('post_gating', 0) for pm in pipeline_metrics_samples)
+        total_prox = sum(pm.get('proximity_propagated', 0) for pm in pipeline_metrics_samples)
+        agg_coverage = {}
+        for pm in pipeline_metrics_samples:
+            for k, v in pm.get('type_coverage', {}).items():
+                agg_coverage[k] = agg_coverage.get(k, 0) + v
+        agg_pipeline = {
+            'sample_count': len(pipeline_metrics_samples),
+            'total_raw_detections': total_raw,
+            'total_post_nms': total_nms,
+            'total_post_gating': total_gated,
+            'total_proximity_propagated': total_prox,
+            'nms_reduction_pct': round((1 - total_nms / total_raw) * 100, 1) if total_raw > 0 else None,
+            'gating_reduction_pct': round((1 - total_gated / total_nms) * 100, 1) if total_nms > 0 else None,
+            'type_coverage_aggregate': agg_coverage,
+        }
+
+    return {
+        'api_usage': api_usage,
+        'session_stats': {
+            'total_sessions': session_count,
+            'sessions_with_results': len(timing_samples),
+            'detection_counts': {
+                'mean': round(sum(detection_counts) / len(detection_counts), 1) if detection_counts else None,
+                'min': min(detection_counts) if detection_counts else None,
+                'max': max(detection_counts) if detection_counts else None,
+            },
+            'gags_scores': {
+                'mean': round(sum(gags_scores) / len(gags_scores), 1) if gags_scores else None,
+                'min': min(gags_scores) if gags_scores else None,
+                'max': max(gags_scores) if gags_scores else None,
+            },
+        },
+        'timing': {
+            'local_pipeline': local_timing_avg,
+            'cloud_inference': cloud_timing_avg,
+            'sample_count': len(timing_samples),
+        },
+        'pipeline_metrics': agg_pipeline,
+    }
+
+
 @app.post('/analyze', response_model=AnalyzeResultResponse)
 @limiter.limit('10/minute')
 async def analyze(
@@ -1632,6 +1780,17 @@ async def analyze(
         analysis_results['consensus_summary'] = consensus_summary(assignments)
         analysis_results['cloud_results'] = cloud_results
         analysis_results['source_stream_provenance'] = summarize_stream_provenance(cloud_results)
+
+        # Phase 5 instrumentation: capture cloud timing and pipeline metrics
+        cloud_timing = cloud_results.get('_timing')
+        if cloud_timing:
+            analysis_results['cloud_timing'] = cloud_timing
+        cloud_file_sizes = cloud_results.get('_file_sizes')
+        if cloud_file_sizes:
+            analysis_results['cloud_file_sizes'] = cloud_file_sizes
+        pipeline_metrics = assignments.get('_pipeline_metrics')
+        if pipeline_metrics:
+            analysis_results['pipeline_metrics'] = pipeline_metrics
 
         managed_original = absolute_managed_path(original_path)
         managed_diagnostic = absolute_managed_path(diagnostic_path)
