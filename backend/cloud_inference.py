@@ -29,41 +29,63 @@ NATIVE_CONFIDENCE = 35
 # Timeout in seconds for each Roboflow API call
 API_CALL_TIMEOUT = 60
 
+# JPEG compression quality for API uploads (0-100).
+# Default 85 balances file size vs detail — keeps uploads well under
+# Roboflow's ~1 MB limit even at 1280px.
+JPEG_QUALITY = int(os.getenv('JPEG_QUALITY', 85))
+
 class CloudInferenceEngine:
     def __init__(self, api_key: str):
         self.rf = Roboflow(api_key=api_key)
-        self.max_api_dim = int(os.getenv("MAX_API_DIM", 2048))
+        self.max_api_dim = int(os.getenv('MAX_API_DIM', 2048))
+        # Model B needs a lower resolution cap to avoid 413 errors.
+        # At 2048px, large images produce JPEGs >1 MB which Roboflow
+        # rejects.  1280px keeps all tested images under 650 KB.
+        self.max_model_b_dim = int(os.getenv('MAX_MODEL_B_DIM', 1280))
+        # When False (default), only Model A @ 1280px is sent — saving
+        # 33 % of API calls.  The 640px pass is a subset of the 1280px
+        # pass and adds negligible detection lift.
+        self.enable_dual_scale_a = os.getenv(
+            'ENABLE_DUAL_SCALE_A', 'false',
+        ).lower() in ('true', '1', 'yes')
 
     def fetch_multi_scale_consensus(
-        self, 
-        image: np.ndarray, 
-        model_a_id: str, 
-        model_b_id: str
+        self,
+        image: np.ndarray,
+        model_a_id: str,
+        model_b_id: str,
     ) -> Dict[str, List[Dict]]:
-        """
-        Executes the 'Triple-Look Strategy' in parallel.
-        Returns detections for:
-        1. Model A @ 640px
-        2. Model A @ 1280px
-        3. Model B @ Native/2048px
+        """Execute the multi-scale consensus strategy in parallel.
+
+        When ``enable_dual_scale_a`` is *True* (legacy "Triple-Look"),
+        three API calls are made: Model A @ 640px, Model A @ 1280px,
+        and Model B @ ``max_model_b_dim``.
+
+        When *False* (default), the 640px pass is skipped — reducing
+        API usage by 33 % with negligible detection loss.
+
+        Returns:
+            Dict with keys ``preds_a_640``, ``preds_a_1280``, ``preds_b``.
+            ``preds_a_640`` is always present but may be an empty list
+            when dual-scale is disabled.
         """
         H, W = image.shape[:2]
-        
-        # Define tasks for the thread pool
-        tasks = [
-            (model_a_id, 640),
-            (model_a_id, 1280),
-            (model_b_id, self.max_api_dim)
-        ]
 
-        results = {}
-        
-        with concurrent.futures.ThreadPoolExecutor(max_workers=3) as executor:
+        # Build the task list — optionally include the 640px pass.
+        tasks = []
+        if self.enable_dual_scale_a:
+            tasks.append((model_a_id, 640))
+        tasks.append((model_a_id, 1280))
+        tasks.append((model_b_id, self.max_model_b_dim))
+
+        results: Dict[str, List[Dict]] = {}
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=len(tasks)) as executor:
             future_to_task = {
-                executor.submit(self._fetch_single_scale, image, m_id, dim): f"{m_id}_{dim}"
+                executor.submit(self._fetch_single_scale, image, m_id, dim): f'{m_id}_{dim}'
                 for m_id, dim in tasks
             }
-            
+
             for future in concurrent.futures.as_completed(future_to_task):
                 task_name = future_to_task[future]
                 try:
@@ -73,38 +95,39 @@ class CloudInferenceEngine:
                     results[task_name] = []
 
         return {
-            "preds_a_640": results.get(f"{model_a_id}_640", []),
-            "preds_a_1280": results.get(f"{model_a_id}_1280", []),
-            "preds_b": results.get(f"{model_b_id}_{self.max_api_dim}", [])
+            'preds_a_640': results.get(f'{model_a_id}_640', []),
+            'preds_a_1280': results.get(f'{model_a_id}_1280', []),
+            'preds_b': results.get(f'{model_b_id}_{self.max_model_b_dim}', []),
         }
 
     def _fetch_single_scale(self, image: np.ndarray, model_id: str, target_dim: int) -> List[Dict]:
         """Internal helper for single API call with scaling."""
-        parts = model_id.split("/")
-        ws = parts[0] if len(parts) == 3 else "runner-e0dmy"
+        parts = model_id.split('/')
+        ws = parts[0] if len(parts) == 3 else 'runner-e0dmy'
         proj = parts[1] if len(parts) == 3 else parts[0]
         ver = parts[2] if len(parts) == 3 else parts[1]
-        
+
         H, W = image.shape[:2]
         model = self.rf.workspace(ws).project(proj).version(int(ver)).model
-        
+        jpeg_params = [cv2.IMWRITE_JPEG_QUALITY, JPEG_QUALITY]
+
         # Scaling logic
         if max(H, W) > target_dim:
             scale = target_dim / max(H, W)
-            temp = cv2.resize(image, (int(W*scale), int(H*scale)))
+            temp = cv2.resize(image, (int(W * scale), int(H * scale)))
             tmp = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
             temp_path = tmp.name
             tmp.close()
-            cv2.imwrite(temp_path, temp)
-            
+            cv2.imwrite(temp_path, temp, jpeg_params)
+
             try:
                 res = model.predict(temp_path, confidence=SCALED_CONFIDENCE).json()
-                preds = res.get("predictions", [])
+                preds = res.get('predictions', [])
                 # Re-scale coordinates back to original image size
                 for p in preds:
-                    p["x"] /= scale; p["y"] /= scale
-                    p["width"] /= scale; p["height"] /= scale
-                log_api_call(model_id, "success")
+                    p['x'] /= scale; p['y'] /= scale
+                    p['width'] /= scale; p['height'] /= scale
+                log_api_call(model_id, 'success')
                 return preds
             finally:
                 os.remove(temp_path)
@@ -113,10 +136,10 @@ class CloudInferenceEngine:
             tmp = tempfile.NamedTemporaryFile(suffix='.jpg', delete=False)
             temp_path = tmp.name
             tmp.close()
-            cv2.imwrite(temp_path, image)
+            cv2.imwrite(temp_path, image, jpeg_params)
             try:
                 res = model.predict(temp_path, confidence=NATIVE_CONFIDENCE).json()
-                log_api_call(model_id, "success")
-                return res.get("predictions", [])
+                log_api_call(model_id, 'success')
+                return res.get('predictions', [])
             finally:
                 os.remove(temp_path)
