@@ -123,7 +123,7 @@ class LesionMapper:
 
         total_lesions = 0
         for name, items in assignments.items():
-            if name == "unassigned": continue
+            if name == "unassigned" or name.startswith("_"): continue
             
             count = len(items)
             total_lesions += count

@@ -200,10 +200,13 @@ def draw_lesion_boxes(
 
     if lesions:
         for region_name, detections in lesions.items():
-            if region_name == 'unassigned':
+            if region_name == 'unassigned' or region_name.startswith('_'):
                 color = (255, 255, 255)
             else:
                 color = REGION_COLORS.get(region_name, (0, 242, 255))
+
+            if not isinstance(detections, list):
+                continue
 
             for det in detections:
                 x1, y1, x2, y2 = det['bbox']
