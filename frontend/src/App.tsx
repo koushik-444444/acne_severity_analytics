@@ -7,6 +7,7 @@ import { Footer } from './components/marketing/Footer'
 import { Hero } from './components/marketing/Hero'
 import { Navbar } from './components/marketing/Navbar'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { ToastProvider } from './components/workspace/ToastContainer'
 
 const ClinicalWorkspace = lazy(() =>
   import('./components/workspace/ClinicalWorkspace').then(m => ({ default: m.ClinicalWorkspace }))
@@ -26,22 +27,24 @@ function WorkspaceLoadingFallback() {
 export default function App() {
   return (
     <LazyMotion features={domAnimation}>
-      <div className="bg-[#010101] text-white selection:bg-cyan-400 selection:text-black">
-        <header>
-          <Navbar />
-        </header>
-        <main>
-          <Hero />
-          <section id="features"><Features /></section>
-          <section id="analytics"><AnalyticsDashboard /></section>
-          <ErrorBoundary>
-            <Suspense fallback={<WorkspaceLoadingFallback />}>
-              <section id="workspace"><ClinicalWorkspace /></section>
-            </Suspense>
-          </ErrorBoundary>
-        </main>
-        <Footer />
-      </div>
+      <ToastProvider>
+        <div className="bg-[#010101] text-white selection:bg-cyan-400 selection:text-black">
+          <header>
+            <Navbar />
+          </header>
+          <main>
+            <Hero />
+            <section id="features"><Features /></section>
+            <section id="analytics"><AnalyticsDashboard /></section>
+            <ErrorBoundary>
+              <Suspense fallback={<WorkspaceLoadingFallback />}>
+                <section id="workspace"><ClinicalWorkspace /></section>
+              </Suspense>
+            </ErrorBoundary>
+          </main>
+          <Footer />
+        </div>
+      </ToastProvider>
     </LazyMotion>
   )
 }
