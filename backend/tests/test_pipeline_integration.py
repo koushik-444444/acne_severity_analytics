@@ -50,7 +50,10 @@ def client(tmp_path, monkeypatch):
         'file_sizes': {'original': 1000}
     }
 
-    # Patch the functions that retrieve the resources
+    # Check what the current get_pipeline looks like
+    print(f"DEBUG: Original get_pipeline: {id(__import__('api_bridge', fromlist=['get_pipeline']).get_pipeline)}")
+    
+    # Patch the functions that retrieve the resources - IMPORTANT: patch at the point of use
     monkeypatch.setattr('api_bridge.get_pipeline', lambda: mock_pipeline)
     monkeypatch.setattr('api_bridge.get_cloud_engine', lambda: mock_cloud)
     monkeypatch.setattr('api_bridge.get_store', lambda: store)
@@ -59,12 +62,18 @@ def client(tmp_path, monkeypatch):
     app.state.resources = {
         'pipeline': mock_pipeline,
         'cloud_engine': mock_cloud,
-        'store': store
+        'store': store,
+        'startup_cleanup': {'purged_sessions': 0, 'purged_files': 0}
     }
+
+    # Check if patching worked
+    import api_bridge
+    print(f"DEBUG: After patch get_pipeline: {id(api_bridge.get_pipeline)}")
+    print(f"DEBUG: app.state.resources['pipeline']: {app.state.resources.get('pipeline')}")
     
     # Mock visualizers and runtime imports to avoid heavy deps
     monkeypatch.setattr('api_bridge.ensure_runtime_imports', lambda: None)
-    monkeypatch.setattr('api_bridge.draw_lesion_boxes', MagicMock(side_effect=lambda img, **kwargs: img))
+    monkeypatch.setattr('api_bridge.draw_lesion_boxes', lambda img, **kwargs: img)
     
     mock_mapper_inst = MagicMock()
     mock_mapper_inst.ensemble_map_multi_scale.return_value = {
@@ -78,7 +87,7 @@ def client(tmp_path, monkeypatch):
         'symmetry_delta': 0.1,
         'regions': {}
     }
-    monkeypatch.setattr('api_bridge.EnsembleLesionMapper', MagicMock(return_value=mock_mapper_inst))
+    monkeypatch.setattr('api_bridge.EnsembleLesionMapper', lambda masks: mock_mapper_inst)
 
     from api_bridge import limiter
     limiter.reset()
